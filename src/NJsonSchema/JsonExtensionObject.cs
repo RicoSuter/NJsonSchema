@@ -2,12 +2,10 @@
 // <copyright file="JsonExtensionObject.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,7 +34,7 @@ namespace NJsonSchema
             {
                 var obj = (IJsonExtensionObject)Activator.CreateInstance(objectType)!;
                 serializer.Populate(reader, obj);
-                DeserializeExtensionDataSchemas(obj, serializer);
+                ExtensionDataDeserializationConverter.DeserializeExtensionDataSchemas(obj, serializer);
                 return obj;
             }
             else
@@ -59,7 +57,7 @@ namespace NJsonSchema
         /// <summary>Transforms the extension data so that contained schemas are correctly deserialized.</summary>
         /// <param name="extensionObject">The extension object.</param>
         /// <param name="serializer">The serializer.</param>
-        internal void DeserializeExtensionDataSchemas(IJsonExtensionObject extensionObject, JsonSerializer serializer)
+        internal static void DeserializeExtensionDataSchemas(IJsonExtensionObject extensionObject, JsonSerializer serializer)
         {
             if (extensionObject.ExtensionData != null)
             {
@@ -70,11 +68,24 @@ namespace NJsonSchema
             }
         }
 
-        private object? TryDeserializeValueSchemas(object? value, JsonSerializer serializer)
+        private static object? TryDeserializeValueSchemas(object? value, JsonSerializer serializer)
         {
             if (value is JObject obj)
             {
                 var isSchema = obj.Property("type") != null || obj.Property("properties") != null;
+
+                // special case "required" boolean property as it's contained in parameters for example and will always
+                // cause serialization exception when boolean value is tried to be injected to JsonSchema.Required which
+                // is a list of strings
+                if (isSchema)
+                {
+                    var requiredProperty = obj.Property("required");
+                    if (requiredProperty is { Value.Type: JTokenType.Boolean })
+                    {
+                        isSchema = false;
+                    }
+                }
+
                 if (isSchema)
                 {
                     try
@@ -87,7 +98,7 @@ namespace NJsonSchema
                     }
                 }
 
-                var dictionary = new Dictionary<string, object?>();
+                var dictionary = new Dictionary<string, object?>(obj.Count);
                 foreach (var property in obj.Properties())
                 {
                     dictionary[property.Name] = TryDeserializeValueSchemas(property.Value, serializer);

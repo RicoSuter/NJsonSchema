@@ -7,10 +7,12 @@ namespace NJsonSchema.Benchmark
         public static void Main(string[] args)
         {
             // RunCsharpBenchmark();
-            BenchmarkDotNet.Running.BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).RunAllJoined();
+            BenchmarkDotNet.Running.BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run();
         }
 
+#pragma warning disable IDE0051
         private static void RunCsharpBenchmark()
+#pragma warning restore IDE0051
         {
             var benchmark = new CsharpGeneratorBenchmark();
             benchmark.Setup().GetAwaiter().GetResult();

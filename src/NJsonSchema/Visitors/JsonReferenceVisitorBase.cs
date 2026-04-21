@@ -2,13 +2,11 @@
 // <copyright file="JsonReferenceVisitorBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Namotion.Reflection;
@@ -245,19 +243,25 @@ namespace NJsonSchema.Visitors
 
         private static void ReplaceOrDelete<T>(ObservableCollection<T> collection, int index, T obj)
         {
-            collection.RemoveAt(index);
-            if (obj != null)
+            if (obj is not null)
             {
-                collection.Insert(index, obj);
+                collection[index] = obj;
+            }
+            else
+            {
+                collection.RemoveAt(index);
             }
         }
 
         private static void ReplaceOrDelete(IList collection, int index, object obj)
         {
-            collection.RemoveAt(index);
-            if (obj != null)
+            if (obj is not null)
             {
-                collection.Insert(index, obj);
+                collection[index] = obj;
+            }
+            else
+            {
+                collection.RemoveAt(index);
             }
         }
     }

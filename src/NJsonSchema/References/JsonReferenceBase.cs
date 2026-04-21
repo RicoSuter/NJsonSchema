@@ -2,11 +2,10 @@
 // <copyright file="JsonReferenceBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Infrastructure;
 using Newtonsoft.Json;
 
 namespace NJsonSchema.References

@@ -1,0 +1,14 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "discriminator": {
+    "propertyName": "discr",
+    "mapping": {
+      "Bar": "#/definitions/Foo"
+    }
+  },
+  "definitions": {
+    "Foo": {
+      "type": "object"
+    }
+  }
+}

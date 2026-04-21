@@ -1,5 +1,4 @@
 ﻿using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -18,13 +17,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void When_ShouldSerialize_method_exists_then_schema_is_generated()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Test>();
 
-            //// Act
+            // Act
 
 
-            //// Assert
+            // Assert
             Assert.NotNull(schema);
         }
     }

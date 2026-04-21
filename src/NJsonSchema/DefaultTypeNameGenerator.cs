@@ -2,12 +2,10 @@
 // <copyright file="DefaultTypeNameGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -17,10 +15,16 @@ namespace NJsonSchema
     /// <summary>Converts the last part of the full type name to upper case.</summary>
     public class DefaultTypeNameGenerator : ITypeNameGenerator
     {
-        private static readonly char[] TypeNameHintCleanupChars = { '[', ']', '<', '>', ',', ' ' };
+        private static readonly char[] _typeNameHintCleanupChars = ['[', ']', '<', '>', ',', ' '];
 
-        private readonly Dictionary<string, string> _typeNameMappings = new();
-        private string[] _reservedTypeNames = { "object" };
+#if NET8_0_OR_GREATER
+        private static readonly System.Buffers.SearchValues<char> TypeNameHintCleanupChars = System.Buffers.SearchValues.Create(_typeNameHintCleanupChars);
+#else
+        private static readonly char[] TypeNameHintCleanupChars = _typeNameHintCleanupChars;
+#endif
+
+        private readonly Dictionary<string, string> _typeNameMappings = [];
+        private string[] _reservedTypeNames = ["object"];
 
         // TODO: Expose as options to UI and cmd line?
 
@@ -39,13 +43,14 @@ namespace NJsonSchema
         {
             if (string.IsNullOrEmpty(typeNameHint) && !string.IsNullOrEmpty(schema.DocumentPath))
             {
-                typeNameHint = schema.DocumentPath!.Replace("\\", "/").Split('/').Last();
+                var parts = schema.DocumentPath!.Replace("\\", "/").Split('/');
+                typeNameHint = parts[^1];
             }
 
             typeNameHint ??= "";
 
             // check with one pass before doing iterations
-            var requiresCleanup = !string.IsNullOrEmpty(typeNameHint) && typeNameHint.IndexOfAny(TypeNameHintCleanupChars) != -1;
+            var requiresCleanup = typeNameHint.AsSpan().IndexOfAny(TypeNameHintCleanupChars) != -1;
 
             if (requiresCleanup)
             {
@@ -62,12 +67,14 @@ namespace NJsonSchema
             }
 
             var typeName = Generate(schema, typeNameHint);
+            typeName = RemoveIllegalCharacters(typeName);
+
             if (string.IsNullOrEmpty(typeName) || reservedTypeNames.Contains(typeName))
             {
                 typeName = GenerateAnonymousTypeName(typeNameHint, reservedTypeNames);
             }
 
-            return RemoveIllegalCharacters(typeName);
+            return typeName;
         }
 
         /// <summary>Generates the type name for the given schema.</summary>
@@ -96,6 +103,7 @@ namespace NJsonSchema
                 }
 
                 typeNameHint = GetLastSegment(typeNameHint)!;
+                typeNameHint = ConversionUtilities.ConvertToUpperCamelCase(typeNameHint, true);
 
                 if (typeNameHint != null &&
                     !reservedTypeNames.Contains(typeNameHint) && 
@@ -105,12 +113,14 @@ namespace NJsonSchema
                 }
 
                 var count = 1;
+                string typeName;
                 do
                 {
                     count++;
-                } while (reservedTypeNames.Contains(typeNameHint + count));
+                    typeName = typeNameHint + count;
+                } while (reservedTypeNames.Contains(typeName));
 
-                return typeNameHint + count;
+                return typeName;
             }
 
             return GenerateAnonymousTypeName("Anonymous", reservedTypeNames);

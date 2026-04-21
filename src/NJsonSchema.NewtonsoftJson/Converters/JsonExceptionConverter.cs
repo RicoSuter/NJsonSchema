@@ -2,12 +2,10 @@
 // <copyright file="JsonExceptionConverter.cs" company="NSwag">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -48,8 +46,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            var exception = value as Exception;
-            if (exception != null)
+            if (value is Exception exception)
             {
                 var resolver = serializer.ContractResolver as DefaultContractResolver ?? _defaultContractResolver;
 
@@ -65,16 +62,13 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                     }
                 };
 
-                if (value is not null)
+                foreach (var property in GetExceptionProperties(exception.GetType()))
                 {
-                    foreach (var property in GetExceptionProperties(value.GetType()))
+                    var propertyValue = property.Key.GetValue(exception);
+                    if (propertyValue != null)
                     {
-                        var propertyValue = property.Key.GetValue(exception);
-                        if (propertyValue != null)
-                        {
-                            jObject.AddFirst(new JProperty(resolver.GetResolvedPropertyName(property.Value),
-                                JToken.FromObject(propertyValue, serializer)));
-                        }
+                        jObject.AddFirst(new JProperty(resolver.GetResolvedPropertyName(property.Value),
+                            JToken.FromObject(propertyValue, serializer)));
                     }
                 }
 
@@ -89,7 +83,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         /// <returns><c>true</c> if this instance can convert the specified object type; otherwise, <c>false</c>.</returns>
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Exception).GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo());
+            return typeof(Exception).IsAssignableFrom(objectType);
         }
 
         /// <summary>Reads the JSON representation of the object.</summary>
@@ -106,14 +100,13 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 return null;
             }
 
-            var newSerializer = new JsonSerializer();
-            newSerializer.ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType());
+            var newSerializer = new JsonSerializer
+            {
+                ContractResolver = (IContractResolver)Activator.CreateInstance(serializer.ContractResolver.GetType())!
+            };
 
             var field = GetField(typeof(DefaultContractResolver), "_sharedCache");
-            if (field != null)
-            {
-                field.SetValue(newSerializer.ContractResolver, false);
-            }
+            field?.SetValue(newSerializer.ContractResolver, false);
 
             dynamic resolver = newSerializer.ContractResolver;
             if (newSerializer.ContractResolver.GetType().GetRuntimeProperty("IgnoreSerializableAttribute") != null)
@@ -126,11 +119,10 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 resolver.IgnoreSerializableInterface = true;
             }
 
-            JToken? token;
-            if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out token))
+            if (jObject.TryGetValue("discriminator", StringComparison.OrdinalIgnoreCase, out JToken? token))
             {
                 var discriminator = token.Value<string>();
-                if (objectType.Name.Equals(discriminator) == false)
+                if (!objectType.Name.Equals(discriminator, StringComparison.Ordinal))
                 {
                     var exceptionType = Type.GetType("System." + discriminator, false);
                     if (exceptionType != null)
@@ -165,7 +157,9 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                     }
                     else
                     {
-                        var fieldNameSuffix = property.Value.Substring(0, 1).ToLowerInvariant() + property.Value.Substring(1);
+                        var fieldNameSuffix = char.IsLower(property.Value[0])
+                            ? property.Value
+                            : char.ToLowerInvariant(property.Value[0]) + property.Value.Substring(1);
 
                         field = GetField(objectType, "m_" + fieldNameSuffix);
                         if (field != null)
@@ -175,10 +169,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                         else
                         {
                             field = GetField(objectType, "_" + fieldNameSuffix);
-                            if (field != null)
-                            {
-                                field.SetValue(value, propertyValue);
-                            }
+                            field?.SetValue(value, propertyValue);
                         }
                     }
                 }
@@ -192,10 +183,10 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             return value;
         }
 
-        private FieldInfo? GetField(Type type, string fieldName)
+        private static FieldInfo? GetField(Type type, string fieldName)
         {
-            var typeInfo = type.GetTypeInfo();
-            var field = typeInfo.GetDeclaredField(fieldName);
+            var typeInfo = type;
+            var field = typeInfo.GetTypeInfo().GetDeclaredField(fieldName);
             if (field == null && typeInfo.BaseType != null)
             {
                 return GetField(typeInfo.BaseType, fieldName);
@@ -204,7 +195,11 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             return field;
         }
 
-        private IDictionary<PropertyInfo, string> GetExceptionProperties(Type exceptionType)
+
+        private static readonly HashSet<string> ignoredExceptionProperties =
+            ["Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult"];
+
+        private static Dictionary<PropertyInfo, string> GetExceptionProperties(Type exceptionType)
         {
             var result = new Dictionary<PropertyInfo, string>();
             foreach (var property in exceptionType.GetRuntimeProperties().Where(p => p.GetMethod?.IsPublic == true))
@@ -212,8 +207,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 var attribute = property.GetCustomAttribute<JsonPropertyAttribute>();
                 var propertyName = attribute != null ? attribute.PropertyName : property.Name;
 
-                if (propertyName is not null &&
-                    !new[] { "Message", "StackTrace", "Source", "InnerException", "Data", "TargetSite", "HelpLink", "HResult" }.Contains(propertyName))
+                if (propertyName is not null && !ignoredExceptionProperties.Contains(propertyName))
                 {
                     result[property] = propertyName;
                 }
@@ -221,14 +215,14 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             return result;
         }
 
-        private void SetExceptionFieldValue(JObject jObject, string propertyName, object value, string fieldName, IContractResolver resolver, JsonSerializer serializer)
+        private static void SetExceptionFieldValue(JObject jObject, string propertyName, object value, string fieldName, IContractResolver resolver, JsonSerializer serializer)
         {
             var field = typeof(Exception).GetTypeInfo().GetDeclaredField(fieldName);
-            var jsonPropertyName = resolver is DefaultContractResolver ? ((DefaultContractResolver)resolver).GetResolvedPropertyName(propertyName) : propertyName;
+            var jsonPropertyName = resolver is DefaultContractResolver contractResolver ? contractResolver.GetResolvedPropertyName(propertyName) : propertyName;
             var property = jObject.Properties().FirstOrDefault(p => string.Equals(p.Name, jsonPropertyName, StringComparison.OrdinalIgnoreCase));
             if (property != null)
             {
-                var fieldValue = property.Value.ToObject(field.FieldType, serializer);
+                var fieldValue = property.Value.ToObject(field!.FieldType, serializer);
                 field.SetValue(value, fieldValue);
             }
         }

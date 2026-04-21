@@ -1,21 +1,13 @@
 ﻿using Newtonsoft.Json;
-using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
-using VerifyXunit;
-using Xunit;
-
-using static NJsonSchema.CodeGeneration.TypeScript.Tests.VerifyHelper;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
-    [UsesVerify]
     public class ClassGenerationTests
     {
         public class MyClassTest
@@ -53,45 +45,35 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Theory]
-        [InlineData(TypeScriptTypeStyle.Class, 1.8)]
-        [InlineData(TypeScriptTypeStyle.Class, 2.1)]
-        [InlineData(TypeScriptTypeStyle.Class, 2.7)]
-        [InlineData(TypeScriptTypeStyle.Class, 4.3)]
-        [InlineData(TypeScriptTypeStyle.KnockoutClass, 1.8)]
-        [InlineData(TypeScriptTypeStyle.KnockoutClass, 2.1)]
-        [InlineData(TypeScriptTypeStyle.KnockoutClass, 2.7)]
-        [InlineData(TypeScriptTypeStyle.KnockoutClass, 4.3)]
-        [InlineData(TypeScriptTypeStyle.Interface, 1.8)]
-        [InlineData(TypeScriptTypeStyle.Interface, 2.1)]
-        [InlineData(TypeScriptTypeStyle.Interface, 2.7)]
-        [InlineData(TypeScriptTypeStyle.Interface, 4.3)]
-        public async Task Verify_output(TypeScriptTypeStyle style, decimal version)
+        [InlineData(TypeScriptTypeStyle.Class)]
+        [InlineData(TypeScriptTypeStyle.KnockoutClass)]
+        [InlineData(TypeScriptTypeStyle.Interface)]
+        public async Task Verify_output(TypeScriptTypeStyle style)
         {
             var settings = new TypeScriptGeneratorSettings
             {
-                TypeStyle = style,
-                TypeScriptVersion = version
+                TypeStyle = style
             };
             var output = await PrepareAsync(settings);
 
-            await Verify(output).UseParameters(style, version);
+            await VerifyHelper.Verify(output).UseParameters(style);
         }
 
-        private static async Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
+        private static Task<string> PrepareAsync(TypeScriptGeneratorSettings settings)
         {
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyClassTest>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, settings);
             var code = generator.GenerateFile("MyClass");
-            return code;
+            return Task.FromResult(code);
         }
 
         [Fact]
-        public void When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
+        public async Task When_array_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema
             {
                 Properties =
@@ -119,25 +101,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             };
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2,
-                TypeScriptVersion = 1.8m
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("a: string[];", code);
-            Assert.Contains("this.a = [];", code);
-            Assert.Contains("b: string[];", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
+        public async Task When_dictionary_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema
             {
                 Properties =
@@ -165,25 +145,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             };
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2,
-                TypeScriptVersion = 1.8m
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("a: { [key: string]: string; };", code);
-            Assert.Contains("this.a = {};", code);
-            Assert.Contains("b: { [key: string]: string; };", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
-        public void When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
+        public async Task When_object_property_is_required_or_not_then_the_code_has_correct_initializer()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema
             {
                 Properties =
@@ -219,22 +197,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             };
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.Class,
-                SchemaType = SchemaType.Swagger2,
-                TypeScriptVersion = 1.8m
+                SchemaType = SchemaType.Swagger2
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("a: A;", code);
-            Assert.Contains("this.a = new A();", code);
-            Assert.Contains("this.a = _data[\"A\"] ? A.fromJS(_data[\"A\"]) : new A();", code);
-
-            Assert.Contains("b: B;", code);
-            Assert.Contains("this.b = _data[\"B\"] ? B.fromJS(_data[\"B\"]) : <any>undefined;", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -242,10 +215,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class, ExportTypes = false });
 
-            //// Assert
-            Assert.DoesNotContain("export class Student extends Person implements IStudent {", code);
-            Assert.DoesNotContain("export interface IStudent extends IPerson {", code);
-            Assert.DoesNotContain("export interface IPerson {", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -253,8 +225,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         {
             var code = await PrepareAsync(new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.KnockoutClass, ExportTypes = false });
 
-            //// Assert
-            Assert.DoesNotContain("export class Student extends Person {", code);
+            // Assert
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]
@@ -266,9 +238,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 GenerateConstructorInterface = false
             });
 
-            //// Assert
-            Assert.DoesNotContain("interface IStudent extends IPerson {", code);
-            Assert.DoesNotContain("interface IPerson {", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -277,12 +249,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = await PrepareAsync(new TypeScriptGeneratorSettings
             {
                 TypeStyle = TypeScriptTypeStyle.KnockoutClass,
-                GenerateConstructorInterface = false,
-                TypeScriptVersion = 2.0m
+                GenerateConstructorInterface = false
             });
 
-            //// Assert
-            Assert.DoesNotContain("let firstName_ = data[\"FirstName\"];", code);
+            // Assert
+            await VerifyHelper.Verify(code);
         }
 
         [Fact]
@@ -305,7 +276,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var output = generator.GenerateFile();
 
             // Assert
-            Assert.DoesNotContain("if (!data) {", output);
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [JsonConverter(typeof(JsonInheritanceConverter))]

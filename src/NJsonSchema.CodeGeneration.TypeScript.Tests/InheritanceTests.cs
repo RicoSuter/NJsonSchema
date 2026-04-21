@@ -1,15 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
-using Xunit;
+using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -32,50 +27,29 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [InlineData(true, true)]
         [InlineData(false, false)]
         [InlineData(true, false)]
-        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inlineNamedDictionaries, bool convertConstructorInterfaceData)
+        public async Task When_empty_class_inherits_from_dictionary_then_allOf_inheritance_still_works(bool inline, bool convert)
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyContainer>();
             var data = schema.ToJson();
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeScriptVersion = 2.0m,
-                InlineNamedDictionaries = inlineNamedDictionaries,
-                ConvertConstructorInterfaceData = convertConstructorInterfaceData
+                InlineNamedDictionaries = inline,
+                ConvertConstructorInterfaceData = convert
             });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("ContainerClass");
 
-            //// Assert
+            // Assert
             var dschema = schema.Definitions["EmptyClassInheritingDictionary"];
 
             Assert.Empty(dschema.AllOf);
             Assert.True(dschema.IsDictionary);
 
-            if (inlineNamedDictionaries)
-            {
-                Assert.Contains("customDictionary: { [key: string]: any; } | undefined;", code);
-                Assert.DoesNotContain("EmptyClassInheritingDictionary", code);
-            }
-            else
-            {
-                Assert.Contains("Foobar.", data);
-                Assert.Contains("Foobar.", code);
-
-                Assert.Contains("customDictionary: EmptyClassInheritingDictionary", code);
-                Assert.Contains("[key: string]: any;", code);
-
-                if (convertConstructorInterfaceData)
-                {
-                    Assert.Contains("this.customDictionary = data.customDictionary && !(<any>data.customDictionary).toJSON ? new EmptyClassInheritingDictionary(data.customDictionary) : <EmptyClassInheritingDictionary>this.customDictionary;", code);
-                }
-                else
-                {
-                    Assert.DoesNotContain("new EmptyClassInheritingDictionary(data.customDictionary)", code);
-                }
-            }
+            await VerifyHelper.Verify(code).UseParameters(inline, convert);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [KnownType(typeof(MyException))]
@@ -98,55 +72,49 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             public ExceptionBase Exception { get; set; }
         }
 
+#if !NETFRAMEWORK
         [Fact]
         public async Task When_class_with_discriminator_has_base_class_then_csharp_is_generated_correctly()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
             var data = schema.ToJson();
 
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.Contains("Foobar.", data);
-            Assert.Contains("Foobar.", code);
-
-            Assert.Contains("class ExceptionBase extends Exception", code);
-            Assert.Contains("class MyException extends ExceptionBase", code);
-
-            Assert.Contains("this._discriminator = \"MyException\";", code);
-            Assert.Contains("if (data[\"kind\"] === \"MyException\") {", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_interfaces_are_generated_with_inheritance_then_type_check_methods_are_generated()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
             var data = schema.ToJson();
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeScriptVersion = 2.0m,
                 TypeStyle = TypeScriptTypeStyle.Interface,
                 GenerateTypeCheckFunctions = true
             });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.Contains("export function isExceptionBase(object: any): object is ExceptionBase {", code);
-            Assert.Contains("function isMyException(object: any): object is MyException {", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_discriminator_does_not_match_typename_then_TypeScript_is_correct()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ExceptionContainer>();
 
             schema.Definitions["ExceptionBase"].AllOf.Last().DiscriminatorObject.Mapping["FooBar"] =
@@ -154,18 +122,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             schema.Definitions["ExceptionBase"].AllOf.Last().DiscriminatorObject.Mapping.Remove("MyException");
 
             var data = schema.ToJson();
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m });
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings());
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.Contains("class ExceptionBase extends Exception", code);
-            Assert.Contains("class MyException extends ExceptionBase", code);
-
-            Assert.Contains("this._discriminator = \"FooBar\";", code);
-            Assert.Contains("if (data[\"kind\"] === \"FooBar\") {", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
+#endif
 
         [Theory]
         [InlineData(SchemaType.JsonSchema)]
@@ -243,17 +209,15 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 }";
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver());
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m, SchemaType = schemaType });
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver(), CancellationToken.None);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { SchemaType = schemaType });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.DoesNotContain("request!: any;", code);
-            Assert.DoesNotContain("request: any;", code);
-            Assert.Contains("this.request = new RequestBodyBase()", code);
-            Assert.Contains("this.request = new RequestBody()", code);
+            // Assert
+            await VerifyHelper.Verify(code).UseParameters(schemaType);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Theory]
@@ -334,21 +298,22 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 ";
 
             var factory = JsonReferenceResolver.CreateJsonReferenceResolverFactory(new DefaultTypeNameGenerator());
-            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver());
-            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeScriptVersion = 2.0m, SchemaType = schemaType });
+            var schema = await JsonSchemaSerialization.FromJsonAsync(json, schemaType, null, factory, new DefaultContractResolver(), CancellationToken.None);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { SchemaType = schemaType });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.DoesNotContain("SkillLevel2", code);
+            // Assert
+            await VerifyHelper.Verify(code).UseParameters(schemaType);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
 
         [Fact]
-        public async Task When_class_has_baseclass_and_extension_code_baseclass_is_preserved()
+        public void When_class_has_baseclass_and_extension_code_baseclass_is_preserved()
         {
-            //// Arrange
+            // Arrange
             string extensionCode = @"
 import * as generated from ""./generated"";
 
@@ -361,13 +326,13 @@ export class ExceptionBase extends generated.ExceptionBase {
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings 
             {
                 ExtensionCode = extensionCode,
-                ExtendedClasses = new[] { "ExceptionBase" },
+                ExtendedClasses = ["ExceptionBase"],
             });
 
-            //// Act
+            // Act
             var output = generator.GenerateTypes(schema, null);
 
-            //// Assert
+            // Assert
             var outputArray = output.ToArray();
             Assert.Equal(4, outputArray.Length);
 

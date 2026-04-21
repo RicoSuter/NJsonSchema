@@ -2,11 +2,10 @@
 // <copyright file="JsonInheritanceConverter.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -147,7 +146,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                         return true;
                     }
 
-                    type = type.GetTypeInfo().BaseType;
+                    type = type.BaseType;
                 }
 
                 return false;
@@ -173,8 +172,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
             var discriminator = jObject.GetValue(_discriminator, StringComparison.OrdinalIgnoreCase)?.Value<string>();
             var subtype = GetDiscriminatorType(jObject, objectType, discriminator);
 
-            var objectContract = serializer.ContractResolver.ResolveContract(subtype) as JsonObjectContract;
-            if (objectContract == null || objectContract.Properties.All(p => p.PropertyName != _discriminator))
+            if (serializer.ContractResolver.ResolveContract(subtype) is not JsonObjectContract objectContract || objectContract.Properties.All(p => p.PropertyName != _discriminator))
             {
                 jObject.Remove(_discriminator);
             }
@@ -231,7 +229,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 }
 
                 var typeName = objectType.Namespace + "." + discriminatorValue;
-                var subtype = objectType.GetTypeInfo().Assembly.GetType(typeName);
+                var subtype = objectType.Assembly.GetType(typeName);
                 if (subtype != null)
                 {
                     return subtype;
@@ -243,32 +241,35 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                 var typeInfo = jObject.GetValue("$type");
                 if (typeInfo != null)
                 {
-                    return Type.GetType(typeInfo.Value<string>());
+                    return Type.GetType(typeInfo.Value<string>()!)!;
                 }
             }
 
             throw new InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminatorValue + "'.");
         }
 
-        private Type? GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
+        private static Type? GetSubtypeFromKnownTypeAttributes(Type objectType, string discriminator)
         {
             var type = objectType;
             do
             {
-                var knownTypeAttributes = type.GetTypeInfo().GetCustomAttributes(false)
-                    .Where(a => a.GetType().Name == "KnownTypeAttribute");
-                foreach (dynamic attribute in knownTypeAttributes)
+                foreach (dynamic attribute in type.GetCustomAttributes(inherit: false))
                 {
+                    if (attribute.GetType().Name != "KnownTypeAttribute")
+                    {
+                        continue;
+                    }
+
                     if (attribute.Type != null && attribute.Type.Name == discriminator)
                     {
                         return attribute.Type;
                     }
                     else if (attribute.MethodName != null)
                     {
-                        var method = type.GetRuntimeMethod((string)attribute.MethodName, new Type[0]);
+                        var method = type.GetRuntimeMethod((string)attribute.MethodName, Type.EmptyTypes);
                         if (method != null)
                         {
-                            var types = (System.Collections.Generic.IEnumerable<Type>)method.Invoke(null, new object[0]);
+                            var types = (IEnumerable<Type>) method.Invoke(null, [])!;
                             foreach (var knownType in types)
                             {
                                 if (knownType.Name == discriminator)
@@ -280,7 +281,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
                         }
                     }
                 }
-                type = type.GetTypeInfo().BaseType;
+                type = type.BaseType;
             } while (type != null);
 
             return null;
@@ -288,22 +289,28 @@ namespace NJsonSchema.NewtonsoftJson.Converters
 
         private static Type? GetObjectSubtype(Type baseType, string discriminatorName)
         {
-            var jsonInheritanceAttributes = baseType
-                .GetTypeInfo()
-                .GetCustomAttributes(true)
-                .OfType<JsonInheritanceAttribute>();
+            foreach (var a in baseType.GetCustomAttributes<JsonInheritanceAttribute>(inherit: true))
+            {
+                if (a.Key == discriminatorName)
+                {
+                    return a.Type;
+                }
+            }
 
-            return jsonInheritanceAttributes.SingleOrDefault(a => a.Key == discriminatorName)?.Type;
+            return null;
         }
 
         private static string? GetSubtypeDiscriminator(Type objectType)
         {
-            var jsonInheritanceAttributes = objectType
-                .GetTypeInfo()
-                .GetCustomAttributes(true)
-                .OfType<JsonInheritanceAttribute>();
+            foreach (var a in objectType.GetCustomAttributes<JsonInheritanceAttribute>(inherit: true))
+            {
+                if (a.Type == objectType)
+                {
+                    return a.Key;
+                }
+            }
 
-            return jsonInheritanceAttributes.SingleOrDefault(a => a.Type == objectType)?.Key;
+            return null;
         }
     }
 }

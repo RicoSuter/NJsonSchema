@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.CodeGeneration.CSharp;
-using NJsonSchema.Generation;
+using NJsonSchema.CodeGeneration.CSharp.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests.CSharp
 {
@@ -14,7 +11,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_enum_has_no_type_then_enum_is_generated()
         {
-            //// Arrange
+            // Arrange
             var json =
                 @"{
                 ""type"": ""object"", 
@@ -30,17 +27,18 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema);
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("public enum MyClassCategory", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_enum_has_no_type_then_enum_is_generated_with_flags()
         {
-            //// Arrange
+            // Arrange
             var json =
                 @"{
                 ""type"": ""object"", 
@@ -60,22 +58,18 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { EnforceFlagEnums = true });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("[System.Flags]", code);
-            Assert.Contains("Commercial = 1,", code);
-            Assert.Contains("Residential = 2,", code);
-            Assert.Contains("Government = 4,", code);
-            Assert.Contains("Military = 8,", code);
-            Assert.Contains("Foreigngovernment = 16,", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_enum_name_contains_colon_then_it_is_removed_and_next_word_converted_to_upper_case()
         {
-            //// Arrange
+            // Arrange
             var json = @"
             {
                 ""type"": ""object"",
@@ -113,11 +107,47 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema);
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("PullrequestUpdated = 0,", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task When_enum_is_string_then_generic_StringEnumConverter_is_used(bool nullable)
+        {
+            // Arrange
+            var json =
+                $$"""
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "size" : {
+                            "type": [ "string"{{(nullable ? ", \"null\"" : "")}} ],
+                            "enum" : [
+                                "small",
+                                "medium",
+                                "large"
+                            ]
+                        }
+                    }
+                }
+                """;
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { JsonLibrary = CSharpJsonLibrary.SystemTextJson });
+
+            // Act
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         public class MyStringEnumListTest
@@ -137,34 +167,56 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_enum_list_uses_string_enums_then_ItemConverterType_is_set()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStringEnumListTest>();
             var data = schema.ToJson();
             var generator =
                 new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.Contains("ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter)", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Fact]
+        public async Task When_enum_list_uses_string_enums_then_ItemConverterType_is_set_for_STJ_target()
+        {
+            // Arrange
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStringEnumListTest>();
+            var data = schema.ToJson();
+            var generator =
+                new CSharpGenerator(schema, new CSharpGeneratorSettings
+                {
+                    ClassStyle = CSharpClassStyle.Poco, 
+                    JsonLibrary = CSharpJsonLibrary.SystemTextJson
+                });
+
+            // Act
+            var code = generator.GenerateFile();
+
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_enum_is_nullable_then_StringEnumConverter_is_set()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyStringEnumListTest>();
             var data = schema.ToJson();
             var generator =
                 new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.Contains("[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]",
-                code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         public enum SomeEnum
@@ -182,24 +234,24 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         [Fact]
         public async Task When_class_has_enum_array_property_then_enum_name_is_preserved()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<SomeClass>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
-            //// Act
+            // Act
             var generator =
                 new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
             var code = generator.GenerateFile();
 
-            //// Assert
-            Assert.Contains("SomeEnum", code);
-            Assert.DoesNotContain("Anonymous", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_type_name_hint_has_generics_then_they_are_converted()
         {
-            /// Arrange
+            // Arrange
             var json = @"
 {
     ""properties"": {
@@ -224,7 +276,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            /// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings();
@@ -232,14 +284,15 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var code = generator.GenerateFile("Foo");
 
-            /// Assert
-            Assert.Contains("public enum FirstMetdodOfMetValueGroupChar", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_enum_property_is_not_required_in_Swagger2_then_it_is_nullable()
         {
-            //// Arrange
+            // Arrange
             var json =
                 @"{
     ""type"": ""object"",
@@ -262,11 +315,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { SchemaType = SchemaType.Swagger2 });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("public MyClassStatus? Status { get; set; }", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -302,7 +356,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 }
             }";
 
-            /// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings();
@@ -310,10 +364,9 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var code = generator.GenerateFile("Foo");
 
-            /// Assert
-            Assert.DoesNotContain("__", code);
-            Assert.Contains("Eq = 0", code);
-
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -339,7 +392,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 }
             }";
 
-            /// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings();
@@ -347,17 +400,15 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var code = generator.GenerateFile("Foo");
 
-            /// Assert
-            Assert.DoesNotContain("__", code);
-            Assert.Contains("MinusFoo = 0", code);
-            Assert.Contains("PlusFoo = 1", code);
-
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_array_item_enum_is_not_referenced_then_type_name_hint_is_property_name()
         {
-            /// Arrange
+            // Arrange
             var json = @"
 {
     ""properties"": {
@@ -391,7 +442,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            /// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings();
@@ -399,15 +450,15 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var code = generator.GenerateFile("Foo");
 
-            /// Assert
-            Assert.DoesNotContain("public enum Anonymous", code);
-            Assert.Contains("public enum Status", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_enum_is_integer_flags_it_should_use_declared_values()
         {
-            //// Arrange
+            // Arrange
             var json = @"
 {
     ""properties"": {
@@ -439,7 +490,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
       }
     }
 }";
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings();
@@ -447,31 +498,16 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var code = generator.GenerateFile("Foo");
 
-            //// Assert
-            Assert.DoesNotContain("public enum Anonymous", code);
-            // Verify previous incorrect logic wasn't used to determine enum values (and doesn't generate duplicate incorrect values):
-            Assert.DoesNotContain("None = 1,", code);
-            Assert.DoesNotContain("FirstBit = 2,", code);
-            Assert.DoesNotContain("SecondBit = 4,", code);
-            Assert.DoesNotContain("ThirdBit = 8,", code);
-            Assert.DoesNotContain("FirstAndSecondBits = 16,", code);
-            Assert.DoesNotContain("All = 16,", code);
-            Assert.DoesNotContain("All = 32,", code);
-            // Verify correct logic:
-            Assert.Contains("public enum FlagsTestEnum", code);
-            Assert.Contains("None = 0,", code);
-            Assert.Contains("FirstBit = 1,", code);
-            Assert.Contains("SecondBit = 2,", code);
-            Assert.Contains("ThirdBit = 4,", code);
-            Assert.Contains("FirstAndSecondBits = 3,", code);
-            Assert.Contains("All = 7,", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
 
         [Fact]
         public async Task When_enum_is_nullable_not_required_it_should_be_nullable_with_converter()
         {
-            //// Arrange
+            // Arrange
             var json = @"
 {
     ""type"": ""object"",
@@ -491,7 +527,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true };
@@ -500,15 +536,14 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var code = generator.GenerateFile("Foo");
 
             //Assert
-            Assert.Contains("StringEnumConverter", code);
-            Assert.Contains("public FooMyProperty?", code);
-            Assert.Contains("Value3 = 4", code);
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_enum_is_nullable_required_it_should_be_nullable_with_converter()
         {
-            //// Arrange
+            // Arrange
             var json = @"
 {
     ""type"": ""object"",
@@ -529,7 +564,7 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
     }
 }";
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
 
             var settings = new CSharpGeneratorSettings { EnforceFlagEnums = true };
@@ -537,16 +572,15 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
 
             var code = generator.GenerateFile("Foo");
 
-            //Assert
-            Assert.Contains("StringEnumConverter", code);
-            Assert.Contains("public FooMyProperty?", code);
-            Assert.Contains("Value3 = 4", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_enum_is_nullable_and_has_default_then_question_mark_is_omitted()
         {
-            //// Arrange
+            // Arrange
             var json =
                 @"{
                 ""type"": ""object"", 
@@ -570,12 +604,12 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                 GenerateOptionalPropertiesAsNullable = true,
             });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("public MyClassCategory? Category { get; set; } = MyNamespace.MyClassCategory.Commercial;",
-                code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -607,11 +641,51 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new CSharpGenerator(schema);
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("public enum ManyValuesTestEnum : long", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Fact]
+        public async Task When_nullable_enum_array_then_IsStringEnumArray_is_true()
+        {
+            // Arrange - schema with a nullable string enum array (items uses oneOf with null + $ref)
+            var json = @"
+{
+    ""type"": ""object"",
+    ""properties"": {
+        ""colors"": {
+            ""type"": ""array"",
+            ""items"": {
+                ""oneOf"": [
+                    { ""type"": ""null"" },
+                    { ""$ref"": ""#/definitions/Color"" }
+                ]
+            }
+        }
+    },
+    ""definitions"": {
+        ""Color"": {
+            ""type"": ""string"",
+            ""enum"": [""Red"", ""Green"", ""Blue""]
+        }
+    }
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert - should have StringEnumConverter for the nullable enum array
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
         }
     }
 }

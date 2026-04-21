@@ -2,59 +2,30 @@
 // <copyright file="XmlDocumentationExtensions.cs" company="NSwag">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/NSwag/NSwag/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Collections.Concurrent;
+using System.Runtime.Serialization;
+
 using Namotion.Reflection;
 using Newtonsoft.Json;
+
 using NJsonSchema.Generation;
-using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Threading;
 
 namespace NJsonSchema.Infrastructure
 {
     /// <summary>Provides extension methods for reading contextual type names and descriptions.</summary>
     public static class TypeExtensions
     {
-        private static ReaderWriterLockSlim _namesLock = new ReaderWriterLockSlim();
-        private static Dictionary<ContextualMemberInfo, string> _names = new Dictionary<ContextualMemberInfo, string>();
+        private static readonly ConcurrentDictionary<ContextualAccessorInfo, string> _names = [];
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
         public static string GetName(this ContextualAccessorInfo accessorInfo)
         {
-            _namesLock.EnterUpgradeableReadLock();
-            try
-            {
-                if (_names.TryGetValue(accessorInfo, out var name))
-                {
-                    return name;
-                }
-
-                _namesLock.EnterWriteLock();
-                try
-                {
-                    if (_names.TryGetValue(accessorInfo, out name))
-                    {
-                        return name;
-                    }
-
-                    name = GetNameWithoutCache(accessorInfo);
-                    _names[accessorInfo] = name;
-                    return name;
-                }
-                finally
-                {
-                    _namesLock.ExitWriteLock();
-                }
-            }
-            finally
-            {
-                _namesLock.ExitUpgradeableReadLock();
-            }
+            return _names.GetOrAdd(accessorInfo, GetNameWithoutCache);
         }
 
         private static string GetNameWithoutCache(ContextualAccessorInfo accessorInfo)

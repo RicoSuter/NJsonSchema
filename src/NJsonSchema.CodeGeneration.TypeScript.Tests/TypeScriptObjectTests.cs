@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -15,20 +13,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_property_is_object_then_jsonProperty_has_no_reference_and_is_any()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ObjectTest>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("Test: any;", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         public class DictionaryObjectTest
@@ -39,20 +37,20 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_dictionary_value_is_object_then_typescript_uses_any()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<DictionaryObjectTest>();
             var data = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("Test: { [key: string]: any; };", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
     }
 }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Reflection;
+﻿using System.Globalization;
 using Fluid;
 using NJsonSchema.CodeGeneration.TypeScript;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.Tests
 {
@@ -14,7 +10,7 @@ namespace NJsonSchema.CodeGeneration.Tests
         {
             public string Foo { get; } = "Foo.";
 
-            public Dictionary<string, object> Bar { get; } = new Dictionary<string, object>();
+            public Dictionary<string, object> Bar { get; } = [];
         }
 
         [Fact]
@@ -75,11 +71,11 @@ namespace NJsonSchema.CodeGeneration.Tests
             {
                 TemplateDirectory = "Templates"
             };
-            var templateFactory = new DefaultTemplateFactory(settings, Array.Empty<Assembly>());
+            var templateFactory = new DefaultTemplateFactory(settings, []);
             var template1 = templateFactory.CreateTemplate("csharp", "elseif", new object());
 
             // Act
-            var ex = Assert.Throws<InvalidOperationException>(() => template1.Render());
+            var ex = Assert.Throws<InvalidOperationException>(template1.Render);
 
             // Assert
             Assert.Contains(", did you use 'elseif' instead of correct 'elsif'?", ex.Message);

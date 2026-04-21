@@ -2,19 +2,16 @@
 // <copyright file="JsonSchemaExtensionDataAttribute.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Collections.Generic;
 
 namespace NJsonSchema.Annotations;
 
 /// <summary>Adds an extension data property to a class or property.</summary>
 /// <seealso cref="System.Attribute" />
 [AttributeUsage(
-    AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue,
+    AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.ReturnValue,
     AllowMultiple = true)]
 public class JsonSchemaExtensionDataAttribute : Attribute, IJsonSchemaExtensionDataAttribute
 {

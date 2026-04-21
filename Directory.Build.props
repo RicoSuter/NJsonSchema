@@ -1,0 +1,54 @@
+<Project>
+    <PropertyGroup>
+        <VersionPrefix>11.6.0</VersionPrefix>
+
+        <Authors>Rico Suter</Authors>
+        <Copyright>Copyright © Rico Suter, 2025</Copyright>
+
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
+
+        <PackageTags>json schema validation generator .net</PackageTags>
+        <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
+        <Description>JSON Schema reader, generator and validator for .NET</Description>
+        <PackageIcon>NuGetIcon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Company />
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <DebugSymbols>True</DebugSymbols>
+
+        <LangVersion>latest</LangVersion>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+
+        <UseArtifactsOutput>true</UseArtifactsOutput>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <PropertyGroup Label="Analyzer settings">
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisLevel>latest-Recommended</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <!--
+          [CA1200] Avoid using cref tags with a prefix
+          [CA1510] Use 'ArgumentNullException.ThrowIfNull' instead of explicitly throwing a new exception instance
+          [CA1716] rename parameter property so that it no longer conflicts with the reserved language keyword
+          [CA1720] Identifier 'xxx' contains type name
+        -->
+        <NoWarn>$(NoWarn);CA1200;CA1510;CA1716;CA1720</NoWarn>
+
+        <!-- Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken -->
+        <NoWarn>$(NoWarn);xUnit1051</NoWarn>
+    </PropertyGroup>
+
+</Project>

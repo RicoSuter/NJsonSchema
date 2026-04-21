@@ -2,11 +2,10 @@
 // <copyright file="JsonTypeDescription.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
 using Namotion.Reflection;
 using NJsonSchema.Generation.TypeMappers;
@@ -93,6 +92,12 @@ namespace NJsonSchema.Generation
         public bool RequiresSchemaReference(IEnumerable<ITypeMapper> typeMappers)
         {
             var typeMapper = typeMappers.FirstOrDefault(m => m.MappedType == ContextualType.OriginalType);
+            if (typeMapper == null && ContextualType.OriginalType.IsGenericType)
+            {
+                var genericType = ContextualType.OriginalType.GetGenericTypeDefinition();
+                typeMapper = typeMappers.FirstOrDefault(m => m.MappedType == genericType);
+            }
+
             if (typeMapper != null)
             {
                 return typeMapper.UseReference;

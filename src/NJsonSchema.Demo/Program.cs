@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 
@@ -10,7 +7,7 @@ namespace NJsonSchema.Demo
 {
     public class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {

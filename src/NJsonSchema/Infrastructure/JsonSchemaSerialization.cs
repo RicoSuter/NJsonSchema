@@ -2,15 +2,11 @@
 // <copyright file="DynamicApis.cs" company="NSwag">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/NSwag/NSwag/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.References;
@@ -104,7 +100,7 @@ namespace NJsonSchema.Infrastructure
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
             where T : notnull
         {
-            var loader = () => FromJson<T>(json, contractResolver);
+            var loader = () => FromJson<T>(json, contractResolver)!;
             return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
         }
 
@@ -120,7 +116,7 @@ namespace NJsonSchema.Infrastructure
             Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
             where T : notnull
         {
-            var loader = () => FromJson<T>(stream, contractResolver);
+            var loader = () => FromJson<T>(stream, contractResolver)!;
             return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
         }
 
@@ -214,7 +210,8 @@ namespace NJsonSchema.Infrastructure
                 MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
                 ConstructorHandling = ConstructorHandling.Default,
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.None
+                PreserveReferencesHandling = PreserveReferencesHandling.None,
+                MaxDepth = 128
             };
         }
     }

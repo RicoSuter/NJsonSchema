@@ -2,12 +2,10 @@
 // <copyright file="CSharpTypeResolver.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
-using System;
 using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
@@ -61,19 +59,19 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 throw new ArgumentNullException(nameof(schema));
             }
 
-            schema = GetResolvableSchema(schema);
-
-            if (schema == ExceptionSchema)
-            {
-                return "System.Exception";
-            }
-
             // Primitive schemas (no new type)
             if (Settings.GenerateOptionalPropertiesAsNullable &&
                 schema is JsonSchemaProperty property &&
                 !property.IsRequired)
             {
                 isNullable = true;
+            }
+
+            schema = GetResolvableSchema(schema);
+
+            if (schema == ExceptionSchema)
+            {
+                return "System.Exception";
             }
 
             var markAsNullableType = Settings.GenerateNullableReferenceTypes && isNullable;
@@ -91,9 +89,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var type = schema.ActualTypeSchema.Type;
             if (type == JsonObjectType.None && schema.ActualTypeSchema.IsEnumeration)
             {
-                type = schema.ActualTypeSchema.Enumeration.All(v => v is int) ?
-                    JsonObjectType.Integer :
-                    JsonObjectType.String;
+                type = schema.ActualTypeSchema.Enumeration.All(v => v is int)
+                    ? JsonObjectType.Integer
+                    : JsonObjectType.String;
             }
 
             if (type.IsNumber())
@@ -165,22 +163,30 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
             if (schema.Format == JsonFormatStrings.Date)
             {
-                return isNullable && Settings.DateType?.ToLowerInvariant() != "string" ? Settings.DateType + "?" : Settings.DateType + nullableReferenceType;
+                return isNullable && Settings.DateType?.ToLowerInvariant() != "string"
+                    ? Settings.DateType + "?"
+                    : Settings.DateType + nullableReferenceType;
             }
 
             if (schema.Format == JsonFormatStrings.DateTime)
             {
-                return isNullable && Settings.DateTimeType?.ToLowerInvariant() != "string" ? Settings.DateTimeType + "?" : Settings.DateTimeType + nullableReferenceType;
+                return isNullable && Settings.DateTimeType?.ToLowerInvariant() != "string"
+                    ? Settings.DateTimeType + "?"
+                    : Settings.DateTimeType + nullableReferenceType;
             }
 
             if (schema.Format == JsonFormatStrings.Time)
             {
-                return isNullable && Settings.TimeType?.ToLowerInvariant() != "string" ? Settings.TimeType + "?" : Settings.TimeType + nullableReferenceType;
+                return isNullable && Settings.TimeType?.ToLowerInvariant() != "string"
+                    ? Settings.TimeType + "?"
+                    : Settings.TimeType + nullableReferenceType;
             }
 
             if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
             {
-                return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType + nullableReferenceType;
+                return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string"
+                    ? Settings.TimeSpanType + "?"
+                    : Settings.TimeSpanType + nullableReferenceType;
             }
 
             if (schema.Format == JsonFormatStrings.Uri)
@@ -190,12 +196,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
 #pragma warning disable 618 // used to resolve type from schemas generated with previous version of the library
 
-            if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
+            if (schema.Format is JsonFormatStrings.Guid or JsonFormatStrings.Uuid)
             {
                 return isNullable ? "System.Guid?" : "System.Guid";
             }
 
-            if (schema.Format == JsonFormatStrings.Base64 || schema.Format == JsonFormatStrings.Byte)
+            if (schema.Format is JsonFormatStrings.Base64 or JsonFormatStrings.Byte)
             {
                 return "byte[]" + nullableReferenceType;
             }
@@ -210,24 +216,24 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "bool?" : "bool";
         }
 
-        private string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
+        private static string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
         {
             if (schema.Format == JsonFormatStrings.Byte)
             {
                 return isNullable ? "byte?" : "byte";
             }
 
-            if (schema.Format == JsonFormatStrings.Long || schema.Format == "long")
+            if (schema.Format is JsonFormatStrings.Long or "long")
             {
                 return isNullable ? "long?" : "long";
             }
 
-            if (schema.Format == JsonFormatStrings.Long || schema.Format == "long")
+            if (schema.Format is JsonFormatStrings.Long or "long")
             {
                 return isNullable ? "long?" : "long";
             }
 
-            if (schema.Format == JsonFormatStrings.ULong || schema.Format == "ulong")
+            if (schema.Format is JsonFormatStrings.ULong or "ulong")
             {
                 return isNullable ? "ulong?" : "ulong";
             }
@@ -250,19 +256,22 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "int?" : "int";
         }
 
-        private static string ResolveNumber(JsonSchema schema, bool isNullable)
+        private string ResolveNumber(JsonSchema schema, bool isNullable)
         {
-            if (schema.Format == JsonFormatStrings.Decimal)
+            var numberType = schema.Format switch
             {
-                return isNullable ? "decimal?" : "decimal";
+                JsonFormatStrings.Decimal => Settings.NumberDecimalType,
+                JsonFormatStrings.Double => Settings.NumberDoubleType,
+                JsonFormatStrings.Float => Settings.NumberFloatType,
+                _ => Settings.NumberType
+            };
+
+            if (string.IsNullOrWhiteSpace(numberType))
+            {
+                numberType = "double";
             }
 
-            if (schema.Format == JsonFormatStrings.Float)
-            {
-                return isNullable ? "float?" : "float";
-            }
-
-            return isNullable ? "double?" : "double";
+            return isNullable ? numberType + "?" : numberType;
         }
 
         private string ResolveArrayOrTuple(JsonSchema schema)

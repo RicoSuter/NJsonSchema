@@ -2,15 +2,12 @@
 // <copyright file="CSharpClassGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
-using NJsonSchema.CodeGeneration.TypeScript.Models;
 using System.Linq;
-using NJsonSchema.CodeGeneration.Models;
-using System.Collections.Generic;
+using NJsonSchema.CodeGeneration.TypeScript.Models;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -53,8 +50,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>The code.</returns>
         public override IEnumerable<CodeArtifact> GenerateTypes()
         {
-            _extensionCode = _extensionCode ??
-                new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
+            _extensionCode ??= new TypeScriptExtensionCode(Settings.ExtensionCode, Settings.ExtendedClasses);
 
             return GenerateTypes(_extensionCode);
         }
@@ -79,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     else
                     {
                         index = classCode.IndexOf("class", StringComparison.Ordinal);
-                        index = classCode.IndexOf("{", index, StringComparison.Ordinal) + 1;
+                        index = classCode.IndexOf('{', index) + 1;
 
                         var code = classCode.Insert(index, "\n    " + extensionCode.GetExtensionClassBody(artifact.TypeName).Trim() + "\n");
                         yield return new CodeArtifact(artifact.TypeName, artifact.BaseTypeName, artifact.Type, artifact.Language, artifact.Category, code);
@@ -146,7 +142,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 }
                 else
                 {
+#pragma warning disable CA2208
                     throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
+#pragma warning restore CA2208
                 }
 
                 var template = Settings.TemplateFactory.CreateTemplate("TypeScript", templateName, model);

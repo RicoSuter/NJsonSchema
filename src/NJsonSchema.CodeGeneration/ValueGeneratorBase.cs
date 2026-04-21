@@ -2,14 +2,11 @@
 // <copyright file="ValueGeneratorBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using NJsonSchema.Annotations;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -18,8 +15,8 @@ namespace NJsonSchema.CodeGeneration
     public abstract class ValueGeneratorBase
     {
         private readonly CodeGeneratorSettingsBase _settings;
-        private readonly List<string> _unsupportedFormatStrings = new List<string>()
-        {
+        private readonly HashSet<string> _unsupportedFormatStrings =
+        [
             JsonFormatStrings.Date,
             JsonFormatStrings.DateTime,
             JsonFormatStrings.Time,
@@ -32,7 +29,7 @@ namespace NJsonSchema.CodeGeneration
             JsonFormatStrings.Uuid,
             JsonFormatStrings.Base64,
 #pragma warning restore CS0618 // Type or member is obsolete
-        };
+        ];
 
         /// <summary>Initializes a new instance of the <see cref="ValueGeneratorBase" /> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -62,7 +59,7 @@ namespace NJsonSchema.CodeGeneration
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
             }
 
-            if (schema.Type.IsString() && (schema.Format == null || _unsupportedFormatStrings.Contains(schema.Format) == false))
+            if (schema.Type.IsString() && (schema.Format == null || !_unsupportedFormatStrings.Contains(schema.Format)))
             {
                 return GetDefaultAsStringLiteral(schema);
             }
@@ -70,7 +67,7 @@ namespace NJsonSchema.CodeGeneration
 
             if (schema.Type.IsBoolean())
             {
-                return schema.Default.ToString().ToLowerInvariant();
+                return schema.Default.ToString()!.ToLowerInvariant();
             }
 
             if (schema.Type.IsInteger() ||
@@ -99,9 +96,9 @@ namespace NJsonSchema.CodeGeneration
         {
             var typeName = typeResolver.Resolve(actualSchema, false, typeNameHint);
 
-            var index = actualSchema.Enumeration.ToList().IndexOf(schema.Default);
+            var index = actualSchema.Enumeration.IndexOf(schema.Default);
             var enumName = index >= 0 && actualSchema.EnumerationNames?.Count > index
-                ? actualSchema.EnumerationNames.ElementAt(index)
+                ? actualSchema.EnumerationNames[index]
                 : schema.Default?.ToString();
 
             return typeName.Trim('?') + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
@@ -110,77 +107,41 @@ namespace NJsonSchema.CodeGeneration
         /// <summary>Gets the default value as string literal.</summary>
         /// <param name="schema">The schema.</param>
         /// <returns>The string literal.</returns>
+#pragma warning disable CA1822
         protected string GetDefaultAsStringLiteral(JsonSchema schema)
+#pragma warning restore CA1822
         {
-            return "\"" + ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty) + "\"";
+            return ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty, "\"", "\"");
         }
 
         /// <summary>Converts a number to its string representation.</summary>
         /// <param name="value">The value.</param>
         /// <returns>The string.</returns>
+#pragma warning disable CA1822
         protected string ConvertNumberToString(object value)
+#pragma warning restore CA1822
         {
-            if (value is byte)
-            {
-                return ((byte)value).ToString(CultureInfo.InvariantCulture);
-            }
+            return ConvertToNumberToStringCore(value);
+        }
 
-            if (value is sbyte)
+        internal static string ConvertToNumberToStringCore(object value)
+        {
+            return value switch
             {
-                return ((sbyte)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is short)
-            {
-                return ((short)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is ushort)
-            {
-                return ((ushort)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is int)
-            {
-                return ((int)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is uint)
-            {
-                return ((uint)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is long)
-            {
-                return ((long)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is ulong)
-            {
-                return ((ulong)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is float)
-            {
-                return ((float)value).ToString("r", CultureInfo.InvariantCulture);
-            }
-
-            if (value is double)
-            {
-                return ((double)value).ToString("r", CultureInfo.InvariantCulture);
-            }
-
-            if (value is decimal)
-            {
-                return ((decimal)value).ToString(CultureInfo.InvariantCulture);
-            }
-
-            if (value is string stringValue && Regex.IsMatch(stringValue, "^[0-9]+(\\.[0-9]+)?$"))
-            {
-                return (string)value;
-            }
-
-            return value.ToString();
+                byte b => b.ToString(CultureInfo.InvariantCulture),
+                sbyte value1 => value1.ToString(CultureInfo.InvariantCulture),
+                short s => s.ToString(CultureInfo.InvariantCulture),
+                ushort value1 => value1.ToString(CultureInfo.InvariantCulture),
+                int i => i.ToString(CultureInfo.InvariantCulture),
+                uint u => u.ToString(CultureInfo.InvariantCulture),
+                long l => l.ToString(CultureInfo.InvariantCulture),
+                ulong value1 => value1.ToString(CultureInfo.InvariantCulture),
+                float f => f.ToString("r", CultureInfo.InvariantCulture),
+                double d => d.ToString("r", CultureInfo.InvariantCulture),
+                decimal value1 => value1.ToString(CultureInfo.InvariantCulture),
+                string stringValue when Regex.IsMatch(stringValue, "^[0-9]+(\\.[0-9]+)?$") => stringValue,
+                _ => value.ToString()!
+            };
         }
     }
 }

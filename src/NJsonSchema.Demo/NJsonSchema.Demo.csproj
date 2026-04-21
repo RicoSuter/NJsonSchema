@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>true</GenerateProgramFile>
         <ApplicationIcon />
         <OutputType>Exe</OutputType>
         <StartupObject />
         <Nullable>disable</Nullable>
+        <NoWarn>$(NoWarn);CS1591;IDE0005</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

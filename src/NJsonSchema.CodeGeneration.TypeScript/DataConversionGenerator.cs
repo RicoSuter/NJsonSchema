@@ -2,12 +2,9 @@
 // <copyright file="DataConversionGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
-
-using NJsonSchema.Annotations;
-using System;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -95,8 +92,6 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 IsArrayItemDate = IsDate(typeSchema.Item?.Format, parameters.Settings.DateTimeType),
                 IsArrayItemDateTime = IsDateTime(typeSchema.Item?.Format, parameters.Settings.DateTimeType),
 
-                RequiresStrictPropertyInitialization = parameters.Settings.TypeScriptVersion >= 2.7m,
-
                 // Dates
                 //StringToDateCode is used for date and date-time formats
                 UseJsDate = parameters.Settings.DateTimeType == TypeScriptDateTimeType.Date,
@@ -147,7 +142,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "dayjs";
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(parameters));
             }
         }
 
@@ -168,7 +163,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "toFormat('yyyy-MM-dd')";
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(parameters));
             }
         }
 
@@ -207,7 +202,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                     return "toISOString()";
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(parameters));
             }
         }
 
@@ -216,56 +211,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             // TODO: Make this more generic (see TypeScriptTypeResolver.ResolveString)
             if (type == TypeScriptDateTimeType.Date)
             {
-                if (format == JsonFormatStrings.DateTime)
-                {
-                    return true;
-                }
-
-                if (format == JsonFormatStrings.Time)
-                {
-                    return false;
-                }
-
-                if (format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
-                {
-                    return false;
-                }
+                return format == JsonFormatStrings.DateTime;
             }
-            else if (type == TypeScriptDateTimeType.DayJS ||
-                     type == TypeScriptDateTimeType.MomentJS ||
-                     type == TypeScriptDateTimeType.OffsetMomentJS)
+
+            if (type is TypeScriptDateTimeType.DayJS or TypeScriptDateTimeType.MomentJS or TypeScriptDateTimeType.OffsetMomentJS)
             {
-                if (format == JsonFormatStrings.DateTime)
-                {
-                    return true;
-                }
-
-                if (format == JsonFormatStrings.Time)
-                {
-                    return true;
-                }
-
-                if (format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
-                {
-                    return true;
-                }
+                return format is JsonFormatStrings.DateTime or JsonFormatStrings.Time or JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan;
             }
-            else if (type == TypeScriptDateTimeType.Luxon)
+
+            if (type == TypeScriptDateTimeType.Luxon)
             {
-                if (format == JsonFormatStrings.DateTime)
-                {
-                    return true;
-                }
-
-                if (format == JsonFormatStrings.Time)
-                {
-                    return true;
-                }
-
-                if (format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
-                {
-                    return true;
-                }
+                return format is JsonFormatStrings.DateTime or JsonFormatStrings.Time or JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan;
             }
             return false;
         }
@@ -276,26 +232,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             // TODO: Make this more generic (see TypeScriptTypeResolver.ResolveString)
             if (type == TypeScriptDateTimeType.Date)
             {
-                if (format == JsonFormatStrings.Date)
-                {
-                    return true;
-                }
+                return format == JsonFormatStrings.Date;
             }
-            else if (type == TypeScriptDateTimeType.DayJS ||
-                     type == TypeScriptDateTimeType.MomentJS ||
-                     type == TypeScriptDateTimeType.OffsetMomentJS)
+
+            if (type is TypeScriptDateTimeType.DayJS or TypeScriptDateTimeType.MomentJS or TypeScriptDateTimeType.OffsetMomentJS)
             {
-                if (format == JsonFormatStrings.Date)
-                {
-                    return true;
-                }
+                return format == JsonFormatStrings.Date;
             }
-            else if (type == TypeScriptDateTimeType.Luxon)
+
+            if (type == TypeScriptDateTimeType.Luxon)
             {
-                if (format == JsonFormatStrings.Date)
-                {
-                    return true;
-                }
+                return format == JsonFormatStrings.Date;
             }
             return false;
         }

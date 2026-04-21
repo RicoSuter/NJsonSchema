@@ -2,14 +2,12 @@
 // <copyright file="SampleJsonSchemaGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
-using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace NJsonSchema.Generation
@@ -108,7 +106,7 @@ namespace NJsonSchema.Generation
                     }
                     else if (schema.Type.IsInteger())
                     {
-                        return HandleIntegerType(schema);
+                        return SampleJsonDataGenerator.HandleIntegerType(schema);
                     }
                     else if (schema.Type.IsNumber())
                     {
@@ -149,19 +147,19 @@ namespace NJsonSchema.Generation
             return JToken.FromObject(0.0);
         }
 
-        private JToken HandleIntegerType(JsonSchema schema)
+        private static JToken HandleIntegerType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw != null)
             {
-                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimumRaw));
+                return JToken.FromObject(Convert.ToInt64(schema.ExclusiveMinimumRaw, CultureInfo.InvariantCulture));
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(Convert.ToInt32(schema.ExclusiveMinimum));
+                return JToken.FromObject(Convert.ToInt64(schema.ExclusiveMinimum, CultureInfo.InvariantCulture));
             }
             else if (schema.Minimum.HasValue)
             {
-                return Convert.ToInt32(schema.Minimum);
+                return Convert.ToInt64(schema.Minimum, CultureInfo.InvariantCulture);
             }
             return JToken.FromObject(0);
         }
@@ -170,11 +168,17 @@ namespace NJsonSchema.Generation
         {
             if (schema.Format == JsonFormatStrings.Date)
             {
-                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd"));
+                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
             }
             else if (schema.Format == JsonFormatStrings.DateTime)
             {
                 return JToken.FromObject(DateTimeOffset.UtcNow.ToString("o"));
+            }
+#pragma warning disable CS0618 // Type or member is obsolete
+            else if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
+#pragma warning restore CS0618 // Type or member is obsolete
+            {
+                return JToken.FromObject(Guid.NewGuid().ToString());
             }
             else if (property != null)
             {

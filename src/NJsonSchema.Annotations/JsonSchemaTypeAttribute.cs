@@ -2,11 +2,9 @@
 // <copyright file="JsonSchemaTypeAttribute.cs" company="NSwag">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/NSwag/NSwag/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
-
-using System;
 
 namespace NJsonSchema.Annotations;
 

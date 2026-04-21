@@ -2,12 +2,11 @@
 // <copyright file="IpV4FormatValidator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 using Newtonsoft.Json.Linq;
-using NJsonSchema.Annotations;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.Validation.FormatValidators
@@ -15,7 +14,7 @@ namespace NJsonSchema.Validation.FormatValidators
     /// <summary>Validator for "IpV4" format.</summary>
     public class IpV4FormatValidator : IFormatValidator
     {
-        private const string IpV4RegexExpression = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        private const string IpV4RegexExpression = @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
 
         /// <summary>Gets the format attribute's value.</summary>
         public string Format { get; } = JsonFormatStrings.IpV4;

@@ -1,0 +1,67 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Dog",
+  "type": "object",
+  "discriminator": {
+    "propertyName": "breed",
+    "mapping": {
+      "1": "#/definitions/Dalmation",
+      "2": "#/definitions/Poodle"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "breed"
+  ],
+  "properties": {
+    "Baz": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "breed": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "Dalmation": {
+      "allOf": [
+        {
+          "$ref": "#"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "Foo": {
+              "type": [
+                "null",
+                "string"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "Poodle": {
+      "allOf": [
+        {
+          "$ref": "#"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "Bar": {
+              "type": [
+                "null",
+                "string"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

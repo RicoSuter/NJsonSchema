@@ -1,0 +1,17 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "EnumWithFlags",
+  "type": "string",
+  "description": "",
+  "x-enumFlags": true,
+  "x-enumNames": [
+    "Foo",
+    "Bar",
+    "Baz"
+  ],
+  "enum": [
+    "Foo",
+    "Bar",
+    "Baz"
+  ]
+}

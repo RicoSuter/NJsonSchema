@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Xunit;
-
-namespace NJsonSchema.Tests.Generation
+﻿namespace NJsonSchema.Tests.Generation
 {   
     public class DefaultTypeNameGeneratorTests
     {
@@ -20,15 +17,15 @@ namespace NJsonSchema.Tests.Generation
                 { " Foo.ActionResponse [System.Net.HttpStatusCode, User]", "ActionResponseOfHttpStatusCodeAndUser" }
             };
 
-            //// Arrange
+            // Arrange
             var generator = new DefaultTypeNameGenerator();
 
             foreach (var p in tests)
             {
-                //// Act
+                // Act
                 var name = generator.Generate(new JsonSchema(), p.Key, new List<string>());
 
-                //// Assert
+                // Assert
                 Assert.Equal(p.Value, name);
             }
         }
@@ -49,15 +46,15 @@ namespace NJsonSchema.Tests.Generation
                 { " Foo.ActionRes+ponse [System.Net.HttpSta+tusCode, Us+er]", "ActionRes_ponseOfHttpSta_tusCodeAndUs_er" }
             };
 
-            //// Arrange
+            // Arrange
             var generator = new DefaultTypeNameGenerator();
 
             foreach (var p in tests)
             {
-                //// Act
+                // Act
                 var name = generator.Generate(new JsonSchema(), p.Key, new List<string>());
 
-                //// Assert
+                // Assert
                 Assert.Equal(p.Value, name);
             }
         }

@@ -2,14 +2,13 @@
 // <copyright file="ISchemaProcessor.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using NJsonSchema.Converters;
-using System;
 
 namespace NJsonSchema.Generation.SchemaProcessors
 {

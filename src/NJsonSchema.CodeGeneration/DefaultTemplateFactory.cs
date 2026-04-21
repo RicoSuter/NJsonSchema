@@ -2,32 +2,28 @@
 // <copyright file="DefaultTemplateFactory.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Fluid;
-using Fluid.Ast;
 using Fluid.Values;
-using Parlot.Fluent;
 
 namespace NJsonSchema.CodeGeneration
 {
     /// <summary>The default template factory which loads templates from embedded resources.</summary>
-    public class DefaultTemplateFactory : ITemplateFactory
+    public partial class DefaultTemplateFactory : ITemplateFactory
     {
+        internal const string TemplateTagName = "template";
+
         private readonly CodeGeneratorSettingsBase _settings;
         private readonly Assembly[] _assemblies;
+        private readonly Func<string, string, string, string> _templateContentLoader;
 
         /// <summary>Initializes a new instance of the <see cref="DefaultTemplateFactory"/> class.</summary>
         /// <param name="settings">The settings.</param>
@@ -36,6 +32,24 @@ namespace NJsonSchema.CodeGeneration
         {
             _settings = settings;
             _assemblies = assemblies;
+            _templateContentLoader = GetLiquidTemplate;
+
+            FluidParser = new LiquidParser(new FluidParserOptions());
+
+            var templateOptions = new TemplateOptions
+            {
+                MemberAccessStrategy = new UnsafeMemberAccessStrategy(),
+                CultureInfo = CultureInfo.InvariantCulture,
+                Greedy = false
+            };
+            templateOptions.Filters.AddFilter("csharpdocs", LiquidFilters.Csharpdocs);
+            templateOptions.Filters.AddFilter("tab", LiquidFilters.Tab);
+            templateOptions.Filters.AddFilter("lowercamelcase", LiquidFilters.Lowercamelcase);
+            templateOptions.Filters.AddFilter("uppercamelcase", LiquidFilters.Uppercamelcase);
+            templateOptions.Filters.AddFilter("literal", LiquidFilters.Literal);
+            templateOptions.Filters.AddFilter("rtrimquestionmark", LiquidFilters.RightTrimQuestionMark);
+
+            TemplateOptions = templateOptions;
         }
 
         /// <summary>Creates a template for the given language, template name and template model.</summary>
@@ -46,14 +60,19 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">Could not load template.</exception>
         public ITemplate CreateTemplate(string language, string template, object model)
         {
-            return new LiquidTemplate(
-                language,
-                template,
-                (lang, name) => GetLiquidTemplate(lang, name),
-                model,
-                GetToolchainVersion(),
-                _settings);
+            return new LiquidTemplate(FluidParser, TemplateOptions, language, template, _templateContentLoader, model, GetToolchainVersion(), _settings);
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="FluidParser"/> that will be used when parsing template content.
+        /// </summary>
+        public FluidParser FluidParser { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="TemplateOptions"/> that will be used when processing template content.
+        /// </summary>
+        /// <value></value>
+        public TemplateOptions TemplateOptions { get; }
 
         /// <summary>Gets the current toolchain version.</summary>
         /// <returns>The toolchain version.</returns>
@@ -68,13 +87,13 @@ namespace NJsonSchema.CodeGeneration
         /// <exception cref="InvalidOperationException">The assembly containting liquid templates could not be found.</exception>
         protected Assembly GetLiquidAssembly(string name)
         {
-            var assembly = _assemblies.FirstOrDefault(a => a.FullName.Contains(name));
+            var assembly = _assemblies.FirstOrDefault(a => a.FullName?.Contains(name) == true);
             if (assembly != null)
             {
                 return assembly;
             }
 
-            throw new InvalidOperationException("The assembly '" + name + "' containting liquid templates could not be found.");
+            throw new InvalidOperationException("The assembly '" + name + "' containing liquid templates could not be found.");
         }
 
         /// <summary>Tries to load an embedded Liquid template.</summary>
@@ -91,74 +110,76 @@ namespace NJsonSchema.CodeGeneration
             var resource = assembly.GetManifestResourceStream(resourceName);
             if (resource != null)
             {
-                using (var reader = new StreamReader(resource))
-                {
-                    return reader.ReadToEnd();
-                }
+                using var reader = new StreamReader(resource);
+                return reader.ReadToEnd();
             }
 
             throw new InvalidOperationException("Could not load template '" + template + "' for language '" + language + "'.");
         }
 
         /// <exception cref="InvalidOperationException">Could not load template.</exception>
-        private string GetLiquidTemplate(string language, string template)
+        private string GetLiquidTemplate(string language, string template, string templateDirectory)
         {
-            if (!template.EndsWith("!") && !string.IsNullOrEmpty(_settings.TemplateDirectory))
+            if (!template.EndsWith('!') && !string.IsNullOrEmpty(templateDirectory))
             {
-                var templateFilePath = Path.Combine(_settings.TemplateDirectory, template + ".liquid");
-                if (File.Exists(templateFilePath))
+                foreach (var directory in templateDirectory.Split([';'], StringSplitOptions.RemoveEmptyEntries))
                 {
-                    return File.ReadAllText(templateFilePath);
+                    var templateFilePath = Path.Combine(directory, template + ".liquid");
+                    if (File.Exists(templateFilePath))
+                    {
+                        return File.ReadAllText(templateFilePath);
+                    }
                 }
             }
 
             return GetEmbeddedLiquidTemplate(language, template);
         }
 
-        private sealed class LiquidTemplate : ITemplate
+        private sealed partial class LiquidTemplate : ITemplate
         {
-            internal const string TemplateTagName = "template";
-            private static readonly ConcurrentDictionary<(string, string), IFluidTemplate> Templates = new ConcurrentDictionary<(string, string), IFluidTemplate>();
+            private readonly record struct TemplateKey(string Language, string Template, string TemplateDirectory);
 
-            static LiquidTemplate()
-            {
-                // thread-safe
-                _parser = new LiquidParser();
-                _templateOptions = new TemplateOptions
-                {
-                    MemberAccessStrategy = new UnsafeMemberAccessStrategy(),
-                    CultureInfo = CultureInfo.InvariantCulture,
-                    Greedy = false
-                };
-                _templateOptions.Filters.AddFilter("csharpdocs", LiquidFilters.Csharpdocs);
-                _templateOptions.Filters.AddFilter("tab", LiquidFilters.Tab);
-                _templateOptions.Filters.AddFilter("lowercamelcase", LiquidFilters.Lowercamelcase);
-                _templateOptions.Filters.AddFilter("uppercamelcase", LiquidFilters.Uppercamelcase);
-                _templateOptions.Filters.AddFilter("literal", LiquidFilters.Literal);
-            }
+            private static readonly ConcurrentDictionary<TemplateKey, IFluidTemplate> Templates = new();
+
+            private readonly FluidParser _parser;
+            private readonly TemplateOptions _templateOptions;
 
             private readonly string _language;
             private readonly string _template;
-            private readonly Func<string, string, string> _templateContentLoader;
+            private readonly Func<string, string, string, string> _templateContentLoader;
             private readonly object _model;
             private readonly string _toolchainVersion;
             private readonly CodeGeneratorSettingsBase _settings;
 
-            private static readonly LiquidParser _parser;
-            private static readonly TemplateOptions _templateOptions;
+            private const string TabCountRegexString = @"(\s*)?\{%(-)?\s+template\s+([a-zA-Z0-9_.]+)(\s*?.*?)\s(-)?%}";
+            private const string CsharpDocsRegexString = "(\n( )*)([^\n]*?) \\| csharpdocs }}";
+            private const string TabRegexString = "(\n( )*)([^\n]*?) \\| tab }}";
+            private const string EmptyTemplateCleanupRegexString = @"^[ ]+__EMPTY-TEMPLATE__$[\n]{0,1}";
 
-            private static readonly Regex _tabCountRegex = new("(\\s*)?\\{%(-)?\\s+template\\s+([a-zA-Z0-9_.]+)(\\s*?.*?)\\s(-)?%}", RegexOptions.Singleline | RegexOptions.Compiled);
-            private static readonly Regex _csharpDocsRegex = new("(\n( )*)([^\n]*?) \\| csharpdocs }}", RegexOptions.Singleline | RegexOptions.Compiled);
-            private static readonly Regex _tabRegex = new("(\n( )*)([^\n]*?) \\| tab }}", RegexOptions.Singleline | RegexOptions.Compiled);
+#if NET8_0_OR_GREATER
+            private static readonly Regex _tabCountRegex = TabCountRegex();
+            private static readonly Regex _csharpDocsRegex = CsharpDocsRegex();
+            private static readonly Regex _tabRegex = TabRegex();
+            private static readonly Regex _emptyTemplateCleanupRegex = EmptyTemplateCleanupRegex();
+#else
+            private static readonly Regex _tabCountRegex = new(TabCountRegexString, RegexOptions.Singleline | RegexOptions.Compiled);
+            private static readonly Regex _csharpDocsRegex = new(CsharpDocsRegexString, RegexOptions.Singleline | RegexOptions.Compiled);
+            private static readonly Regex _tabRegex = new(TabRegexString, RegexOptions.Singleline | RegexOptions.Compiled);
+            private static readonly Regex _emptyTemplateCleanupRegex = new(EmptyTemplateCleanupRegexString, RegexOptions.Multiline | RegexOptions.Compiled);
+#endif
 
             public LiquidTemplate(
+                FluidParser parser,
+                TemplateOptions templateOptions,
                 string language,
                 string template,
-                Func<string, string, string> templateContentLoader,
+                Func<string, string, string, string> templateContentLoader,
                 object model,
                 string toolchainVersion,
                 CodeGeneratorSettingsBase settings)
             {
+                _parser = parser;
+                _templateOptions = templateOptions;
                 _language = language;
                 _template = template;
                 _templateContentLoader = templateContentLoader;
@@ -174,12 +195,14 @@ namespace NJsonSchema.CodeGeneration
 
                 try
                 {
-                    // use language and template name as key for faster lookup than using the content
-                    var key = (_language, _template);
+                    var templateDirectory = _settings.TemplateDirectory ?? string.Empty;
+                    // use language, template name and template directory as key for faster lookup than using the content
+                    // template directory as part of key is requred for processing multiple files since files may use different TemplateDirectory for same language
+                    var key = new TemplateKey(_language, _template, templateDirectory);
                     var template = Templates.GetOrAdd(key, _ =>
                     {
                         // our matching expects unix new lines
-                        var templateContent = _templateContentLoader(_language, _template);
+                        var templateContent = _templateContentLoader(_language, _template, templateDirectory);
                         var data = templateContent.Replace("\r", "");
                         data = "\n" + data;
 
@@ -205,7 +228,7 @@ namespace NJsonSchema.CodeGeneration
                                 return rewritten;
                             });
 
-                        data = _csharpDocsRegex.Replace(data,  m =>
+                        data = _csharpDocsRegex.Replace(data, m =>
                             m.Groups[1].Value + m.Groups[3].Value + " | csharpdocs: " + m.Groups[1].Value.Length / 4 + " }}");
 
                         data = _tabRegex.Replace(data, m =>
@@ -235,10 +258,11 @@ namespace NJsonSchema.CodeGeneration
                     var trimmed = render.Replace("\r", "").Trim('\n');
 
                     // clean up cases where we have called template but it produces empty output
-                    var withoutEmptyWhiteSpace = Regex.Replace(trimmed, @"^[ ]+__EMPTY-TEMPLATE__$[\n]{0,1}", string.Empty, RegexOptions.Multiline);
+                    var withoutEmptyWhiteSpace = _emptyTemplateCleanupRegex.Replace(trimmed, string.Empty);
 
                     // just to make sure we don't leak out marker
-                    return withoutEmptyWhiteSpace.Replace("__EMPTY-TEMPLATE__", "");
+                    // also handle case where empty annotation template marker is on its own line (e.g. when annotation templates are empty)
+                    return withoutEmptyWhiteSpace.Replace("\n__EMPTY-TEMPLATE__\n", "\n").Replace("__EMPTY-TEMPLATE__", "");
                 }
                 catch (Exception exception)
                 {
@@ -247,6 +271,7 @@ namespace NJsonSchema.CodeGeneration
                     {
                         message += ", did you use 'elseif' instead of correct 'elsif'?";
                     }
+
                     throw new InvalidOperationException(message, exception);
                 }
                 finally
@@ -257,20 +282,34 @@ namespace NJsonSchema.CodeGeneration
                     }
                 }
             }
+
+#if NET8_0_OR_GREATER
+            [GeneratedRegex(TabCountRegexString, RegexOptions.Compiled | RegexOptions.Singleline)]
+            private static partial Regex TabCountRegex();
+
+            [GeneratedRegex(CsharpDocsRegexString, RegexOptions.Compiled | RegexOptions.Singleline)]
+            private static partial Regex CsharpDocsRegex();
+
+            [GeneratedRegex(TabRegexString, RegexOptions.Compiled | RegexOptions.Singleline)]
+            private static partial Regex TabRegex();
+
+            [GeneratedRegex(EmptyTemplateCleanupRegexString, RegexOptions.Compiled | RegexOptions.Multiline)]
+            private static partial Regex EmptyTemplateCleanupRegex();
+#endif
         }
 
         private static class LiquidFilters
         {
             public static ValueTask<FluidValue> Csharpdocs(FluidValue input, FilterArguments arguments, TemplateContext context)
             {
-                var tabCount = (int) arguments.At(0).ToNumberValue();
+                var tabCount = (int)arguments.At(0).ToNumberValue();
                 var converted = ConversionUtilities.ConvertCSharpDocs(input.ToStringValue(), tabCount);
                 return new ValueTask<FluidValue>(new StringValue(converted));
             }
 
             public static ValueTask<FluidValue> Tab(FluidValue input, FilterArguments arguments, TemplateContext context)
             {
-                var tabCount = (int) arguments.At(0).ToNumberValue();
+                var tabCount = (int)arguments.At(0).ToNumberValue();
                 var converted = ConversionUtilities.Tab(input.ToStringValue(), tabCount);
                 return new ValueTask<FluidValue>(new StringValue(converted));
             }
@@ -291,60 +330,14 @@ namespace NJsonSchema.CodeGeneration
 
             public static ValueTask<FluidValue> Literal(FluidValue input, FilterArguments arguments, TemplateContext context)
             {
-                var converted = "\"" + ConversionUtilities.ConvertToStringLiteral(input.ToStringValue()) + "\"";
+                var converted = ConversionUtilities.ConvertToStringLiteral(input.ToStringValue(), "\"", "\"");
                 return new ValueTask<FluidValue>(new StringValue(converted, encode: false));
             }
-        }
 
-        private sealed class LiquidParser : FluidParser
-        {
-            internal const string LanguageKey = "__language";
-            internal const string TemplateKey = "__template";
-            internal const string SettingsKey = "__settings";
-
-            public LiquidParser()
+            public static ValueTask<FluidValue> RightTrimQuestionMark(FluidValue input, FilterArguments arguments, TemplateContext context)
             {
-                RegisterParserTag(LiquidTemplate.TemplateTagName, Parsers.OneOrMany(Primary), RenderTemplate);
-            }
-
-            private static ValueTask<Completion> RenderTemplate(
-                List<Expression> arguments,
-                TextWriter writer,
-                TextEncoder encoder,
-                TemplateContext context)
-            {
-                var templateName = ((LiteralExpression) arguments[0]).Value.ToStringValue();
-
-                var tabCount = -1;
-                if (arguments.Count > 1 && arguments[1] is LiteralExpression literalExpression)
-                {
-                    tabCount = (int) literalExpression.Value.ToNumberValue();
-                }
-
-                var settings = (CodeGeneratorSettingsBase) context.AmbientValues[SettingsKey];
-                var language = (string) context.AmbientValues[LanguageKey];
-                templateName = !string.IsNullOrEmpty(templateName)
-                    ? templateName
-                    : (string) context.AmbientValues[TemplateKey] + "!";
-
-                var template = settings.TemplateFactory.CreateTemplate(language, templateName, context);
-                var output = template.Render();
-
-                if (string.IsNullOrWhiteSpace(output))
-                {
-                    // signal cleanup
-                    writer.Write("__EMPTY-TEMPLATE__");
-                }
-                else if (tabCount > 0)
-                {
-                    ConversionUtilities.Tab(output, tabCount, writer);
-                }
-                else
-                {
-                    writer.Write(output);
-                }
-
-                return new ValueTask<Completion>(Completion.Normal);
+                var converted = input.ToStringValue().TrimEnd('?');
+                return new ValueTask<FluidValue>(new StringValue(converted, encode: false));
             }
         }
 
@@ -353,6 +346,8 @@ namespace NJsonSchema.CodeGeneration
         /// </summary>
         private sealed class UnsafeMemberAccessStrategy : DefaultMemberAccessStrategy
         {
+            private readonly ConcurrentDictionary<Type, object?> _handledTypes = new();
+
             private readonly MemberAccessStrategy baseMemberAccessStrategy = new DefaultMemberAccessStrategy();
 
             public override IMemberAccessor GetAccessor(Type type, string name)
@@ -363,8 +358,14 @@ namespace NJsonSchema.CodeGeneration
                     return accessor;
                 }
 
-                baseMemberAccessStrategy.Register(type);
+                if (!_handledTypes.ContainsKey(type))
+                {
+                    baseMemberAccessStrategy.Register(type);
+                    _handledTypes.TryAdd(type, null);
+                }
+
                 accessor = baseMemberAccessStrategy.GetAccessor(type, name);
+
                 return accessor;
             }
         }

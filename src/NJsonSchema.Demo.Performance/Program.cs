@@ -1,14 +1,12 @@
 ﻿using NJsonSchema.NewtonsoftJson.Generation;
-using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Demo.Performance
 {
     public class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Run().GetAwaiter().GetResult();
         }
@@ -62,7 +60,7 @@ namespace NJsonSchema.Demo.Performance
     {
         public static Type[] GetKnownTypes()
         {
-            return new[] { typeof(Pen), typeof(Pencil) };
+            return [typeof(Pen), typeof(Pencil)];
         }
 
         public string Baz { get; set; }

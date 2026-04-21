@@ -2,14 +2,12 @@
 // <copyright file="CSharpGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema.CodeGeneration.CSharp.Models;
-using NJsonSchema.CodeGeneration.Models;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -81,13 +79,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
         }
 
         /// <inheritdoc />
-        protected override string GenerateFile(IEnumerable<CodeArtifact> artifactCollection)
+        protected override string GenerateFile(IEnumerable<CodeArtifact> artifacts)
         {
             var model = new FileTemplateModel
             {
                 Namespace = Settings.Namespace ?? string.Empty,
                 GenerateNullableReferenceTypes = Settings.GenerateNullableReferenceTypes,
-                TypesCode = artifactCollection.Concatenate()
+                TypesCode = artifacts.Concatenate()
             };
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);
@@ -116,18 +114,18 @@ namespace NJsonSchema.CodeGeneration.CSharp
         {
             var model = new ClassTemplateModel(typeName, Settings, _resolver, schema, RootObject);
 
-            RenamePropertyWithSameNameAsClass(typeName, model.Properties);
+            RenamePropertyWithSameNameAsClass(typeName, model._properties);
 
             var template = Settings.TemplateFactory.CreateTemplate("CSharp", "Class", model);
             return new CodeArtifact(typeName, model.BaseClassName, CodeArtifactType.Class, CodeArtifactLanguage.CSharp, CodeArtifactCategory.Contract, template);
         }
 
-        private static void RenamePropertyWithSameNameAsClass(string typeName, IEnumerable<PropertyModel> properties)
+        private static void RenamePropertyWithSameNameAsClass(string typeName, List<PropertyModel> properties)
         {
-            var propertyModels = properties as PropertyModel[] ?? properties.ToArray();
             PropertyModel? propertyWithSameNameAsClass = null;
-            foreach (var p in propertyModels)
+            for (var i = 0; i < properties.Count; i++)
             {
+                var p = properties[i];
                 if (p.PropertyName == typeName)
                 {
                     propertyWithSameNameAsClass = p;
@@ -139,12 +137,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             {
                 var number = 1;
                 var candidate = typeName + number;
-                while (propertyModels.Any(p => p.PropertyName == candidate))
+                while (properties.Exists(p => p.PropertyName == candidate))
                 {
                     number++;
+                    candidate = typeName + number;
                 }
 
-                propertyWithSameNameAsClass.PropertyName = propertyWithSameNameAsClass.PropertyName + number;
+                propertyWithSameNameAsClass.PropertyName += number;
             }
         }
 

@@ -5,13 +5,21 @@
 {%- endif -%}
 {%- if HasDiscriminator -%}
 {%- if UseSystemTextJson -%}
+{%- if UseSystemTextJsonPolymorphicSerialization -%}
+[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = "{{ Discriminator }}")]
+{%- else -%}
 [JsonInheritanceConverter(typeof({{ ClassName }}), "{{ Discriminator }}")]
+{%- endif -%}
 {%- else -%}
 [Newtonsoft.Json.JsonConverter(typeof(JsonInheritanceConverter), "{{ Discriminator }}")]
 {%- endif -%}
 {%- for derivedClass in DerivedClasses -%}
 {%- if derivedClass.IsAbstract != true -%}
+{%- if UseSystemTextJson and UseSystemTextJsonPolymorphicSerialization -%}
+[System.Text.Json.Serialization.JsonDerivedType(typeof({{ derivedClass.ClassName }}), typeDiscriminator: "{{ derivedClass.Discriminator }}")]
+{%- else -%}
 [JsonInheritanceAttribute("{{ derivedClass.Discriminator }}", typeof({{ derivedClass.ClassName }}))]
+{%- endif -%}
 {%- endif -%}
 {%- endfor -%}
 {%- endif -%}
@@ -26,8 +34,8 @@
 {%- if IsDeprecated -%}
 [System.Obsolete{% if HasDeprecatedMessage %}({{ DeprecatedMessage | literal }}){% endif %}]
 {% endif -%}
-{%- template Class.Annotations -%}
-{{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial {% if GenerateNativeRecords %}record{% else %}class{% endif %} {{ClassName}} {%- template Class.Inheritance %}
+{%- template Class.Annotations %}
+{{ TypeAccessModifier }} {% if IsAbstract %}abstract {% endif %}partial {{ ClassType }} {{ClassName}} {%- template Class.Inheritance %}
 {
 {%- if IsTuple -%}
     public {{ ClassName }}({%- for tupleType in TupleTypes %}{{ tupleType }} item{{ forloop.index }}{%- if forloop.last == false %}, {% endif %}{% endfor %}) : base({%- for tupleType in TupleTypes %}item{{ forloop.index }}{%- if forloop.last == false %}, {% endif %}{% endfor %})
@@ -41,23 +49,20 @@
 {%- endfor -%}
 
 {%- endif -%}
-    {%- template Class.Constructor -%}
+    {% template Class.Constructor %}
 {%- if RenderRecord -%}
-    {% template Class.Constructor.Record -%}
-{%- endif -%}
+    {% template Class.Constructor.Record %}
+{%- endif %}
 {%- for property in Properties -%}
 {%-   if property.HasDescription -%}
     /// <summary>
     /// {{ property.Description | csharpdocs }}
     /// </summary>
 {%-   endif -%}
-{%- if UseSystemTextJson %}
+{%- if UseSystemTextJson -%}
     [System.Text.Json.Serialization.JsonPropertyName("{{ property.Name }}")]
-{%-   if property.HasJsonIgnoreCondition %}
-    [System.Text.Json.Serialization.JsonIgnore(Condition = {{ property.JsonIgnoreCondition }})]   
-{%-   endif -%}
-{%-   if property.IsStringEnumArray %}
-    // TODO(system.text.json): Add string enum item converter
+{%-   if property.IsStringEnumArray -%}
+    // TODO(system.text.json): Add ItemConverterType with enum converter when supported
 {%-   endif -%}
 {%- else -%}
     [Newtonsoft.Json.JsonProperty("{{ property.Name }}", Required = {{ property.JsonPropertyRequiredCode }}{% if property.IsStringEnumArray %}, ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter){% endif %})]
@@ -66,7 +71,11 @@
     [System.ComponentModel.DataAnnotations.Required{% if property.AllowEmptyStrings %}(AllowEmptyStrings = true){% endif %}]
 {%-   endif -%}
 {%-   if property.RenderRangeAttribute -%}
+    {%-   if property.RangeType -%}
+    [System.ComponentModel.DataAnnotations.Range(typeof({{ property.RangeType }}), "{{ property.RangeMinimumValue }}", "{{ property.RangeMaximumValue }}")]
+    {%-   else -%}
     [System.ComponentModel.DataAnnotations.Range({{ property.RangeMinimumValue }}, {{ property.RangeMaximumValue }})]
+    {%-   endif -%}
 {%-   endif -%}
 {%-   if property.RenderStringLengthAttribute -%}
     [System.ComponentModel.DataAnnotations.StringLength({{ property.StringLengthMaximumValue }}{% if property.StringLengthMinimumValue > 0 %}, MinimumLength = {{ property.StringLengthMinimumValue }}{% endif %})]
@@ -82,7 +91,7 @@
 {%-   endif -%}
 {%-   if property.IsStringEnum -%}
 {%-     if UseSystemTextJson -%}
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<{{ property.Type | rtrimquestionmark }}>))]
 {%-     else -%}
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 {%-     endif -%}
@@ -97,12 +106,11 @@
 {%-   if property.IsDeprecated -%}
     [System.Obsolete{% if property.HasDeprecatedMessage %}({{ property.DeprecatedMessage | literal }}){% endif %}]
 {%-   endif -%}
-    {%- template Class.Property.Annotations -%}
-    public {{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}set; {% elsif RenderRecord and GenerateNativeRecords %}init; {% endif %}}{% if property.HasDefaultValue and RenderRecord == false %} = {{ property.DefaultValue }};{% elsif GenerateNullableReferenceTypes and RenderRecord == false %} = default!;{% endif %}
-{% else %}
+    {%- template Class.Property.Annotations %}
+    public {% if UseRequiredKeyword and property.IsRequired %}required {% endif %}{{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}{{ WriteAccessor }}; {% elsif RenderRecord and GenerateNativeRecords %}init; {% endif %}}{% if property.HasDefaultValue and RenderRecord == false and UseRequiredKeyword == false %} = {{ property.DefaultValue }};{% elsif GenerateNullableReferenceTypes and RenderRecord == false and UseRequiredKeyword == false %} = default!;{% endif %}
+{%- else -%}
     {
         get { return {{ property.FieldName }}; }
-
 {%-     if property.HasSetter -%}
 {%-         if RenderInpc -%}
         {{PropertySetterAccessModifier}}set
@@ -118,11 +126,10 @@
 {%-         endif -%}
 {%-     endif -%}
     }
-{%-   endif %}
+{%-   endif -%}
+
 {%- endfor -%}
-
 {%- if GenerateAdditionalPropertiesProperty -%}
-
     private System.Collections.Generic.IDictionary<string, {{ AdditionalPropertiesType }}>{% if GenerateNullableReferenceTypes %}?{% endif %} _additionalProperties;
 
 {%-       if UseSystemTextJson -%}
@@ -140,7 +147,6 @@
 {%- if GenerateJsonMethods -%}
     {% template Class.ToJson %}
     {% template Class.FromJson %}
-
 {%- endif -%}
 {%- if RenderInpc -%}
     {% template Class.Inpc %}

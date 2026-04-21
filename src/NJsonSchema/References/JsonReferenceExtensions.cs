@@ -2,7 +2,7 @@
 // <copyright file="JsonReferenceExtensions.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace NJsonSchema.References
                 return obj;
             }
 
-            while ((parent as IJsonReference)?.PossibleRoot != null)
+            while (parent is IJsonReference { PossibleRoot: not null })
             {
                 parent = ((IJsonReference)parent!).PossibleRoot;
                 if (parent is IDocumentPathProvider pathProvider && pathProvider.DocumentPath != null)

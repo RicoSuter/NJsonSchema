@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace NJsonSchema.Tests.Generation
+﻿namespace NJsonSchema.Tests.Generation
 {
     public class RecordTests
     {
@@ -12,16 +10,16 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public void Should_have_only_one_property()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = JsonSchema.FromType<Address>();
             var data = schema.ToJson();
 
             var add = new Address();
 
-            //// Assert
-            Assert.Equal(1, schema.Properties.Count);
+            // Assert
+            Assert.Single(schema.Properties);
         }
     }
 }

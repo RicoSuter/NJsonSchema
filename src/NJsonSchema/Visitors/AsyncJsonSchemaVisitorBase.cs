@@ -2,12 +2,10 @@
 // <copyright file="JsonSchemaVisitorBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using System.Threading;
-using System.Threading.Tasks;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Visitors

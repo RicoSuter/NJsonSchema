@@ -2,12 +2,9 @@
 // <copyright file="PrimitiveTypeMapper.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Threading.Tasks;
 
 namespace NJsonSchema.Generation.TypeMappers
 {
@@ -29,7 +26,7 @@ namespace NJsonSchema.Generation.TypeMappers
         public Type MappedType { get; }
 
         /// <summary>Gets a value indicating whether to use a JSON Schema reference for the type.</summary>
-        public bool UseReference { get; } = false;
+        public bool UseReference { get; }
 
         /// <summary>Gets the schema for the mapped type.</summary>
         /// <param name="schema">The schema.</param>

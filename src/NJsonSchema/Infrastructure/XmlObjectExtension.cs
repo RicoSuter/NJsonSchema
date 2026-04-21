@@ -2,15 +2,12 @@
 // <copyright file="XmlObjectExtension.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Namotion.Reflection;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using Namotion.Reflection;
 
 namespace NJsonSchema.Infrastructure
 {

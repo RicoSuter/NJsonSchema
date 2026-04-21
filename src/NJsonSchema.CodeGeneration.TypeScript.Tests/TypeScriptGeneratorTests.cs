@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Xunit;
+﻿using NJsonSchema.CodeGeneration.TypeScript.Tests.Models;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Generation;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
@@ -13,7 +9,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_more_properties_are_defined_in_allOf_and_type_none_then_all_of_contains_all_properties_in_generated_code()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
                 'type': 'object',
@@ -35,27 +31,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 ]
             }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Class,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Class
             });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
-            //// Assert
-            Assert.Contains(@"export class Foo extends Anonymous implements IFoo {
-    prop1: string;
-    prop2: string;
-".Replace("\r", string.Empty), code);
-            Assert.Contains("class Anonymous", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_allOf_schema_is_object_type_then_it_is_an_inherited_class_in_generated_code()
         {
-            //// Arrange
+            // Arrange
             var json = @"{
                 '$schema': 'http://json-schema.org/draft-04/schema#',
                 'type': 'object',
@@ -77,68 +69,72 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             }";
 
-            //// Act
+            // Act
             var schema = await JsonSchema.FromJsonAsync(json);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile("Foo");
 
-            //// Assert
-            Assert.Contains("class Foo extends Bar", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_property_name_does_not_match_property_name_then_casing_is_correct_in_output()
         {
-            //// Arrange
+            // Arrange
             var generator = await CreateGeneratorAsync();
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("Teacher");
 
-            //// Assert
-            Assert.Contains(@"lastName: string;", output);
-            Assert.Contains(@"Dictionary: { [key: string]: number; };", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
         public async Task When_property_is_required_name_then_TypeScript_property_is_not_optional()
         {
-            //// Arrange
+            // Arrange
             var generator = await CreateGeneratorAsync();
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("Teacher");
 
-            //// Assert
-            Assert.Contains(@"FirstName: string;", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
         public async Task When_allOf_contains_one_schema_then_csharp_inheritance_is_generated()
         {
-            //// Arrange
+            // Arrange
             var generator = await CreateGeneratorAsync();
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("Teacher");
 
-            //// Assert
-            Assert.Contains(@"interface Teacher extends Person", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
         public async Task When_enum_has_description_then_typescript_has_comment()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.AllOf.First().ActualSchema.Properties["Gender"].Description = "EnumDesc.";
             var generator = new TypeScriptGenerator(schema);
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains(@"/** EnumDesc. *", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         /// <summary>
@@ -147,7 +143,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_enum_has_default_and_using_enumstyle_stringliteral_it_defaults_to_stringliteral()
         {
-            //// Arrange
+            // Arrange
             var jsonSchema = @"
                 {
                     ""$schema"": ""http://json-schema.org/draft-04/schema#"",
@@ -166,76 +162,73 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var schema = await JsonSchema.FromJsonAsync(jsonSchema);
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                EnumStyle = TypeScriptEnumStyle.StringLiteral,
-                TypeScriptVersion = 5m,
+                EnumStyle = TypeScriptEnumStyle.StringLiteral
             });
 
-            //// Act
+            // Act
             var code = generator.GenerateFile("MyFile");
 
-            //// Assert
-            Assert.Contains("export type MyFileColor = \"red\" | \"green\" | \"blue\" | \"black\";", code);
-            Assert.Contains("this.color = _data[\"color\"] !== undefined ? _data[\"color\"] : \"green\";", code);
-            Assert.Contains("this.color = \"green\";", code);
-
-            // This is the old code gen that used the enum prior to the fix for #1618
-            Assert.DoesNotContain("Color.Green", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
         public async Task When_class_has_description_then_typescript_has_comment()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.Description = "ClassDesc.";
             var generator = new TypeScriptGenerator(schema);
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains(@"/** ClassDesc. *", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
         public async Task When_property_has_description_then_csharp_has_xml_comment()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             schema.ActualProperties["Class"].Description = "PropertyDesc.";
             var json = schema.ToJson();
 
             var generator = new TypeScriptGenerator(schema);
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains(@"/** PropertyDesc. *", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
         public async Task When_property_is_readonly_then_ts_property_is_also_readonly()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 2.0m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains(@"readonly Birthday", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
-        public void When_name_contains_dash_then_it_is_converted_to_upper_case()
+        public async Task When_name_contains_dash_then_it_is_converted_to_upper_case()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
             schema.Properties["foo-bar"] = new JsonSchemaProperty
             {
@@ -244,44 +237,45 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Interface });
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains(@"""foo-bar"": string;", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
-        public void When_type_name_is_missing_then_anonymous_name_is_generated()
+        public async Task When_type_name_is_missing_then_anonymous_name_is_generated()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema();
 
             var generator = new TypeScriptGenerator(schema);
 
-            //// Act
+            // Act
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.DoesNotContain(@"interface  {", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
-        private static async Task<TypeScriptGenerator> CreateGeneratorAsync()
+        private static Task<TypeScriptGenerator> CreateGeneratorAsync()
         {
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Teacher>();
             var schemaData = schema.ToJson();
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
-                TypeStyle = TypeScriptTypeStyle.Interface,
-                TypeScriptVersion = 1.8m
+                TypeStyle = TypeScriptTypeStyle.Interface
             });
-            return generator;
+            return Task.FromResult(generator);
         }
 
         [Fact]
         public async Task When_patternProperties_is_set_with_string_value_type_then_correct_dictionary_is_generated()
         {
-            //// Arrange
+            // Arrange
             var schemaJson = @"{
                 ""required"": [ ""dict"" ],
                 ""properties"": {
@@ -299,13 +293,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var schema = await JsonSchema.FromJsonAsync(schemaJson);
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("dict: { [key: string]: string; };", code); // property not nullable
-            Assert.Contains("this.dict = {};", code); // must be initialized with {}
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
 
         [Fact]
@@ -390,18 +384,19 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = TypeScriptTypeStyle.Class });
             var code = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.DoesNotContain("Liquid error: ", code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
         
         [Fact]
         public async Task When_a_nullable_array_property_exists_and_typestyle_is_null_then_init_should_assign_null()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema
             {
                 Properties =
@@ -420,25 +415,23 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             };
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 NullValue = TypeScriptNullValue.Null,
-                TypeScriptVersion = 4,
                 MarkOptionalProperties = false,
             });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
-            //// Assert
-            Assert.Matches(new Regex(
-                @"init\(.*\)\s{.*}\s*else\s{\s*this\.prop\s=\s<any>null;\s*}", RegexOptions.Singleline),
-                code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
         
         [Fact]
         public async Task When_a_nullable_dict_property_exists_and_typestyle_is_null_then_init_should_assign_null()
         {
-            //// Arrange
+            // Arrange
             var schema = new JsonSchema
             {
                 Properties =
@@ -457,19 +450,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
                 }
             };
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 NullValue = TypeScriptNullValue.Null,
-                TypeScriptVersion = 4,
                 MarkOptionalProperties = false,
             });
             var code = generator.GenerateFile("Foo").Replace("\r\n", "\n");
 
-            //// Assert
-            Assert.Matches(new Regex(
-                    @"init\(.*\)\s{.*}\s*else\s{\s*this\.prop\s=\s<any>null;\s*}", RegexOptions.Singleline),
-                code);
+            // Assert
+            await VerifyHelper.Verify(code);
+            TypeScriptCompiler.AssertCompile(code);
         }
     }
 }

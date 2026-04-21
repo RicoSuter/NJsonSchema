@@ -6,7 +6,7 @@
 {%   if property.HasDescription -%}
     /** {{ property.Description }} */
 {%   endif -%}
-    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% elsif RequiresStrictPropertyInitialization %}!{% endif %}: {{ property.Type }}{{ property.TypePostfix }};
+    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% else %}!{% endif %}: {{ property.Type }}{{ property.TypePostfix }};
 {% endfor -%}
 {% if HasIndexerProperty -%}
 
@@ -28,7 +28,7 @@
 {%         if HasInheritance == false -%}
             for (var property in data) {
                 if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
+                    (this as any)[property] = (data as any)[property];
             }
 {%         endif -%}
 {%         if ConvertConstructorInterfaceData -%}
@@ -39,7 +39,7 @@
                 this.{{ property.PropertyName }} = [];
                 for (let i = 0; i < data.{{ property.PropertyName }}.length; i++) {
                     let item = data.{{ property.PropertyName }}[i];
-                    this.{{ property.PropertyName }}[i] = item && !(<any>item).toJSON ? new {{ property.ArrayItemType }}(item) : <{{ property.ArrayItemType }}>item;
+                    this.{{ property.PropertyName }}[i] = item && !(item as any).toJSON ? new {{ property.ArrayItemType }}(item) : item as {{ property.ArrayItemType }};
                 }
             }
 {%                     elsif property.IsDictionary -%}
@@ -48,12 +48,12 @@
                 for (let key in data.{{ property.PropertyName }}) {
                     if (data.{{ property.PropertyName }}.hasOwnProperty(key)) {
                         let item = data.{{ property.PropertyName }}[key];
-                        this.{{ property.PropertyName }}[key] = item && !(<any>item).toJSON ? new {{ property.DictionaryItemType }}(item) : <{{ property.DictionaryItemType }}>item;
+                        this.{{ property.PropertyName }}[key] = item && !(item as any).toJSON ? new {{ property.DictionaryItemType }}(item) : item as {{ property.DictionaryItemType }};
                     }
                 }
             }
 {%                     else -%}
-            this.{{ property.PropertyName }} = data.{{ property.PropertyName }} && !(<any>data.{{ property.PropertyName }}).toJSON ? new {{ property.Type }}(data.{{ property.PropertyName }}) : <{{ property.Type }}>this.{{ property.PropertyName }};
+            this.{{ property.PropertyName }} = data.{{ property.PropertyName }} && !(data.{{ property.PropertyName }} as any).toJSON ? new {{ property.Type }}(data.{{ property.PropertyName }}) : this.{{ property.PropertyName }} as {{ property.Type }};
 {%                     endif -%}
 {%                 endif -%}
 {%             endfor -%}
@@ -75,7 +75,7 @@
     }
 {% endif -%}
 
-    {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}init(_data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
+    {% if HasInheritance %}override {% endif %}init(_data?: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
 {% if HasInheritance -%}
         super.init(_data);
 {% endif -%}
@@ -94,7 +94,7 @@
 {% endif -%}
     }
 
-    static {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }}{% if HandleReferences %} | null{% endif %} {
+    static {% if HasInheritance %}override {% endif %}fromJS(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }}{% if HandleReferences %} | null{% endif %} {
         data = typeof data === 'object' ? data : {};
 {% if HandleReferences -%}
 {%   if HasBaseDiscriminator -%}
@@ -136,7 +136,7 @@
 {% endif -%}
     }
 
-    {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}toJSON(data?: any) {
+    {% if HasInheritance %}override {% endif %}toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
 {% if HasIndexerProperty -%}
         for (var property in this) {

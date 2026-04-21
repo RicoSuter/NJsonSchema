@@ -1,11 +1,7 @@
 using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -14,13 +10,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_minLength_and_maxLength_attribute_are_set_on_array_then_minItems_and_maxItems_are_set()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Items"];
 
-            //// Assert
+            // Assert
             Assert.Equal(3, property.MinItems);
             Assert.Equal(5, property.MaxItems);
         }
@@ -28,13 +24,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_minLength_and_maxLength_attribute_are_set_on_string_then_minLength_and_maxLenght_are_set()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["String"];
 
-            //// Assert
+            // Assert
             Assert.Equal(3, property.MinLength);
             Assert.Equal(5, property.MaxLength);
         }
@@ -42,13 +38,32 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_Range_attribute_is_set_on_double_then_minimum_and_maximum_are_set()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Double"];
 
-            //// Assert
+            // Assert
+            Assert.Equal(5.5m, property.Minimum);
+            Assert.Equal(10.5m, property.Maximum);
+        }
+        
+        [Theory]
+        [InlineData("en-US")]
+        [InlineData("de-DE")]
+        [InlineData("nb-NO")]
+        public async Task When_Range_attribute_is_set_on_decimal_then_minimum_and_maximum_are_set_regardless_of_culture(string culture)
+        {
+            // Arrange
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(culture);
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(culture);
+
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
+            var property = schema.Properties["Decimal"];
+
+            // Assert
             Assert.Equal(5.5m, property.Minimum);
             Assert.Equal(10.5m, property.Maximum);
         }
@@ -56,13 +71,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_Range_attribute_has_double_max_then_max_is_not_set()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["DoubleOnlyMin"];
 
-            //// Assert
+            // Assert
             Assert.Equal(5.5m, property.Minimum);
             Assert.Null(property.Maximum);
         }
@@ -70,13 +85,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_Range_attribute_is_set_on_integer_then_minimum_and_maximum_are_set()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Integer"];
 
-            //// Assert
+            // Assert
             Assert.Equal(5, property.Minimum);
             Assert.Equal(10, property.Maximum);
         }
@@ -84,14 +99,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_display_attribute_is_available_then_name_and_description_are_read()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Display"];
 
-            //// Assert
+            // Assert
             Assert.Equal("Foo", property.Title);
             Assert.Equal("Bar", property.Description);
         }
@@ -99,14 +114,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_display_attribute_with_resource_type_is_available_then_name_and_description_are_read() 
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["DisplayWithResource"];
 
-            //// Assert
+            // Assert
             Assert.Equal(AttributeGenerationTestsResources.AttributeGenerationsTests_Name, property.Title);
             Assert.Equal(AttributeGenerationTestsResources.AttributeGenerationsTests_Description, property.Description);
         }
@@ -114,42 +129,42 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_description_attribute_is_available_then_description_are_read()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
-            //// Assert
+            // Assert
             Assert.Equal("Abc", property.Description);
         }
 
         [Fact]
         public async Task When_required_attribute_is_available_then_property_is_required()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Required"];
 
-            //// Assert
+            // Assert
             Assert.True(property.IsRequired);
         }
 
         [Fact]
         public async Task When_required_attribute_is_not_available_then_property_is_can_be_null()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["Description"];
 
-            //// Assert
+            // Assert
             Assert.False(property.IsRequired);
             Assert.True(property.Type.HasFlag(JsonObjectType.Null));
         }
@@ -157,14 +172,14 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_ReadOnly_is_set_then_readOnly_is_set_in_schema()
         {
-            //// Arrange
+            // Arrange
 
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<AttributeTestClass>();
             var property = schema.Properties["ReadOnly"];
 
-            //// Assert
+            // Assert
             Assert.True(property.IsReadOnly);
         }
 
@@ -180,6 +195,9 @@ namespace NJsonSchema.Tests.Generation
 
             [Range(5.5, 10.5)]
             public double Double { get; set; }
+
+            [Range(typeof(decimal), "5.5", "10.5")]
+            public double Decimal { get; set; }
 
             [Range(5.5, double.MaxValue)]
             public double DoubleOnlyMin { get; set; }
@@ -216,13 +234,13 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_range_has_type_and_strings_then_it_is_processed_correctly()
         {
-            //// Arrange
+            // Arrange
 
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithTypedRange>();
             var property = schema.Properties["Foo"];
 
-            //// Assert
+            // Assert
             Assert.Equal(0.0m, property.Minimum);
             Assert.Equal(1.0m, property.Maximum);
         }
@@ -273,13 +291,109 @@ namespace NJsonSchema.Tests.Generation
         [Fact]
         public async Task When_dictionary_property_has_regex_attribute_then_regex_is_added_to_additionalProperties()
         {
-            //// Act
+            // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRegexDictionaryProperty>();
             var json = schema.ToJson();
 
-            //// Assert
+            // Assert
             Assert.Null(schema.Properties["Versions"].Pattern);
             Assert.NotNull(schema.Properties["Versions"].AdditionalPropertiesSchema.ActualSchema.Pattern);
         }
+
+        public class ClassWithRequiredDateTimeProperties
+        {
+            [Required]
+            public DateTime RequiredDateTime { get; set; }
+
+            [Required]
+            public DateTimeOffset RequiredDateTimeOffset { get; set; }
+
+#if NET6_0_OR_GREATER
+            [Required]
+            public DateOnly RequiredDateOnly { get; set; }
+
+            [Required]
+            public TimeOnly RequiredTimeOnly { get; set; }
+#endif
+
+            [Required]
+            public string RequiredString { get; set; }
+        }
+
+        [Fact]
+        public void When_required_DateTime_then_MinLength_is_not_set()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredDateTimeProperties>();
+
+            // Assert
+            Assert.Null(schema.Properties["RequiredDateTime"].MinLength);
+            Assert.Null(schema.Properties["RequiredDateTimeOffset"].MinLength);
+#if NET6_0_OR_GREATER
+            Assert.Null(schema.Properties["RequiredDateOnly"].MinLength);
+            Assert.Null(schema.Properties["RequiredTimeOnly"].MinLength);
+#endif
+            Assert.Equal(1, schema.Properties["RequiredString"].MinLength);
+        }
+
+#if NET7_0_OR_GREATER
+        public class ClassWithRequiredKeyword
+        {
+            public required string Name { get; set; }
+            public string Optional { get; set; }
+        }
+
+        [Fact]
+        public void When_property_has_required_keyword_then_it_is_required_in_Newtonsoft_schema()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredKeyword>();
+
+            // Assert
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+        }
+
+#nullable enable
+        public class ClassWithRequiredNullableKeyword
+        {
+            public required string? Name { get; set; }
+            public string? Optional { get; set; }
+        }
+#nullable restore
+
+        [Fact]
+        public void When_property_has_required_keyword_and_nullable_type_then_it_is_required_and_nullable_in_Newtonsoft_schema()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredNullableKeyword>();
+
+            // Assert: required keyword adds to required array
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: nullable type is preserved — required keyword alone must not suppress nullability
+            Assert.True(schema.Properties["Name"].IsNullable(SchemaType.JsonSchema));
+            Assert.Null(schema.Properties["Name"].MinLength);
+        }
+#endif
+
+#if NET6_0_OR_GREATER
+        [Display(Name = "My Title", Description = "My Description")]
+        public class ClassWithDisplayAttribute
+        {
+            public string Foo { get; set; }
+        }
+
+        [Fact]
+        public void When_class_has_Display_Name_then_schema_title_is_set()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithDisplayAttribute>();
+
+            // Assert
+            Assert.Equal("My Title", schema.Title);
+            Assert.Equal("My Description", schema.Description);
+        }
+#endif
     }
 }

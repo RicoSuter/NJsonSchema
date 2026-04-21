@@ -7,12 +7,23 @@
 {%- if IsEnumAsBitFlags -%}
 [System.Flags]
 {%- endif -%}
+{%- template Enum.Annotations %}
 {{ TypeAccessModifier }} enum {{ Name }}{%- if HasExtendedValueRange %} : long{% endif %}
 {
 {%- for enum in Enums %}
 {%-   if IsStringEnum -%}
+{%-       if UseSystemTextJson -%}
+{%-           if JsonLibraryVersion >= 9.0 -%}
+    [System.Text.Json.Serialization.JsonStringEnumMemberName(@"{{ enum.Value | replace: '"', '""' }}")]
     [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value | replace: '"', '""' }}")]
+{%-           else -%}
+    [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value | replace: '"', '""' }}")]
+{%-           endif -%}
+{%-       else -%}
+    [System.Runtime.Serialization.EnumMember(Value = @"{{ enum.Value | replace: '"', '""' }}")]
+{%-       endif -%}
 {%-   endif -%}
+{%- template Enum.Member.Annotations -%}
 {%- if IsEnumAsBitFlags -%}
     {{ enum.Name }} = {{ enum.InternalFlagValue }},
 {%- else -%}

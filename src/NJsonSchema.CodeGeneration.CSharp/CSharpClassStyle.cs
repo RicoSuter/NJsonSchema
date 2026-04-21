@@ -2,7 +2,7 @@
 // <copyright file="CSharpClassStyle.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -23,6 +23,6 @@ namespace NJsonSchema.CodeGeneration.CSharp
         Prism,
 
         /// <summary>Generates Records - read only POCOs (Plain Old C# Objects).</summary>
-        Record
+        Record,
     }
 }

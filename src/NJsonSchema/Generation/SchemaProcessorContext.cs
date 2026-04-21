@@ -2,12 +2,11 @@
 // <copyright file="SchemaProcessorContext.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
-using System;
 
 namespace NJsonSchema.Generation
 {
@@ -31,7 +30,7 @@ namespace NJsonSchema.Generation
 
         /// <summary>The source type.</summary>
         [Obsolete("Use ContextualType to obtain this instead.")]
-        public Type Type { get => ContextualType.OriginalType; }
+        public Type Type => ContextualType.OriginalType;
 
         /// <summary>The source contextual type.</summary>
         public ContextualType ContextualType { get; }

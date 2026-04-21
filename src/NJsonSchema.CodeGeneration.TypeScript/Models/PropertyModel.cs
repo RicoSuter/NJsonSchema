@@ -2,7 +2,7 @@
 // <copyright file="PropertyModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -15,10 +15,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
     /// <seealso cref="PropertyModelBase" />
     public class PropertyModel : PropertyModelBase
     {
-        private static readonly string _validPropertyNameRegex = "^[a-zA-Z_$][0-9a-zA-Z_$]*$";
+        private static readonly Lazy<Regex> _validPropertyNameRegex = new(static () => new Regex("^[a-zA-Z_$][0-9a-zA-Z_$]*$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(250)));
 
         private readonly string _parentTypeName;
         private readonly TypeScriptGeneratorSettings _settings;
+        private readonly ClassTemplateModel _classTemplateModel;
         private readonly JsonSchemaProperty _property;
         private readonly TypeScriptTypeResolver _resolver;
 
@@ -35,6 +36,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
             TypeScriptGeneratorSettings settings)
             : base(property, classTemplateModel, typeResolver, settings)
         {
+            _classTemplateModel = classTemplateModel;
             _property = property;
             _resolver = typeResolver;
             _parentTypeName = parentTypeName;
@@ -42,7 +44,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets the name of the property in an interface.</summary>
-        public string InterfaceName => Regex.IsMatch(_property.Name, _validPropertyNameRegex) ? _property.Name : $"\"{_property.Name}\"";
+        public string InterfaceName => _validPropertyNameRegex.Value.IsMatch(_property.Name) ? _property.Name : $"\"{_property.Name}\"";
 
         /// <summary>Gets a value indicating whether the property has description.</summary>
         public bool HasDescription => !string.IsNullOrEmpty(Description);
@@ -51,7 +53,32 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public string? Description => _property.Description;
 
         /// <summary>Gets the type of the property.</summary>
-        public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+        public override string Type
+        {
+            get
+            {
+                if (_settings.TypeStyle == TypeScriptTypeStyle.Interface &&
+                    _classTemplateModel.HasInheritance &&
+                    InterfaceName == _classTemplateModel.BaseDiscriminator)
+                {
+                    // use string type as the discriminator property type in specialized interfaces
+                    if (_property.ActualTypeSchema.IsEnumeration &&
+                        _settings.EnumStyle == TypeScriptEnumStyle.Enum)
+                    {
+                        return _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint()) + "." +
+                            _classTemplateModel.DiscriminatorName;
+                    }
+                    else
+                    {
+                        return $"'{_classTemplateModel.DiscriminatorName}'";
+                    }
+                }
+                else
+                {
+                    return _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
+                }
+            }
+        }
 
         /// <summary>Gets the type of the property in the initializer interface.</summary>
         public string ConstructorInterfaceType => _settings.ConvertConstructorInterfaceData ?
@@ -102,7 +129,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         {
             get
             {
-                if (IsNullable && _settings.SupportsStrictNullChecks)
+                if (IsNullable)
                 {
                     return " | " + _settings.NullValue.ToString().ToLowerInvariant();
                 }
@@ -114,7 +141,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         }
 
         /// <summary>Gets a value indicating whether the property is read only.</summary>
-        public bool IsReadOnly => _property.IsReadOnly && _settings.TypeScriptVersion >= 2.0m;
+        public bool IsReadOnly => _property.IsReadOnly;
 
         /// <summary>Gets a value indicating whether the property is optional.</summary>
         public bool IsOptional => !_property.IsRequired && _settings.MarkOptionalProperties;
@@ -132,8 +159,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                 {
                     return DataConversionGenerator.RenderConvertToClassCode(new DataConversionParameters
                     {
-                        Variable = typeStyle == TypeScriptTypeStyle.Class ?
-                            (IsReadOnly ? "(<any>this)." : "this.") + PropertyName : PropertyName + "_",
+                        Variable = typeStyle == TypeScriptTypeStyle.Class
+                            ? (IsReadOnly ? "(this as any)." : "this.") + PropertyName
+                            : PropertyName + "_",
                         Value = "_data[\"" + _property.Name + "\"]",
                         Schema = _property,
                         IsPropertyNullable = _property.IsNullable(_settings.SchemaType),

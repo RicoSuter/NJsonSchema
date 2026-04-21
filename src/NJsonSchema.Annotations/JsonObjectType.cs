@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NJsonSchema;
+﻿namespace NJsonSchema;
 
 /// <summary>
 /// Enumeration of the possible object types.

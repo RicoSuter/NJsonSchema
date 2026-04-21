@@ -1,4 +1,5 @@
-﻿[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
+﻿{%- if UseSystemTextJsonPolymorphicSerialization == false -%}
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "{{ ToolchainVersion }}")]
 {%- if UseSystemTextJson -%}
 internal class JsonInheritanceConverterAttribute : System.Text.Json.Serialization.JsonConverterAttribute
 {
@@ -45,17 +46,24 @@ public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.Js
 
     public override void Write(System.Text.Json.Utf8JsonWriter writer, TBase value, System.Text.Json.JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-        writer.WriteString(_discriminatorName, GetDiscriminatorValue(value.GetType()));
-
-        var bytes = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes((object)value, options);
-        var document = System.Text.Json.JsonDocument.Parse(bytes);
-        foreach (var property in document.RootElement.EnumerateObject())
+        if (value != null)
         {
-            property.WriteTo(writer);
-        }
+            writer.WriteStartObject();
+            writer.WriteString(_discriminatorName, GetDiscriminatorValue(value.GetType()));
 
-        writer.WriteEndObject();
+            var bytes = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes((object)value, options);
+            var document = System.Text.Json.JsonDocument.Parse(bytes);
+            foreach (var property in document.RootElement.EnumerateObject())
+            {
+                property.WriteTo(writer);
+            }
+
+            writer.WriteEndObject();
+        }
+        else
+        {
+            writer.WriteNullValue();
+        }
     }
 
     public string GetDiscriminatorValue(System.Type type)
@@ -71,36 +79,39 @@ public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.Js
 
     protected System.Type GetDiscriminatorType(System.Text.Json.JsonElement jObject, System.Type objectType, string discriminatorValue)
     {
-        var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
-        if (jsonInheritanceAttributeSubtype != null)
+        if (discriminatorValue != null)
         {
-            return jsonInheritanceAttributeSubtype;
-        }
+            var jsonInheritanceAttributeSubtype = GetObjectSubtype(objectType, discriminatorValue);
+            if (jsonInheritanceAttributeSubtype != null)
+            {
+                return jsonInheritanceAttributeSubtype;
+            }
 
-        if (objectType.Name == discriminatorValue)
-        {
-            return objectType;
-        }
+            if (objectType.Name == discriminatorValue)
+            {
+                return objectType;
+            }
 
-        var typeName = objectType.Namespace + "." + discriminatorValue;
-        var subtype = System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType).Assembly.GetType(typeName);
-        if (subtype != null)
-        {
-            return subtype;
+            var typeName = objectType.Namespace + "." + discriminatorValue;
+            var subtype = System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType).Assembly.GetType(typeName);
+            if (subtype != null)
+            {
+                return subtype;
+            }
         }
 
         throw new System.InvalidOperationException("Could not find subtype of '" + objectType.Name + "' with discriminator '" + discriminatorValue + "'.");
     }
 
-    private System.Type GetObjectSubtype(System.Type objectType, string discriminator)
+    private System.Type GetObjectSubtype(System.Type baseType, string discriminatorValue)
     {
-        foreach (var attribute in System.Reflection.CustomAttributeExtensions.GetCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExtensions.GetTypeInfo(objectType), true))
+        foreach (var attribute in System.Reflection.CustomAttributeExtensions.GetCustomAttributes<JsonInheritanceAttribute>(System.Reflection.IntrospectionExtensions.GetTypeInfo(baseType), true))
         {
-            if (attribute.Key == discriminator)
+            if (attribute.Key == discriminatorValue)
                 return attribute.Type;
         }
 
-        return objectType;
+        return null;
     }
 
     private string GetSubtypeDiscriminator(System.Type objectType)
@@ -111,7 +122,7 @@ public class JsonInheritanceConverter<TBase> : System.Text.Json.Serialization.Js
                 return attribute.Key;
         }
 
-        return objectType.Name;
+        return null;
     }
 }
 {%- else -%}
@@ -235,4 +246,5 @@ public class JsonInheritanceConverter : Newtonsoft.Json.JsonConverter
         return objectType.Name;
     }
 }
+{%- endif -%}
 {%- endif -%}

@@ -2,12 +2,9 @@
 // <copyright file="PropertyModelBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Collections.Generic;
 
 namespace NJsonSchema.CodeGeneration.Models
 {
@@ -64,8 +61,8 @@ namespace NJsonSchema.CodeGeneration.Models
         public bool IsStringEnumArray =>
             _property.ActualTypeSchema.IsArray &&
             _property.ActualTypeSchema.Item != null &&
-            _property.ActualTypeSchema.Item.ActualSchema.IsEnumeration &&
-            _property.ActualTypeSchema.Item.ActualSchema.Type.IsString();
+            _property.ActualTypeSchema.Item.ActualTypeSchema.IsEnumeration &&
+            _property.ActualTypeSchema.Item.ActualTypeSchema.Type.IsString();
 
         /// <summary>Gets the property extension data.</summary>
         public IDictionary<string, object?>? ExtensionData => _property.ExtensionData;
@@ -77,7 +74,7 @@ namespace NJsonSchema.CodeGeneration.Models
         protected string GetTypeNameHint()
         {
             var propertyName = PropertyName;
-            if (_property.IsEnumeration == false)
+            if (!_property.IsEnumeration)
             {
                 return propertyName;
             }

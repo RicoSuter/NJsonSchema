@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using NJsonSchema.Generation;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.NewtonsoftJson.Converters;
 using NJsonSchema.NewtonsoftJson.Generation;
-using Xunit;
 
 namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
@@ -54,47 +51,28 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         [Fact]
         public async Task When_constructor_interface_and_conversion_code_is_generated_then_it_is_correct()
         {
-            //// Arrange
+            // Arrange
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings());
             var json = schema.ToJson();
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 GenerateConstructorInterface = true,
-                ConvertConstructorInterfaceData = true,
-                TypeScriptVersion = 1.8m
+                ConvertConstructorInterfaceData = true
             });
 
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
-
-            Assert.DoesNotContain("new MyClass(", output);
-            // address property is converted:
-            Assert.Contains("this.address = data.address && !(<any>data.address).toJSON ? new Address(data.address) : <Address>this.address;", output);
-            // cars items are converted:
-            Assert.Contains("this.cars[i] = item && !(<any>item).toJSON ? new Car(item) : <Car>item;", output);
-            // skills values are converted:
-            Assert.Contains("this.skills[key] = item && !(<any>item).toJSON ? new Skill(item) : <Skill>item;", output);
-            // student car is converted:
-            Assert.Contains("this.car = data.car && !(<any>data.car).toJSON ? new Car(data.car) : <Car>this.car;", output);
-
-            // interface is correct
-            Assert.Contains(@"export interface IMyClass {
-    supervisor: MyClass;
-    address: IAddress;
-    cars: ICar[];
-    skills: { [key: string]: ISkill; };
-    foo: Car[][];
-    bar: { [key: string]: Skill[]; };
-}".Replace("\r", "").Replace("\n", ""), output.Replace("\r", "").Replace("\n", ""));
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
 
         [Fact]
         public async Task When_array_of_string_dictionary_is_used_with_ConvertConstructorInterfaceData_then_it_should_be_ignored()
         {
-            //// Arrange
+            // Arrange
             var json = @"
 {
     ""type"": ""object"",
@@ -112,7 +90,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 }";
             var schema = await JsonSchema.FromJsonAsync(json);
 
-            //// Act
+            // Act
             var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
             {
                 GenerateConstructorInterface = true,
@@ -122,8 +100,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             var output = generator.GenerateFile("MyClass");
 
-            //// Assert
-            Assert.Contains("custom4: { [key: string]: string; }[];", output);
+            // Assert
+            await VerifyHelper.Verify(output);
+            TypeScriptCompiler.AssertCompile(output);
         }
     }
 }

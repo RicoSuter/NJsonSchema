@@ -2,7 +2,7 @@
 // <copyright file="DefaultReflectionService.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
-// <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
+// SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
@@ -10,7 +10,6 @@ using System.Linq;
 using Newtonsoft.Json.Converters;
 using Namotion.Reflection;
 using Newtonsoft.Json;
-using System;
 using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using System.Runtime.Serialization;
@@ -65,7 +64,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                 converters.Add(new StringEnumConverter());
             }
 
-            return x => JsonConvert.DeserializeObject<string?>(JsonConvert.SerializeObject(x, Formatting.None, converters.ToArray()));
+            return x => JsonConvert.DeserializeObject<string?>(JsonConvert.SerializeObject(x, Formatting.None, [.. converters]));
         }
 
         /// <inheritdoc />
@@ -87,8 +86,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
             var contract = settings.ResolveContract(contextualType.Type);
 
             var allowedProperties = schemaGenerator.GetTypeProperties(contextualType.Type);
-            var objectContract = contract as JsonObjectContract;
-            if (objectContract != null && allowedProperties == null)
+            if (allowedProperties == null && contract is JsonObjectContract objectContract)
             {
                 foreach (var jsonProperty in objectContract.Properties.Where(p => p.DeclaringType == contextualType.Type))
                 {
@@ -156,7 +154,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
         private void LoadPropertyOrField(JsonProperty jsonProperty, ContextualAccessorInfo accessorInfo, Type parentType, JsonSchema parentSchema, NewtonsoftJsonSchemaGeneratorSettings settings, JsonSchemaGenerator schemaGenerator, JsonSchemaResolver schemaResolver)
         {
             var propertyTypeDescription = ((IReflectionService)this).GetDescription(accessorInfo.AccessorType, settings);
-            if (jsonProperty.Ignored == false && schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo) == false)
+            if (!jsonProperty.Ignored && !schemaGenerator.IsPropertyIgnoredBySettings(accessorInfo))
             {
                 var propertyName = GetPropertyName(jsonProperty, accessorInfo, settings);
                 var propertyAlreadyExists = parentSchema.Properties.ContainsKey(propertyName);
@@ -173,26 +171,30 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                     }
                 }
 
-                var requiredAttribute = accessorInfo
-                    .GetAttributes(true)
+                var attributes = accessorInfo.GetAttributes(true);
+                var requiredAttribute = attributes
                     .FirstAssignableToTypeNameOrDefault("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                var hasRequiredMemberAttribute = attributes.FirstAssignableToTypeNameOrDefault(
+                    "System.Runtime.CompilerServices.RequiredMemberAttribute") != null;
 
-                var hasJsonNetAttributeRequired = jsonProperty.Required == Required.Always || jsonProperty.Required == Required.AllowNull;
+                var hasJsonNetAttributeRequired = jsonProperty.Required is Required.Always or Required.AllowNull;
                 var isDataContractMemberRequired = schemaGenerator.GetDataMemberAttribute(accessorInfo, parentType)?.IsRequired == true;
 
-                var hasRequiredAttribute = requiredAttribute != null;
+                var hasRequiredAttribute = requiredAttribute != null || hasRequiredMemberAttribute;
                 if (hasRequiredAttribute || isDataContractMemberRequired || hasJsonNetAttributeRequired)
                 {
                     parentSchema.RequiredProperties.Add(propertyName);
                 }
 
-                var isNullable = propertyTypeDescription.IsNullable &&
-                    hasRequiredAttribute == false &&
-                    (jsonProperty.Required == Required.Default || jsonProperty.Required == Required.AllowNull);
+                // The C# required keyword marks a property as required in the schema's required array
+                // but does not imply a non-nullable value. Only [Required] carries the semantic meaning
+                // of "non-null value required" and should suppress nullability and trigger MinLength = 1
+                // on strings.
+                var isNullable = propertyTypeDescription.IsNullable && requiredAttribute == null && jsonProperty.Required is Required.Default or Required.AllowNull;
 
                 var defaultValue = jsonProperty.DefaultValue;
 
-                schemaGenerator.AddProperty(parentSchema, accessorInfo, propertyTypeDescription, propertyName, requiredAttribute, hasRequiredAttribute, isNullable, defaultValue, schemaResolver);
+                schemaGenerator.AddProperty(parentSchema, accessorInfo, propertyTypeDescription, propertyName, requiredAttribute, requiredAttribute != null, isNullable, defaultValue, schemaResolver);
             }
         }
 

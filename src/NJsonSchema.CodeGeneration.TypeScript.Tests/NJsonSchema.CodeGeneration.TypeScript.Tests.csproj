@@ -1,29 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net462</TargetFrameworks>
+        <TargetFrameworks>net8.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
         <IsPackable>false</IsPackable>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn),1587,1998,1591,618</NoWarn>
         <Nullable>disable</Nullable>
+        <AnalysisLevel>latest-Minimal</AnalysisLevel>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <OutputType>Exe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="Verify.XUnit" />
-        <PackageReference Include="xunit" />
+        <PackageReference Include="Verify.XunitV3" />
+        <PackageReference Include="xunit.v3" />
         <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Condition="'$(TargetFramework)' == 'net462'" Include="System.ComponentModel.DataAnnotations" />
+        <Reference Condition="'$(TargetFramework)' == 'net472'" Include="System.ComponentModel.DataAnnotations" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\NJsonSchema.CodeGeneration.TypeScript\NJsonSchema.CodeGeneration.TypeScript.csproj" />
         <ProjectReference Include="..\NJsonSchema.NewtonsoftJson\NJsonSchema.NewtonsoftJson.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="..\NJsonSchema.Tests\VerifyHelper.cs" Link="VerifyHelper.cs" />
+      <Compile Include="..\NJsonSchema.CodeGeneration.Tests\TypeScriptCompiler.cs" Link="TypeScriptCompiler.cs" />
     </ItemGroup>
 
 </Project>
