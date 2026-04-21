@@ -45,7 +45,7 @@ Reference resolution (`ActualSchema` vs `ActualTypeSchema`, `$ref` semantics, si
 
 Keep this index up to date — if a new persistent doc lands under `docs/`, add a row with a concrete "read when" trigger.
 
-## v12 branch conventions (current branch: `docs/v12-setup` / PRs target `v12`)
+## v12 branch conventions
 
 - **Feature PRs target `v12`**, not `master`. `master` is the v11.x stable line. See `docs/plan_v12.md` for the full branch model, release plan, and pre-release cleanup checklist.
 - **User-visible changes must update `docs/changelog_v12.md`** (add under `Unreleased` → Breaking / New / Fixes, plus a Migration guide section if it breaks v11 consumers).
