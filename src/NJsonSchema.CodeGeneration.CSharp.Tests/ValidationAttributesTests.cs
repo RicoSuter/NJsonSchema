@@ -555,8 +555,36 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             CSharpCompiler.AssertCompile(code);
         }
 
+        [Theory]
+        [InlineData("date-time")]
+        [InlineData("date")]
+        [InlineData("time")]
+        [InlineData("duration")]
+        [InlineData("uri")]
+        [InlineData("uuid")]
+        [InlineData("byte")]
+        public async Task When_non_string_typed_property_has_min_max_length_then_no_string_length_attribute_is_generated(string format)
+        {
+            var json = @"{
+                'type': 'object',
+                'properties': {
+                    'myProp': {
+                        'type': 'string',
+                        'format': '" + format + @"',
+                        'minLength': 1,
+                        'maxLength': 50
+                    }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var code = generator.GenerateFile();
+
+            Assert.DoesNotContain("StringLength", code);
+        }
+
         [Fact]
-        public async Task When_date_time_property_has_min_max_length_then_no_string_length_attribute_is_generated()
+        public async Task When_date_time_property_mapped_to_string_then_string_length_attribute_is_generated()
         {
             var json = @"{
                 'type': 'object',
@@ -570,10 +598,14 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
                 }
             }";
             var schema = await JsonSchema.FromJsonAsync(json);
-            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings { ClassStyle = CSharpClassStyle.Poco });
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                DateTimeType = "string"
+            });
             var code = generator.GenerateFile();
 
-            Assert.DoesNotContain("StringLength", code);
+            Assert.Contains("StringLength(50, MinimumLength = 1)", code);
         }
     }
 }
