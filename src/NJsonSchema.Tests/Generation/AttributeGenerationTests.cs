@@ -352,6 +352,31 @@ namespace NJsonSchema.Tests.Generation
             // Assert
             Assert.Contains("Name", schema.RequiredProperties);
             Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: required keyword is a presence marker only — it must not trigger MinLength = 1
+            // on the string type. That is reserved for [Required] from DataAnnotations.
+            Assert.Null(schema.Properties["Name"].MinLength);
+        }
+
+#nullable enable
+        public class ClassWithRequiredNullableKeyword
+        {
+            public required string? Name { get; set; }
+            public string? Optional { get; set; }
+        }
+#nullable restore
+
+        [Fact]
+        public void When_property_has_required_keyword_and_nullable_type_then_it_is_required_and_nullable_in_Newtonsoft_schema()
+        {
+            // Act
+            var schema = NewtonsoftJsonSchemaGenerator.FromType<ClassWithRequiredNullableKeyword>();
+
+            // Assert: required keyword adds to required array
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: nullable type is preserved — required keyword alone must not suppress nullability
+            Assert.True(schema.Properties["Name"].IsNullable(SchemaType.JsonSchema));
+            Assert.Null(schema.Properties["Name"].MinLength);
         }
 #endif
 

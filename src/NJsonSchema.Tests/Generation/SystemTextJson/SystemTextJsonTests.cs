@@ -149,6 +149,31 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             // Assert
             Assert.Contains("Name", schema.RequiredProperties);
             Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: required keyword is a presence marker only — it must not trigger MinLength = 1
+            // on the string type. That is reserved for [Required] from DataAnnotations.
+            Assert.Null(schema.Properties["Name"].MinLength);
+        }
+
+#nullable enable
+        public class ClassWithRequiredNullableKeyword
+        {
+            public required string? Name { get; set; }
+            public string? Optional { get; set; }
+        }
+#nullable restore
+
+        [Fact]
+        public void When_property_has_required_keyword_and_nullable_type_then_it_is_required_and_nullable_in_schema()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithRequiredNullableKeyword>();
+
+            // Assert: required keyword adds to required array
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: nullable type is preserved — required keyword alone must not suppress nullability
+            Assert.True(schema.Properties["Name"].IsNullable(SchemaType.JsonSchema));
+            Assert.Null(schema.Properties["Name"].MinLength);
         }
 
         public class ClassWithJsonRequired
@@ -167,6 +192,32 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             // Assert
             Assert.Contains("Name", schema.RequiredProperties);
             Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            // Assert: [JsonRequired] is a presence marker only — it must not trigger MinLength = 1.
+            Assert.Null(schema.Properties["Name"].MinLength);
+        }
+
+#nullable enable
+        public class ClassWithJsonRequiredNullable
+        {
+            [System.Text.Json.Serialization.JsonRequired]
+            public string? Name { get; set; }
+            public string? Optional { get; set; }
+        }
+#nullable restore
+
+        [Fact]
+        public void When_property_has_JsonRequired_and_nullable_type_then_it_is_required_and_nullable_in_schema()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithJsonRequiredNullable>();
+
+            // Assert: [JsonRequired] is a presence marker (like the C# required keyword) and matches
+            // System.Text.Json runtime semantics — the property must be present in the JSON, but the
+            // value may be null. Only [Required] (DataAnnotations) implies a non-null value.
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.DoesNotContain("Optional", schema.RequiredProperties);
+            Assert.True(schema.Properties["Name"].IsNullable(SchemaType.JsonSchema));
+            Assert.Null(schema.Properties["Name"].MinLength);
         }
 #endif
 

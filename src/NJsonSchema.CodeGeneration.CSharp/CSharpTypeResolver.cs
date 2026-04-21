@@ -216,7 +216,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             return isNullable ? "bool?" : "bool";
         }
 
-        private static string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
+        private string ResolveInteger(JsonSchema schema, bool isNullable, string? typeNameHint)
         {
             if (schema.Format == JsonFormatStrings.Byte)
             {
@@ -228,14 +228,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isNullable ? "long?" : "long";
             }
 
-            if (schema.Format is JsonFormatStrings.Long or "long")
-            {
-                return isNullable ? "long?" : "long";
-            }
-
             if (schema.Format is JsonFormatStrings.ULong or "ulong")
             {
                 return isNullable ? "ulong?" : "ulong";
+            }
+
+            if (schema.Format == JsonFormatStrings.Integer)
+            {
+                return isNullable ? "int?" : "int";
             }
 
             if (schema.Minimum.HasValue || schema.Maximum.HasValue)
@@ -253,7 +253,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 }
             }
 
-            return isNullable ? "int?" : "int";
+            var integerType = Settings.IntegerType;
+            if (string.IsNullOrWhiteSpace(integerType))
+            {
+                integerType = "int";
+            }
+
+            return isNullable ? integerType + "?" : integerType;
         }
 
         private string ResolveNumber(JsonSchema schema, bool isNullable)
