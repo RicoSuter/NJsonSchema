@@ -205,11 +205,74 @@ namespace NJsonSchema.Validation
                 return;
             }
 
-            var constToken = schema.Const is JToken jt ? jt : new JValue(schema.Const);
-            if (!JToken.DeepEquals(constToken, token))
+            var constToken = schema.Const switch
+            {
+                null => JValue.CreateNull(),
+                JToken jt => jt,
+                _ => JToken.FromObject(schema.Const)
+            };
+
+            if (!JsonValuesAreEqual(constToken, token))
             {
                 errors.Add(new ValidationError(ValidationErrorKind.ConstantValueMismatch, propertyName, propertyPath, token, schema));
             }
+        }
+
+        /// <summary>
+        /// JSON Schema equality (draft 6+): arrays and objects compare structurally, and numbers
+        /// compare by mathematical value regardless of representation (<c>1</c> equals <c>1.0</c>).
+        /// Newtonsoft's <see cref="JToken.DeepEquals(JToken?, JToken?)"/> does not equate
+        /// <see cref="JTokenType.Integer"/> with <see cref="JTokenType.Float"/>, so we recurse manually.
+        /// </summary>
+        private static bool JsonValuesAreEqual(JToken left, JToken right)
+        {
+            if (left.Type is JTokenType.Integer or JTokenType.Float &&
+                right.Type is JTokenType.Integer or JTokenType.Float)
+            {
+                try
+                {
+                    return left.Value<decimal>() == right.Value<decimal>();
+                }
+                catch (OverflowException)
+                {
+                    return left.Value<double>().Equals(right.Value<double>());
+                }
+            }
+
+            if (left is JArray leftArr && right is JArray rightArr)
+            {
+                if (leftArr.Count != rightArr.Count)
+                {
+                    return false;
+                }
+                for (var i = 0; i < leftArr.Count; i++)
+                {
+                    if (!JsonValuesAreEqual(leftArr[i], rightArr[i]))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            if (left is JObject leftObj && right is JObject rightObj)
+            {
+                if (leftObj.Count != rightObj.Count)
+                {
+                    return false;
+                }
+                foreach (var prop in leftObj)
+                {
+                    if (!rightObj.TryGetValue(prop.Key, out var rightValue) ||
+                        !JsonValuesAreEqual(prop.Value!, rightValue))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            return JToken.DeepEquals(left, right);
         }
 
         private void ValidateString(JToken token, JsonSchema schema, JsonObjectType type, string? propertyName, string propertyPath, List<ValidationError> errors)

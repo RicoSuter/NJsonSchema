@@ -49,9 +49,11 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The code.</returns>
         public virtual string? GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string? typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
-            var actualSchema = schema is JsonSchemaProperty ? ((JsonSchemaProperty)schema).ActualTypeSchema : schema.ActualSchema;
+            // For properties dive through allOf via ActualTypeSchema; for other schemas (incl. subclasses
+            // like NSwag's OpenApiParameter that override ActualSchema) respect the override via ActualSchema.
+            var actualSchema = schema is JsonSchemaProperty property ? property.ActualTypeSchema : schema.ActualSchema;
 
-            // Const values are always used as default values (they define the only valid value)
+            // Const values are always used as default values (they define the only valid value).
             if (actualSchema.HasConstValue)
             {
                 return GetConstantValue(actualSchema, targetType);

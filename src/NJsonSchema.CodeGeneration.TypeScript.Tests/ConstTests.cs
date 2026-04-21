@@ -100,5 +100,60 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             Assert.Contains("\"person\"", code);
             TypeScriptCompiler.AssertCompile(code);
         }
+
+        [Fact]
+        public async Task When_property_has_const_via_ref_then_literal_type_is_generated()
+        {
+            // Arrange
+            var json = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""cmdType"": { ""$ref"": ""#/definitions/Cmd"" }
+                },
+                ""definitions"": {
+                    ""Cmd"": { ""const"": ""person"" }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("cmdType: \"person\"", code);
+        }
+
+        [Fact]
+        public async Task When_property_has_const_inside_multi_allOf_then_literal_type_is_generated()
+        {
+            // Only ActualTypeSchema dives into multi-item allOf to find const.
+            var json = @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""cmdType"": {
+                        ""allOf"": [
+                            { ""$ref"": ""#/definitions/Base"" },
+                            { ""const"": ""person"" }
+                        ]
+                    }
+                },
+                ""definitions"": {
+                    ""Base"": { ""type"": ""string"" }
+                }
+            }";
+
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                TypeStyle = TypeScriptTypeStyle.Interface
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("cmdType: \"person\"", code);
+        }
     }
 }
