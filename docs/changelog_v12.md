@@ -2,7 +2,7 @@
 
 Running record of changes on the `v12` branch and migration guidance for users upgrading from v11.
 
-See [`v12.md`](./v12.md) for the v12 scope, branch model, and release plan.
+See [`plan_v12.md`](./plan_v12.md) for the v12 scope, branch model, and release plan.
 
 ---
 

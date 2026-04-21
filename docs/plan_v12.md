@@ -48,7 +48,7 @@ When v12 is feature-complete and entering external validation, NSwag v15 will fl
 Ordered by the NJsonSchema → NSwag dependency:
 
 1. **NJsonSchema v12** stabilizes, merges to `master`, is tagged `v12.0.0`, published to NuGet.
-2. **NSwag v15** (see NSwag's `docs/v15.md`) bumps its dependency to `NJsonSchema 12.0.0`, stabilizes, is tagged `v15.0.0`.
+2. **NSwag v15** (see NSwag's `docs/plan_v15.md`) bumps its dependency to `NJsonSchema 12.0.0`, stabilizes, is tagged `v15.0.0`.
 
 v11.x patches continue to ship from `master` until superseded.
 
@@ -65,9 +65,9 @@ Before the final `v12` → `master` merge, revert the temporary shims that only 
 - **`build/Build.CI.GitHubActions.cs`**: remove `"v12"` from `OnPullRequestBranches` and `OnPushBranches`. The `master` / `main` triggers alone are sufficient once v12 is merged.
 - **`.github/workflows/build.yml`, `.github/workflows/pr.yml`**: regenerate from NUKE (`nuke --generate-configuration GitHubActions_build --host GitHubActions` and the `pr` equivalent) so the `v12` branch entry is removed from the generated YAML.
 - **NuGet preview-package publishing** (if enabled on the `v12` branch during Phase 2): disable or remove the preview feed configuration.
-- **`docs/v12.md`**: move or archive after release. Either delete once v12 is GA, or move into a `docs/releases/` subfolder as historical context.
+- **`docs/plan_v12.md` and `docs/changelog_v12.md`**: move or archive after release. Either delete once v12 is GA, or relocate to `docs/releases/` as historical context.
 - **Any `[Obsolete]` shims or temporary wrappers** added specifically to ease the v11→v12 migration: remove or mark for removal in v13.
-- **Cross-check with NSwag `v15`** — see its `docs/v15.md` cleanup checklist (e.g. removing its sibling-checkout CI step, re-enabling package references by default).
+- **Cross-check with NSwag `v15`** — see its `docs/plan_v15.md` cleanup checklist (e.g. removing its sibling-checkout CI step, re-enabling package references by default).
 
 Add items to this checklist as new temporary shims are introduced during v12 development, so nothing leaks into the final release.
 
