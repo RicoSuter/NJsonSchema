@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="DateTimeFormatValidator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -6,8 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Newtonsoft.Json.Linq;
 using System.Globalization;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.Validation.FormatValidators
@@ -46,10 +46,9 @@ namespace NJsonSchema.Validation.FormatValidators
         /// <param name="value">String value.</param>
         /// <param name="tokenType">Type of token holding the value.</param>
         /// <returns></returns>
-        public bool IsValid(string value, JTokenType tokenType)
+        public bool IsValid(string value, JsonValueKind tokenType)
         {
-            return tokenType == JTokenType.Date
-                   || DateTimeOffset.TryParseExact(value, _acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _)
+            return DateTimeOffset.TryParseExact(value, _acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _)
                    || DateTimeRegexPattern.Value.IsMatch(value);
         }
     }

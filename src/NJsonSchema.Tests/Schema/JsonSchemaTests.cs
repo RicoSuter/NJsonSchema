@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using NJsonSchema.CodeGeneration.Tests;
 
 namespace NJsonSchema.Tests.Schema
@@ -188,7 +188,8 @@ namespace NJsonSchema.Tests.Schema
             var x = schema.ToJson();
 
             // Assert
-            Assert.True(schema.ExtensionData.First().Value is DateTime);
+            Assert.True(schema.ExtensionData.First().Value is string);
+            Assert.Equal("2016-07-28T14:39:37.937Z", schema.ExtensionData.First().Value);
         }
 
         [Fact]
@@ -294,8 +295,8 @@ namespace NJsonSchema.Tests.Schema
                 Type = JsonObjectType.Number | JsonObjectType.Null
             };
 
-            var token = new JObject();
-            token["Foo"] = new JValue(5);
+            var token = new JsonObject();
+            token["Foo"] = JsonValue.Create(5);
 
             // Act
             var errors = schema.Validate(token);
@@ -313,9 +314,9 @@ namespace NJsonSchema.Tests.Schema
             schema.Properties["Foo"] = new JsonSchemaProperty();
             schema.Properties["Bar"] = new JsonSchemaProperty();
 
-            var token = new JObject();
-            token["Foo"] = new JValue(5);
-            token["Bar"] = new JValue("Bar");
+            var token = new JsonObject();
+            token["Foo"] = JsonValue.Create(5);
+            token["Bar"] = JsonValue.Create("Bar");
             // Act
             var errors = schema.Validate(token);
 
@@ -332,7 +333,7 @@ namespace NJsonSchema.Tests.Schema
                 Type = JsonObjectType.String
             };
 
-            var token = new JValue(System.DateTimeOffset.Now);
+            var token = JsonValue.Create(System.DateTimeOffset.Now);
 
             try
             {

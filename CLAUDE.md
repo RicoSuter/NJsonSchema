@@ -116,3 +116,9 @@ Templates are in `src/NJsonSchema.CodeGeneration.CSharp/Templates/` and `src/NJs
 ## Git Rules
 
 - Never include "Claude", "Co-Authored-By", or AI attribution in commit messages, PR descriptions, or GitHub comments.
+
+## Version Management
+
+- Version defined in `Directory.Build.props`
+- Git tags (v*.*.*) trigger production NuGet releases
+- Master branch builds go to MyGet preview feed

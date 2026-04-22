@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation
@@ -12,7 +12,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
 
-            var token = new JValue("test");
+            var token = JsonValue.Create("test");
 
             // Act
             var errors = schema.Validate(token);
@@ -28,7 +28,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.String;
 
-            var token = new JValue(10);
+            var token = JsonValue.Create(10);
 
             // Act
             var errors = schema.Validate(token);
@@ -45,7 +45,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Number;
 
-            var token = new JValue(10);
+            var token = JsonValue.Create(10);
 
             // Act
             var errors = schema.Validate(token);
@@ -61,7 +61,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Number;
 
-            var token = new JValue("foo");
+            var token = JsonValue.Create("foo");
 
             // Act
             var errors = schema.Validate(token);
@@ -78,7 +78,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Integer;
 
-            var token = new JValue(10);
+            var token = JsonValue.Create(10);
 
             // Act
             var errors = schema.Validate(token);
@@ -94,7 +94,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Integer;
 
-            var token = new JValue("foo");
+            var token = JsonValue.Create("foo");
 
             // Act
             var errors = schema.Validate(token);
@@ -111,7 +111,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Boolean;
 
-            var token = new JValue(true);
+            var token = JsonValue.Create(true);
 
             // Act
             var errors = schema.Validate(token);
@@ -127,7 +127,7 @@ namespace NJsonSchema.Tests.Validation
             var schema = new JsonSchema();
             schema.Type = JsonObjectType.Boolean;
 
-            var token = new JValue("foo");
+            var token = JsonValue.Create("foo");
 
             // Act
             var errors = schema.Validate(token);
@@ -145,7 +145,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Pattern = "aa(.*)aa";
 
-            var token = new JValue("aaccbb");
+            var token = JsonValue.Create("aaccbb");
 
             // Act
             var errors = schema.Validate(token);
@@ -163,7 +163,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.MinLength = 2;
 
-            var token = new JValue("a");
+            var token = JsonValue.Create("a");
 
             // Act
             var errors = schema.Validate(token);
@@ -181,7 +181,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.MaxLength = 2;
 
-            var token = new JValue("aaa");
+            var token = JsonValue.Create("aaa");
 
             // Act
             var errors = schema.Validate(token);
@@ -199,7 +199,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.Integer;
             schema.Minimum = 2;
 
-            var token = new JValue(1);
+            var token = JsonValue.Create(1);
 
             // Act
             var errors = schema.Validate(token);
@@ -217,7 +217,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.Integer;
             schema.Maximum = 2;
 
-            var token = new JValue(3);
+            var token = JsonValue.Create(3);
 
             // Act
             var errors = schema.Validate(token);
@@ -235,7 +235,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.Number;
             schema.Minimum = 1.5m;
 
-            var token = new JValue(1.4);
+            var token = JsonValue.Create(1.4);
 
             // Act
             var errors = schema.Validate(token);
@@ -253,7 +253,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.Number;
             schema.Maximum = 1.5m;
 
-            var token = new JValue(1.6);
+            var token = JsonValue.Create(1.6);
 
             // Act
             var errors = schema.Validate(token);
@@ -273,7 +273,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Enumeration.Add("Green");
             schema.Enumeration.Add("Blue");
 
-            var token = new JValue("Yellow");
+            var token = JsonValue.Create("Yellow");
 
             // Act
             var errors = schema.Validate(token);
@@ -293,7 +293,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Enumeration.Add("Green");
             schema.Enumeration.Add("Blue");
 
-            var token = new JValue("Red");
+            var token = JsonValue.Create("Red");
 
             // Act
             var errors = schema.Validate(token);
@@ -312,7 +312,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Enumeration.Add("2");
             schema.Enumeration.Add("3");
 
-            var token = new JValue(3);
+            var token = JsonValue.Create(3);
 
             // Act
             var errors = schema.Validate(token);

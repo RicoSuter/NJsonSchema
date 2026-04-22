@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="JsonReferenceVisitorBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -9,10 +9,10 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Namotion.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Visitors
@@ -20,19 +20,9 @@ namespace NJsonSchema.Visitors
     /// <summary>Visitor to transform an object with <see cref="JsonSchema"/> objects.</summary>
     public abstract class JsonReferenceVisitorBase
     {
-        private readonly IContractResolver _contractResolver;
-
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceVisitorBase"/> class. </summary>
         protected JsonReferenceVisitorBase()
-            : this(new DefaultContractResolver())
         {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="JsonReferenceVisitorBase"/> class. </summary>
-        /// <param name="contractResolver">The contract resolver.</param>
-        protected JsonReferenceVisitorBase(IContractResolver contractResolver)
-        {
-            _contractResolver = contractResolver;
         }
 
         /// <summary>Processes an object.</summary>
@@ -59,7 +49,7 @@ namespace NJsonSchema.Visitors
         /// <returns>The task.</returns>
         protected virtual void Visit(object obj, string path, string? typeNameHint, ISet<object> checkedObjects, Action<object> replacer)
         {
-            if (obj == null || !checkedObjects.Add(obj))
+            if (obj == null || obj is string || obj.GetType().IsValueType || !checkedObjects.Add(obj))
             {
                 return;
             }
@@ -165,24 +155,9 @@ namespace NJsonSchema.Visitors
                 }
             }
 
-            if (obj is not string && obj is not JToken && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
+            if (obj is not string && obj is not JsonNode && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
             {
-                if (_contractResolver.ResolveContract(obj.GetType()) is JsonObjectContract contract)
-                {
-                    foreach (var property in contract.Properties)
-                    {
-                        bool isJsonSchemaProperty = obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(property.UnderlyingName!);
-                        if (!isJsonSchemaProperty && !property.Ignored && property.ShouldSerialize?.Invoke(obj) != false)
-                        {
-                            var value = property.ValueProvider?.GetValue(obj);
-                            if (value != null)
-                            {
-                                Visit(value, $"{path}/{property.PropertyName}", property.PropertyName, checkedObjects, o => property.ValueProvider?.SetValue(obj, o));
-                            }
-                        }
-                    }
-                }
-                else if (obj is IDictionary dictionary)
+                if (obj is IDictionary dictionary)
                 {
                     foreach (var key in dictionary.Keys.OfType<object>().ToArray())
                     {
@@ -205,12 +180,15 @@ namespace NJsonSchema.Visitors
 
                     // Custom dictionary type with additional properties (OpenApiPathItem)
                     var contextualType = obj.GetType().ToContextualType();
-                    if (contextualType.IsAttributeDefined<JsonConverterAttribute>(true))
+                    if (contextualType.IsAttributeDefined<System.Text.Json.Serialization.JsonConverterAttribute>(true))
                     {
                         foreach (var property in contextualType.Type.GetContextualProperties())
                         {
-                            if (property.MemberInfo.DeclaringType == contextualType.Type && 
-                                !property.IsAttributeDefined<JsonIgnoreAttribute>(true))
+                            if (property.MemberInfo.DeclaringType == contextualType.Type &&
+                                !(property.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>() is { Condition: JsonIgnoreCondition.Always }) &&
+                                property.PropertyType.Type != typeof(string) &&
+                                !property.PropertyType.Type.IsValueType &&
+                                property.PropertyInfo.GetIndexParameters().Length == 0)
                             {
                                 var value = property.GetValue(obj);
                                 if (value != null)
@@ -223,19 +201,45 @@ namespace NJsonSchema.Visitors
                 }
                 else if (obj is IList list)
                 {
-                    var items = list.OfType<object>().ToArray();
-                    for (var i = 0; i < items.Length; i++)
+                    var listItems = list.OfType<object>().ToArray();
+                    for (var i = 0; i < listItems.Length; i++)
                     {
                         var index = i;
-                        Visit(items[i], $"{path}[{i}]", null, checkedObjects, o => ReplaceOrDelete(list, index, o));
+                        Visit(listItems[i], $"{path}[{i}]", null, checkedObjects, o => ReplaceOrDelete(list, index, o));
                     }
                 }
                 else if (obj is IEnumerable enumerable)
                 {
-                    var items = enumerable.OfType<object>().ToArray();
-                    for (var i = 0; i < items.Length; i++)
+                    var enumItems = enumerable.OfType<object>().ToArray();
+                    for (var i = 0; i < enumItems.Length; i++)
                     {
-                        Visit(items[i], $"{path}[{i}]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item."));
+                        Visit(enumItems[i], $"{path}[{i}]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item."));
+                    }
+                }
+                else
+                {
+                    // Reflection fallback for non-JsonSchema types (e.g. NSwag types)
+                    foreach (var property in obj.GetType().GetContextualProperties())
+                    {
+                        bool isJsonSchemaProperty = obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(property.Name);
+                        var ignoreAttr = property.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>();
+                        if (isJsonSchemaProperty
+                            || (ignoreAttr != null && ignoreAttr.Condition == JsonIgnoreCondition.Always)
+                            || property.PropertyInfo.GetMethod?.IsStatic == true
+                            || property.PropertyType.Type == typeof(string)
+                            || property.PropertyType.Type.IsPrimitive
+                            || property.PropertyType.Type.IsValueType
+                            || property.PropertyInfo.GetIndexParameters().Length > 0)
+                        {
+                            continue;
+                        }
+
+                        var value = property.GetValue(obj);
+                        if (value != null)
+                        {
+                            var jsonName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
+                            Visit(value, $"{path}/{jsonName}", jsonName, checkedObjects, o => property.SetValue(obj, o));
+                        }
                     }
                 }
             }

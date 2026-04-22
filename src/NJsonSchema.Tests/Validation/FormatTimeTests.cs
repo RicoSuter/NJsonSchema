@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation
@@ -17,7 +17,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
-            var token = new JValue("10 am");
+            var token = JsonValue.Create("10 am");
 
             // Act
             var errors = schema.Validate(token);
@@ -34,7 +34,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
-            var token = new JValue("14:30:00+02:00");
+            var token = JsonValue.Create("14:30:00+02:00");
 
             // Act
             var errors = schema.Validate(token);
@@ -51,7 +51,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
-            var token = new JValue("14:30:00-02:00");
+            var token = JsonValue.Create("14:30:00-02:00");
 
             // Act
             var errors = schema.Validate(token);
@@ -68,7 +68,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
-            var token = new JValue("14:30:00Z");
+            var token = JsonValue.Create("14:30:00Z");
 
             // Act
             var errors = schema.Validate(token);
@@ -85,7 +85,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
-            var token = new JValue("14:30:00.1234567+02:00");
+            var token = JsonValue.Create("14:30:00.1234567+02:00");
 
             // Act
             var errors = schema.Validate(token);
@@ -106,7 +106,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.Time;
 
-            var token = new JValue("14:30:00");
+            var token = JsonValue.Create("14:30:00");
 
             // Act
             var errors = schema.Validate(token);

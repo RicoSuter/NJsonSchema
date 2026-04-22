@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation
@@ -14,9 +14,9 @@ namespace NJsonSchema.Tests.Validation
             schema.AllowAdditionalProperties = false;
             schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
-            var token = new JObject();
-            token.Add("123", new JObject());
-            token.Add("qwe123", new JObject());
+            var token = new JsonObject();
+            token.Add("123", new JsonObject());
+            token.Add("qwe123", new JsonObject());
 
             // Act
             var errors = schema.Validate(token);
@@ -38,9 +38,9 @@ namespace NJsonSchema.Tests.Validation
             schema.AllowAdditionalProperties = false;
             schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
-            var token = new JObject();
-            token.Add("qwerty", new JArray());
-            token.Add("wsad", new JValue("test"));
+            var token = new JsonObject();
+            token.Add("qwerty", new JsonArray());
+            token.Add("wsad", JsonValue.Create("test"));
 
             // Act
             var errors = schema.Validate(token);
@@ -59,9 +59,9 @@ namespace NJsonSchema.Tests.Validation
             schema.AllowAdditionalProperties = false;
             schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.Object});
 
-            var token = new JObject();
-            token.Add("qwerty", new JObject());
-            token.Add("wsad", new JObject());
+            var token = new JsonObject();
+            token.Add("qwerty", new JsonObject());
+            token.Add("wsad", new JsonObject());
 
             // Act
             var errors = schema.Validate(token);
@@ -80,8 +80,8 @@ namespace NJsonSchema.Tests.Validation
             schema.AllowAdditionalProperties = false;
             schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Pattern = "^[A-Z]+$" });
 
-            var token = new JObject();
-            token.Add("capitallettersonly", new JValue("lowercase"));
+            var token = new JsonObject();
+            token.Add("capitallettersonly", JsonValue.Create("lowercase"));
 
             //// Act
             var errors = schema.Validate(token);
@@ -101,8 +101,8 @@ namespace NJsonSchema.Tests.Validation
             schema.AllowAdditionalProperties = false;
             schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Pattern = "^[A-Z]+$" });
 
-            var token = new JObject();
-            token.Add("capitallettersonly", new JValue("UPPERCASE"));
+            var token = new JsonObject();
+            token.Add("capitallettersonly", JsonValue.Create("UPPERCASE"));
 
             //// Act
             var errors = schema.Validate(token);
@@ -121,9 +121,9 @@ namespace NJsonSchema.Tests.Validation
             schema.AllowAdditionalProperties = false;
             schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Type = JsonObjectType.String });
 
-            var token = new JObject();
-            token.Add("name", new JValue("test"));
-            token.Add("extra", new JValue("value"));
+            var token = new JsonObject();
+            token.Add("name", JsonValue.Create("test"));
+            token.Add("extra", JsonValue.Create("value"));
 
             //// Act
             var errors = schema.Validate(token);
@@ -142,8 +142,8 @@ namespace NJsonSchema.Tests.Validation
             schema.AllowAdditionalProperties = false;
             schema.PatternProperties.Add("^[a-z]+$", new JsonSchemaProperty() { Pattern = "^[A-Z]+$" });
 
-            var token = new JObject();
-            token.Add("Property1", new JValue("lowercase"));
+            var token = new JsonObject();
+            token.Add("Property1", JsonValue.Create("lowercase"));
 
             //// Act
             var errors = schema.Validate(token);

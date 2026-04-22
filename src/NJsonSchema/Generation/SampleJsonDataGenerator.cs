@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="SampleJsonSchemaGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -6,15 +6,48 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace NJsonSchema.Generation
 {
     /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
     public class SampleJsonDataGenerator
     {
+        /// <summary>
+        /// Creates a non-null JsonValue representing JSON null, equivalent to the old Newtonsoft JValue(null).
+        /// System.Text.Json.Nodes does not provide a public API to create a non-null JsonNode for null values
+        /// (JsonValue.Create returns null for null-kind JsonElements). We work around this by wrapping a
+        /// sentinel value with a custom JsonConverter that writes JSON null.
+        /// </summary>
+        private static JsonValue CreateJsonNullValue()
+        {
+            return JsonValue.Create(new JsonNullSentinel(), JsonNullSentinel.NodeOptions)!;
+        }
+
+        [JsonConverter(typeof(JsonNullSentinelConverter))]
+        private readonly struct JsonNullSentinel
+        {
+            internal static readonly JsonNodeOptions NodeOptions = new() { PropertyNameCaseInsensitive = false };
+        }
+
+        private sealed class JsonNullSentinelConverter : JsonConverter<JsonNullSentinel>
+        {
+            public override JsonNullSentinel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                reader.Read();
+                return default;
+            }
+
+            public override void Write(Utf8JsonWriter writer, JsonNullSentinel value, JsonSerializerOptions options)
+            {
+                writer.WriteNullValue();
+            }
+        }
+
         private readonly SampleJsonDataGeneratorSettings _settings;
 
         /// <summary>
@@ -36,24 +69,42 @@ namespace NJsonSchema.Generation
 
         /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
         /// <param name="schema">The JSON Schema.</param>
-        /// <returns>The JSON token.</returns>
-        public JToken Generate(JsonSchema schema)
+        /// <returns>The JSON node.</returns>
+        public JsonNode? Generate(JsonSchema schema)
         {
             var stack = new Stack<JsonSchema>();
             stack.Push(schema);
             return Generate(schema, stack);
         }
 
-        private JToken Generate(JsonSchema schema, Stack<JsonSchema> schemaStack)
+        private JsonNode? Generate(JsonSchema schema, Stack<JsonSchema> schemaStack)
         {
             var property = schema as JsonSchemaProperty;
             schema = schema.ActualSchema;
+
+            // Handle oneOf/anyOf schemas (e.g. nullable references expressed as oneOf: [{ type: null }, { $ref: ... }])
+            // by selecting the first non-null sub-schema and generating from it.
+            if (schema.Type == JsonObjectType.None &&
+                !schema.ActualProperties.Any() &&
+                schema.AllOf.Count == 0)
+            {
+                var subSchemas = schema.OneOf.Concat(schema.AnyOf);
+                var nonNullSubSchema = subSchemas.FirstOrDefault(s =>
+                    s.ActualSchema.Type != JsonObjectType.Null &&
+                    (s.HasReference || s.ActualSchema.Type != JsonObjectType.None || s.ActualSchema.ActualProperties.Any()));
+
+                if (nonNullSubSchema != null)
+                {
+                    schema = nonNullSubSchema.ActualSchema;
+                }
+            }
+
             try
             {
                 schemaStack.Push(schema);
                 if (schemaStack.Count(s => s == schema) > _settings.MaxRecursionLevel)
                 {
-                    return new JValue((object?)null);
+                    return CreateJsonNullValue();
                 }
 
                 if (schema.Type.IsObject() || GetPropertiesToGenerate(schema.AllOf).Any())
@@ -61,7 +112,7 @@ namespace NJsonSchema.Generation
                     var schemas = new[] { schema }.Concat(schema.AllOf.Select(x => x.ActualSchema));
                     var properties = GetPropertiesToGenerate(schemas);
 
-                    var obj = new JObject();
+                    var obj = new JsonObject();
                     foreach (var p in properties)
                     {
                         obj[p.Key] = Generate(p.Value, schemaStack);
@@ -71,13 +122,13 @@ namespace NJsonSchema.Generation
                 }
                 else if (schema.Default != null)
                 {
-                    return JToken.FromObject(schema.Default);
+                    return JsonSerializer.SerializeToNode(schema.Default);
                 }
                 else if (schema.Type.IsArray())
                 {
                     if (schema.Item != null)
                     {
-                        var array = new JArray();
+                        var array = new JsonArray();
 
                         var item = Generate(schema.Item, schemaStack);
                         if (item != null)
@@ -89,7 +140,7 @@ namespace NJsonSchema.Generation
                     }
                     else if (schema.Items.Count > 0)
                     {
-                        var array = new JArray();
+                        var array = new JsonArray();
                         foreach (var item in schema.Items)
                         {
                             array.Add(Generate(item, schemaStack));
@@ -102,7 +153,7 @@ namespace NJsonSchema.Generation
                 {
                     if (schema.IsEnumeration)
                     {
-                        return JToken.FromObject(schema.Enumeration.First()!);
+                        return JsonSerializer.SerializeToNode(schema.Enumeration.First()!);
                     }
                     else if (schema.Type.IsInteger())
                     {
@@ -118,11 +169,11 @@ namespace NJsonSchema.Generation
                     }
                     else if (schema.Type.IsBoolean())
                     {
-                        return JToken.FromObject(false);
+                        return JsonValue.Create(false);
                     }
                 }
 
-                return new JValue((object?)null);
+                return null;
             }
             finally
             {
@@ -130,63 +181,74 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private static JToken HandleNumberType(JsonSchema schema)
+        private static JsonValue? HandleNumberType(JsonSchema schema)
         {
             if (schema.ExclusiveMinimumRaw?.Equals(true) == true && schema.Minimum != null)
             {
-                return JToken.FromObject(schema.Minimum.Value + 0.1m);
+                return JsonValue.Create(schema.Minimum.Value + 0.1m);
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(schema.ExclusiveMinimum.Value);
+                return JsonValue.Create(schema.ExclusiveMinimum.Value);
             }
             else if (schema.Minimum.HasValue)
             {
-                return schema.Minimum.Value;
+                return JsonValue.Create(schema.Minimum.Value);
             }
-            return JToken.FromObject(0.0);
+            return JsonValue.Create(0.0);
         }
 
-        private static JToken HandleIntegerType(JsonSchema schema)
+        private static JsonValue? HandleIntegerType(JsonSchema schema)
         {
+            long value;
             if (schema.ExclusiveMinimumRaw != null)
             {
-                return JToken.FromObject(Convert.ToInt64(schema.ExclusiveMinimumRaw, CultureInfo.InvariantCulture));
+                value = Convert.ToInt64(schema.ExclusiveMinimumRaw, CultureInfo.InvariantCulture);
             }
             else if (schema.ExclusiveMinimum != null)
             {
-                return JToken.FromObject(Convert.ToInt64(schema.ExclusiveMinimum, CultureInfo.InvariantCulture));
+                value = Convert.ToInt64(schema.ExclusiveMinimum, CultureInfo.InvariantCulture);
             }
             else if (schema.Minimum.HasValue)
             {
-                return Convert.ToInt64(schema.Minimum, CultureInfo.InvariantCulture);
+                value = Convert.ToInt64(schema.Minimum, CultureInfo.InvariantCulture);
             }
-            return JToken.FromObject(0);
+            else
+            {
+                return JsonValue.Create(0);
+            }
+
+            if (value is >= int.MinValue and <= int.MaxValue)
+            {
+                return JsonValue.Create((int)value);
+            }
+
+            return JsonValue.Create(value);
         }
 
-        private static JToken HandleStringType(JsonSchema schema, JsonSchemaProperty? property)
+        private static JsonValue? HandleStringType(JsonSchema schema, JsonSchemaProperty? property)
         {
             if (schema.Format == JsonFormatStrings.Date)
             {
-                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+                return JsonValue.Create(DateTimeOffset.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
             }
             else if (schema.Format == JsonFormatStrings.DateTime)
             {
-                return JToken.FromObject(DateTimeOffset.UtcNow.ToString("o"));
+                return JsonValue.Create(DateTimeOffset.UtcNow.ToString("o"));
             }
 #pragma warning disable CS0618 // Type or member is obsolete
             else if (schema.Format == JsonFormatStrings.Guid || schema.Format == JsonFormatStrings.Uuid)
 #pragma warning restore CS0618 // Type or member is obsolete
             {
-                return JToken.FromObject(Guid.NewGuid().ToString());
+                return JsonValue.Create(Guid.NewGuid().ToString());
             }
             else if (property != null)
             {
-                return JToken.FromObject(property.Name);
+                return JsonValue.Create(property.Name);
             }
             else
             {
-                return JToken.FromObject("");
+                return JsonValue.Create("");
             }
         }
 

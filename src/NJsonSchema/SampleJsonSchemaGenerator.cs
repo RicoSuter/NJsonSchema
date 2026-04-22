@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="SampleJsonSchemaGenerator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -7,10 +7,9 @@
 //-----------------------------------------------------------------------
 
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema
 {
@@ -41,14 +40,29 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public JsonSchema Generate(string json)
         {
-            var token = JsonConvert.DeserializeObject<JToken>(json, new JsonSerializerSettings
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat
-            })!;
-
+            var node = ParseLenientJson(json);
             var schema = new JsonSchema();
-            Generate(token, schema, schema, "Anonymous");
+            Generate(node, schema, schema, "Anonymous");
             return schema;
+        }
+
+        private static JsonNode? ParseLenientJson(string json)
+        {
+            var documentOptions = new System.Text.Json.JsonDocumentOptions
+            {
+                AllowTrailingCommas = true,
+                CommentHandling = System.Text.Json.JsonCommentHandling.Skip,
+            };
+
+            try
+            {
+                return JsonNode.Parse(json, documentOptions: documentOptions);
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                var fixedJson = Infrastructure.JsonSchemaSerialization.FixLenientJson(json);
+                return JsonNode.Parse(fixedJson, documentOptions: documentOptions);
+            }
         }
 
         /// <summary>Generates the JSON Schema for the given JSON data.</summary>
@@ -56,36 +70,28 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public JsonSchema Generate(Stream stream)
         {
-            using var reader = new StreamReader(stream);
-            using var jsonReader = new JsonTextReader(reader);
-
-            var serializer = JsonSerializer.Create(new JsonSerializerSettings
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat
-            });
-
-            var token = serializer.Deserialize<JToken>(jsonReader)!;
+            var node = JsonNode.Parse(stream);
 
             var schema = new JsonSchema();
-            Generate(token, schema, schema, "Anonymous");
+            Generate(node, schema, schema, "Anonymous");
             return schema;
         }
 
-        private void Generate(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
+        private void Generate(JsonNode? node, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
-            if (schema != rootSchema && token.Type == JTokenType.Object)
+            if (schema != rootSchema && node is JsonObject)
             {
                 JsonSchema? referencedSchema = null;
-                if (token is JObject obj)
+                if (node is JsonObject obj)
                 {
-                    var properties = obj.Properties();
+                    var propertyNames = obj.Select(p => p.Key).ToList();
 
                     referencedSchema = rootSchema.Definitions
                         .Select(t => t.Value)
                         .FirstOrDefault(s =>
                             s.Type == JsonObjectType.Object &&
-                            properties.Any() &&
-                            properties.All(p => s.Properties.ContainsKey(p.Name)));
+                            propertyNames.Count > 0 &&
+                            propertyNames.All(p => s.Properties.ContainsKey(p)));
                 }
 
                 if (referencedSchema == null)
@@ -95,138 +101,141 @@ namespace NJsonSchema
                 }
 
                 schema.Reference = referencedSchema;
-                GenerateWithoutReference(token, referencedSchema, rootSchema, typeNameHint);
+                GenerateWithoutReference(node, referencedSchema, rootSchema, typeNameHint);
                 return;
             }
 
-            GenerateWithoutReference(token, schema, rootSchema, typeNameHint);
+            GenerateWithoutReference(node, schema, rootSchema, typeNameHint);
         }
 
-        private void GenerateWithoutReference(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
+        private void GenerateWithoutReference(JsonNode? node, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
-            if (token == null)
+            if (node == null)
             {
                 return;
             }
 
-            switch (token.Type)
+            if (node is JsonObject)
             {
-                case JTokenType.Object:
-                    GenerateObject(token, schema, rootSchema);
-                    break;
-
-                case JTokenType.Array:
-                    GenerateArray(token, schema, rootSchema, typeNameHint);
-                    break;
-
-                case JTokenType.Date:
-                    schema.Type = JsonObjectType.String;
-                    schema.Format = token.Value<DateTime>() == token.Value<DateTime>().Date
-                        ? JsonFormatStrings.Date
-                        : JsonFormatStrings.DateTime;
-                    break;
-
-                case JTokenType.String:
-                    schema.Type = JsonObjectType.String;
-                    break;
-
-                case JTokenType.Boolean:
-                    schema.Type = JsonObjectType.Boolean;
-                    break;
-
-                case JTokenType.Integer:
-                    schema.Type = JsonObjectType.Integer;
-                    break;
-
-                case JTokenType.Float:
-                    schema.Type = JsonObjectType.Number;
-                    break;
-
-                case JTokenType.Bytes:
-                    schema.Type = JsonObjectType.String;
-                    schema.Format = JsonFormatStrings.Byte;
-                    break;
-
-                case JTokenType.TimeSpan:
-                    schema.Type = JsonObjectType.String;
-                    schema.Format = JsonFormatStrings.Duration;
-                    break;
-
-                case JTokenType.Guid:
-                    schema.Type = JsonObjectType.String;
-                    schema.Format = JsonFormatStrings.Guid;
-                    break;
-
-                case JTokenType.Uri:
-                    schema.Type = JsonObjectType.String;
-                    schema.Format = JsonFormatStrings.Uri;
-                    break;
+                GenerateObject(node, schema, rootSchema);
             }
-
-            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>()!, "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$"))
+            else if (node is JsonArray)
             {
-                schema.Format = JsonFormatStrings.Date;
+                GenerateArray(node, schema, rootSchema, typeNameHint);
             }
-
-            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>()!, "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
+            else if (node is JsonValue jsonValue)
             {
-                schema.Format = JsonFormatStrings.DateTime;
-            }
-
-            if (schema.Type == JsonObjectType.String && Regex.IsMatch(token.Value<string>()!, "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
-            {
-                schema.Format = JsonFormatStrings.Duration;
-            }
-
-            if (_settings.SchemaType == SchemaType.OpenApi3)
-            {
-                if (schema.Type == JsonObjectType.Integer)
+                var element = jsonValue.GetValue<JsonElement>();
+                switch (element.ValueKind)
                 {
-                    var value = token.Value<long?>();
-                    if (value is < int.MinValue or > int.MaxValue)
+                    case JsonValueKind.String:
+                        schema.Type = JsonObjectType.String;
+                        var stringValue = element.GetString()!;
+
+                        // Try to detect date/datetime formats
+                        if (DateTime.TryParse(stringValue, out var dateTime))
+                        {
+                            schema.Format = dateTime == dateTime.Date
+                                ? JsonFormatStrings.Date
+                                : JsonFormatStrings.DateTime;
+                        }
+                        else if (Guid.TryParse(stringValue, out _))
+                        {
+                            schema.Format = JsonFormatStrings.Guid;
+                        }
+                        else if (Uri.TryCreate(stringValue, UriKind.Absolute, out _) && stringValue.Contains("://"))
+                        {
+                            schema.Format = JsonFormatStrings.Uri;
+                        }
+                        break;
+
+                    case JsonValueKind.True:
+                    case JsonValueKind.False:
+                        schema.Type = JsonObjectType.Boolean;
+                        break;
+
+                    case JsonValueKind.Number:
+                        if (element.TryGetInt64(out _))
+                        {
+                            schema.Type = JsonObjectType.Integer;
+                        }
+                        else
+                        {
+                            schema.Type = JsonObjectType.Number;
+                        }
+                        break;
+                }
+
+                if (schema.Type == JsonObjectType.String)
+                {
+                    var str = element.GetString()!;
+
+                    if (Regex.IsMatch(str, "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$"))
                     {
-                        schema.Format = JsonFormatStrings.Long;
+                        schema.Format = JsonFormatStrings.Date;
                     }
-                    else
+
+                    if (Regex.IsMatch(str, "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
                     {
-                        schema.Format = JsonFormatStrings.Integer;
+                        schema.Format = JsonFormatStrings.DateTime;
+                    }
+
+                    if (Regex.IsMatch(str, "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
+                    {
+                        schema.Format = JsonFormatStrings.Duration;
                     }
                 }
 
-                if (schema.Type == JsonObjectType.Number)
+                if (_settings.SchemaType == SchemaType.OpenApi3)
                 {
-                    var value = token.Value<double?>();
-                    if (value is < float.MinValue or > float.MaxValue)
+                    if (schema.Type == JsonObjectType.Integer)
                     {
-                        schema.Format = JsonFormatStrings.Double;
+                        var value = element.GetInt64();
+                        if (value is < int.MinValue or > int.MaxValue)
+                        {
+                            schema.Format = JsonFormatStrings.Long;
+                        }
+                        else
+                        {
+                            schema.Format = JsonFormatStrings.Integer;
+                        }
                     }
-                    else
+
+                    if (schema.Type == JsonObjectType.Number)
                     {
-                        schema.Format = JsonFormatStrings.Float;
+                        var value = element.GetDouble();
+                        if (value is < float.MinValue or > float.MaxValue)
+                        {
+                            schema.Format = JsonFormatStrings.Double;
+                        }
+                        else
+                        {
+                            schema.Format = JsonFormatStrings.Float;
+                        }
                     }
                 }
             }
         }
 
-        private void GenerateObject(JToken token, JsonSchema schema, JsonSchema rootSchema)
+        private void GenerateObject(JsonNode node, JsonSchema schema, JsonSchema rootSchema)
         {
             schema.Type = JsonObjectType.Object;
-            foreach (var property in ((JObject)token).Properties())
+            foreach (var property in ((JsonObject)node))
             {
                 var propertySchema = new JsonSchemaProperty();
-                var propertyName = property.Value.Type == JTokenType.Array ? ConversionUtilities.Singularize(property.Name) : property.Name;
+                var propertyName = property.Value is JsonArray ? ConversionUtilities.Singularize(property.Key) : property.Key;
                 var typeNameHint = ConversionUtilities.ConvertToUpperCamelCase(propertyName, true);
 
                 Generate(property.Value, propertySchema, rootSchema, typeNameHint);
-                schema.Properties[property.Name] = propertySchema;
+                schema.Properties[property.Key] = propertySchema;
             }
         }
 
-        private void GenerateArray(JToken token, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
+        private void GenerateArray(JsonNode node, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
         {
             schema.Type = JsonObjectType.Array;
 
-            var itemSchemas = ((JArray)token).Select(item =>
+            var itemSchemas = ((JsonArray)node).Select(item =>
             {
                 var itemSchema = new JsonSchema();
                 GenerateWithoutReference(item, itemSchema, rootSchema, typeNameHint);

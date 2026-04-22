@@ -1,14 +1,16 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="DynamicApis.cs" company="NSwag">
+// <copyright file="JsonSchemaSerialization.cs" company="NSwag">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // SPDX-License-Identifier: MIT
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using System.Text.RegularExpressions;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Infrastructure
@@ -16,61 +18,78 @@ namespace NJsonSchema.Infrastructure
     /// <summary>The JSON Schema serialization context holding information about the current serialization.</summary>
     public class JsonSchemaSerialization
     {
-        [ThreadStatic]
-        private static SchemaType _currentSchemaType;
+        internal static readonly JsonSerializerOptions DefaultSerializerOptions = new JsonSerializerOptions();
 
-        [ThreadStatic]
-        private static bool _isWriting;
+        /// <summary>Cached type info resolver that enables Populate for getter-only collection properties,
+        /// matching Newtonsoft.Json's default behavior of populating existing collections.</summary>
+        private static readonly IJsonTypeInfoResolver PopulateTypeInfoResolver =
+            new DefaultJsonTypeInfoResolver().WithAddedModifier(static typeInfo =>
+            {
+                if (typeInfo.Kind != JsonTypeInfoKind.Object || typeInfo.CreateObject == null)
+                {
+                    return;
+                }
 
-        [ThreadStatic]
-        private static JsonSerializerSettings? _currentSerializerSettings;
+                foreach (var property in typeInfo.Properties)
+                {
+                    if (property.ObjectCreationHandling != null || property.Set != null)
+                    {
+                        continue;
+                    }
 
-        /// <summary>Gets or sets the current schema type.</summary>
-        public static SchemaType CurrentSchemaType
-        {
-            get => _currentSchemaType;
-            private set => _currentSchemaType = value;
-        }
+                    if (property.PropertyType == typeof(string) || property.PropertyType.IsValueType)
+                    {
+                        continue;
+                    }
 
-        /// <summary>Gets the current serializer settings.</summary>
-        public static JsonSerializerSettings? CurrentSerializerSettings
-        {
-            get => _currentSerializerSettings;
-            private set => _currentSerializerSettings = value;
-        }
+                    if (typeof(System.Collections.IEnumerable).IsAssignableFrom(property.PropertyType))
+                    {
+                        property.ObjectCreationHandling = JsonObjectCreationHandling.Populate;
+                    }
+                }
+            });
+
+        /// <summary>Gets the current schema type.</summary>
+        [field: ThreadStatic]
+        public static SchemaType CurrentSchemaType { get; private set; }
+
+        /// <summary>Gets the current serializer options.</summary>
+        [field: ThreadStatic]
+        public static JsonSerializerOptions? CurrentSerializerOptions { get; private set; }
 
         /// <summary>Gets or sets a value indicating whether the object is currently converted to JSON.</summary>
-        public static bool IsWriting
-        {
-            get => _isWriting;
-            private set => _isWriting = value;
-        }
+        [field: ThreadStatic]
+        public static bool IsWriting { get; private set; }
 
         /// <summary>Serializes an object to a JSON string with reference handling.</summary>
         /// <param name="obj">The object to serialize.</param>
         /// <param name="schemaType">The schema type.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
-        /// <param name="formatting">The formatting.</param>
+        /// <param name="converter">The schema serialization converter (may be null).</param>
+        /// <param name="writeIndented">Whether to write indented JSON.</param>
         /// <returns>The JSON.</returns>
-        public static string ToJson(object obj, SchemaType schemaType, IContractResolver contractResolver, Formatting formatting)
+        public static string ToJson(object obj, SchemaType schemaType, SchemaSerializationConverter? converter, bool writeIndented)
         {
-            IsWriting = false;
+            var previousIsWriting = IsWriting;
+            var previousSchemaType = CurrentSchemaType;
+            var previousOptions = CurrentSerializerOptions;
+
+            IsWriting = true;
             CurrentSchemaType = schemaType;
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false, contractResolver);
+            var options = CreateSerializerOptions(converter, writeIndented);
+            CurrentSerializerOptions = options;
 
-            IsWriting = false;
-            CurrentSerializerSettings = new JsonSerializerSettings
+            try
             {
-                ContractResolver = contractResolver
-            };
-
-            var json = JsonConvert.SerializeObject(obj, formatting, CurrentSerializerSettings);
-
-            CurrentSerializerSettings = null;
-            CurrentSchemaType = SchemaType.JsonSchema;
-
-            return json;
+                JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false);
+                return JsonSerializer.Serialize(obj, obj.GetType(), options);
+            }
+            finally
+            {
+                CurrentSerializerOptions = previousOptions;
+                CurrentSchemaType = previousSchemaType;
+                IsWriting = previousIsWriting;
+            }
         }
 
         /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
@@ -78,30 +97,15 @@ namespace NJsonSchema.Infrastructure
         /// <param name="schemaType">The schema type.</param>
         /// <param name="documentPath">The document path.</param>
         /// <param name="referenceResolverFactory">The reference resolver factory.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
-        /// <returns>The deserialized schema.</returns>
-        [Obsolete("Use FromJsonAsync with cancellation token instead.")]
-        public static Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string? documentPath,
-            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver)
-            where T : notnull
-        {
-            return FromJsonAsync(json, schemaType, documentPath, referenceResolverFactory, contractResolver, CancellationToken.None);
-        }
-
-        /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
-        /// <param name="json">The JSON data.</param>
-        /// <param name="schemaType">The schema type.</param>
-        /// <param name="documentPath">The document path.</param>
-        /// <param name="referenceResolverFactory">The reference resolver factory.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="converter">The schema serialization converter (may be null).</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The deserialized schema.</returns>
         public static Task<T> FromJsonAsync<T>(string json, SchemaType schemaType, string? documentPath,
-            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
+            Func<T, JsonReferenceResolver> referenceResolverFactory, SchemaSerializationConverter? converter, CancellationToken cancellationToken = default)
             where T : notnull
         {
-            var loader = () => FromJson<T>(json, contractResolver)!;
-            return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
+            var loader = () => FromJson<T>(json, converter)!;
+            return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, cancellationToken);
         }
 
         /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
@@ -109,15 +113,15 @@ namespace NJsonSchema.Infrastructure
         /// <param name="schemaType">The schema type.</param>
         /// <param name="documentPath">The document path.</param>
         /// <param name="referenceResolverFactory">The reference resolver factory.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="converter">The schema serialization converter (may be null).</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The deserialized schema.</returns>
         public static Task<T> FromJsonAsync<T>(Stream stream, SchemaType schemaType, string? documentPath,
-            Func<T, JsonReferenceResolver> referenceResolverFactory, IContractResolver contractResolver, CancellationToken cancellationToken = default)
+            Func<T, JsonReferenceResolver> referenceResolverFactory, SchemaSerializationConverter? converter, CancellationToken cancellationToken = default)
             where T : notnull
         {
-            var loader = () => FromJson<T>(stream, contractResolver)!;
-            return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, contractResolver, cancellationToken);
+            var loader = () => FromJson<T>(stream, converter)!;
+            return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, cancellationToken);
         }
 
         private static async Task<T> FromJsonWithLoaderAsync<T>(
@@ -125,7 +129,6 @@ namespace NJsonSchema.Infrastructure
             SchemaType schemaType,
             string? documentPath,
             Func<T, JsonReferenceResolver> referenceResolverFactory,
-            IContractResolver contractResolver,
             CancellationToken cancellationToken)
             where T : notnull
         {
@@ -133,6 +136,9 @@ namespace NJsonSchema.Infrastructure
             CurrentSchemaType = schemaType;
 
             T schema;
+            // Save/restore CurrentSerializerOptions to handle nested calls
+            // (external file resolution triggers nested FromJsonAsync)
+            var previousOptions = CurrentSerializerOptions;
             try
             {
                 schema = loader();
@@ -150,69 +156,306 @@ namespace NJsonSchema.Infrastructure
                     }
                 }
 
-                await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, contractResolver, cancellationToken).ConfigureAwait(false);
+                // Ensure CurrentSerializerOptions is available for both the extension-data
+                // post-processing (which deserializes embedded schemas) and the downstream
+                // reference resolver (which deserializes external refs with the Populate
+                // modifier for getter-only collection properties). FromJson clears it on
+                // exit, so restore/repopulate here.
+                CurrentSerializerOptions ??= CreateSerializerOptions(null, false);
+
+                // Post-process extension data to detect and deserialize embedded schemas
+                // before resolving references (refs may point into extension data)
+                if (schema is IJsonExtensionObject)
+                {
+                    PostProcessExtensionData(schema);
+                }
+
+                await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
+                CurrentSerializerOptions = previousOptions;
                 CurrentSchemaType = SchemaType.JsonSchema;
             }
 
             return schema;
         }
 
-        /// <summary>Deserializes JSON data with the given contract resolver.</summary>
+        /// <summary>Deserializes JSON data with the given converter.</summary>
         /// <param name="json">The JSON data.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="converter">The schema serialization converter (may be null).</param>
         /// <returns>The deserialized schema.</returns>
-        public static T? FromJson<T>(string json, IContractResolver contractResolver)
+        public static T? FromJson<T>(string json, SchemaSerializationConverter? converter)
         {
-            IsWriting = true;
-            UpdateCurrentSerializerSettings<T>(contractResolver);
+            IsWriting = false;
+            var options = CreateSerializerOptions(converter, false);
+            CurrentSerializerOptions = options;
 
             try
             {
-                return JsonConvert.DeserializeObject<T>(json, CurrentSerializerSettings);
+                try
+                {
+                    return JsonSerializer.Deserialize<T>(json, options);
+                }
+                catch (JsonException)
+                {
+                    var fixedJson = FixLenientJson(json);
+                    return JsonSerializer.Deserialize<T>(fixedJson, options);
+                }
             }
             finally
             {
-                CurrentSerializerSettings = null;
+                CurrentSerializerOptions = null;
             }
         }
 
-        /// <summary>Deserializes JSON data with the given contract resolver.</summary>
+        /// <summary>Deserializes JSON data with the given converter.</summary>
         /// <param name="stream">The JSON data stream.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
+        /// <param name="converter">The schema serialization converter (may be null).</param>
         /// <returns>The deserialized schema.</returns>
-        public static T? FromJson<T>(Stream stream, IContractResolver contractResolver)
+        public static T? FromJson<T>(Stream stream, SchemaSerializationConverter? converter)
         {
-            IsWriting = true;
-            UpdateCurrentSerializerSettings<T>(contractResolver);
+            // Buffer the stream and delegate to the string overload so we get the
+            // lenient-JSON fallback (single quotes, unquoted keys, NBSP, stringified
+            // booleans) that stream callers would otherwise miss. Schema documents
+            // are small enough that forgoing STJ's streaming path is worth the uniform
+            // error-recovery behaviour.
+            using var reader = new StreamReader(stream);
+            return FromJson<T>(reader.ReadToEnd(), converter);
+        }
 
-            try
+        private static JsonSerializerOptions CreateSerializerOptions(SchemaSerializationConverter? converter, bool writeIndented)
+        {
+            var options = new JsonSerializerOptions
             {
-                using var reader = new StreamReader(stream);
-                using var jsonReader = new JsonTextReader(reader);
+                WriteIndented = writeIndented,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                MaxDepth = 128,
+                AllowTrailingCommas = true,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString,
+                TypeInfoResolver = PopulateTypeInfoResolver,
 
-                var serializer = JsonSerializer.Create(CurrentSerializerSettings);
-                return serializer.Deserialize<T>(jsonReader);
+            };
+
+            if (converter != null)
+            {
+                // Add additional converters first (they take precedence over the factory)
+                foreach (var additionalConverter in converter.AdditionalConverters)
+                {
+                    options.Converters.Add(additionalConverter);
+                }
+
+                options.Converters.Add(converter);
             }
-            finally
+
+            return options;
+        }
+
+        /// <summary>Walks the deserialized object tree and converts extension data values
+        /// that look like schemas (have "type" or "properties") into JsonSchema instances.</summary>
+        internal static void PostProcessExtensionData(object obj)
+        {
+            PostProcessExtensionData(obj, []);
+        }
+
+        private static void PostProcessExtensionData(object obj, HashSet<object> visited)
+        {
+            if (obj == null || !visited.Add(obj))
             {
-                CurrentSerializerSettings = null;
+                return;
+            }
+
+            if (obj is IJsonExtensionObject extensionObj && extensionObj.ExtensionData != null)
+            {
+                foreach (var pair in extensionObj.ExtensionData.ToArray())
+                {
+                    extensionObj.ExtensionData[pair.Key] = TryDeserializeValueSchemas(pair.Value);
+                }
+            }
+
+            if (obj is JsonSchema schema)
+            {
+                // Unwrap JsonElement values in schema properties that hold object?
+                // STJ deserializes these as JsonElement instead of primitive types
+                if (schema.Default is JsonElement defaultElement)
+                {
+                    schema.Default = ConvertJsonElement(defaultElement);
+                }
+
+                if (schema.Example is JsonElement exampleElement)
+                {
+                    schema.Example = ConvertJsonElement(exampleElement);
+                }
+
+                if (schema.ExclusiveMinimumRaw is JsonElement exMinElement)
+                {
+                    schema.ExclusiveMinimumRaw = ConvertJsonElement(exMinElement);
+                }
+
+                if (schema.ExclusiveMaximumRaw is JsonElement exMaxElement)
+                {
+                    schema.ExclusiveMaximumRaw = ConvertJsonElement(exMaxElement);
+                }
+
+                for (var i = 0; i < schema.Enumeration.Count; i++)
+                {
+                    var items = schema.Enumeration as IList<object?>;
+                    if (items != null && items[i] is JsonElement enumElement)
+                    {
+                        items[i] = ConvertJsonElement(enumElement);
+                    }
+                }
+
+                foreach (var prop in schema.Properties.Values)
+                {
+                    PostProcessExtensionData(prop, visited);
+                }
+
+                foreach (var def in schema.Definitions.Values)
+                {
+                    PostProcessExtensionData(def, visited);
+                }
+
+                foreach (var item in schema.AllOf)
+                {
+                    PostProcessExtensionData(item, visited);
+                }
+
+                foreach (var item in schema.AnyOf)
+                {
+                    PostProcessExtensionData(item, visited);
+                }
+
+                foreach (var item in schema.OneOf)
+                {
+                    PostProcessExtensionData(item, visited);
+                }
+
+                if (schema.Item != null)
+                {
+                    PostProcessExtensionData(schema.Item, visited);
+                }
+
+                if (schema.AdditionalPropertiesSchema != null)
+                {
+                    PostProcessExtensionData(schema.AdditionalPropertiesSchema, visited);
+                }
+
+                if (schema.AdditionalItemsSchema != null)
+                {
+                    PostProcessExtensionData(schema.AdditionalItemsSchema, visited);
+                }
+
+                if (schema.Not != null)
+                {
+                    PostProcessExtensionData(schema.Not, visited);
+                }
             }
         }
 
-        private static void UpdateCurrentSerializerSettings<T>(IContractResolver contractResolver)
+        private static object? TryDeserializeValueSchemas(object? value)
         {
-            CurrentSerializerSettings = new JsonSerializerSettings
+            if (value is JsonElement element)
             {
-                ContractResolver = contractResolver,
-                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-                ConstructorHandling = ConstructorHandling.Default,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                PreserveReferencesHandling = PreserveReferencesHandling.None,
-                MaxDepth = 128
-            };
+                return ConvertJsonElement(element);
+            }
+
+            return value;
+        }
+
+        internal static object? ConvertJsonElement(JsonElement element)
+        {
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Object:
+                {
+                    var hasType = element.TryGetProperty("type", out _);
+                    var hasProperties = element.TryGetProperty("properties", out _);
+                    var isSchema = hasType || hasProperties;
+
+                    if (isSchema && element.TryGetProperty("required", out var req) &&
+                        (req.ValueKind == JsonValueKind.True || req.ValueKind == JsonValueKind.False))
+                    {
+                        isSchema = false;
+                    }
+
+                    if (isSchema)
+                    {
+                        try
+                        {
+                            var options = CurrentSerializerOptions
+                                ?? throw new InvalidOperationException(
+                                    "JsonSchemaSerialization.CurrentSerializerOptions must be set before converting "
+                                    + "extension-data schemas. Use JsonSchema.FromJsonAsync / JsonSchemaSerialization.FromJsonAsync "
+                                    + "to deserialize.");
+                            return element.Deserialize<JsonSchema>(options);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            throw;
+                        }
+                        catch
+                        {
+                            // object was probably not a JSON Schema
+                        }
+                    }
+
+                    var dictionary = new Dictionary<string, object?>();
+                    foreach (var prop in element.EnumerateObject())
+                    {
+                        dictionary[prop.Name] = ConvertJsonElement(prop.Value);
+                    }
+                    return dictionary;
+                }
+
+                case JsonValueKind.Array:
+                    return element.EnumerateArray().Select(ConvertJsonElement).ToArray();
+
+                case JsonValueKind.String:
+                    return element.GetString();
+
+                case JsonValueKind.Number:
+                    if (element.TryGetInt32(out var intValue))
+                    {
+                        return intValue;
+                    }
+                    if (element.TryGetInt64(out var longValue))
+                    {
+                        return longValue;
+                    }
+                    return element.GetDouble();
+
+                case JsonValueKind.True:
+                    return true;
+
+                case JsonValueKind.False:
+                    return false;
+
+                case JsonValueKind.Null:
+                case JsonValueKind.Undefined:
+                default:
+                    return null;
+            }
+        }
+        /// <summary>Fixes lenient JSON (single quotes, unquoted property names) to be valid JSON.</summary>
+        internal static string FixLenientJson(string json)
+        {
+            // Replace non-breaking spaces (U+00A0) with regular spaces — Newtonsoft tolerated them, STJ does not
+            var fixedJson = json.Replace('\u00A0', ' ');
+
+            // Convert string booleans to real booleans (common in real-world Swagger specs,
+            // e.g., "readOnly": "true" instead of "readOnly": true).
+            // Only match at end of line or before comma/brace to avoid matching inside strings.
+            fixedJson = Regex.Replace(fixedJson, @":\s*""(true|false)""(?=\s*[,}\]\r\n])", m =>
+                ": " + m.Groups[1].Value);
+
+            // Replace single-quoted strings with double-quoted, but only at JSON value positions.
+            // Uses a positive lookbehind to only match at positions after JSON structural characters.
+            fixedJson = Regex.Replace(fixedJson, @"(?<=[:,\[\{]\s*)'([^']*)'(?=\s*[,}\]\r\n:])", "\"$1\"");
+            fixedJson = Regex.Replace(fixedJson, @"(?<=[\{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:", "\"$1\":");
+            return fixedJson;
         }
     }
 }

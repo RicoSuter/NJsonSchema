@@ -11,8 +11,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Namotion.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using NJsonSchema.Collections;
 using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
@@ -25,12 +26,13 @@ namespace NJsonSchema
     {
         internal static readonly HashSet<string> JsonSchemaPropertiesCache =
         [
-            ..typeof(JsonSchema).GetContextualProperties().Select(p => p.Name)
+            ..typeof(JsonSchema).GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public)
+                .Select(p => p.Name)
         ];
 
         private const SchemaType SerializationSchemaType = SchemaType.JsonSchema;
 
-        private static readonly Lazy<PropertyRenameAndIgnoreSerializerContractResolver> ContractResolver = new(() => CreateJsonSerializerContractResolver(SerializationSchemaType));
+        private static readonly Lazy<SchemaSerializationConverter> SerializationConverter = new(() => CreateSchemaSerializationConverter(SerializationSchemaType));
 
         private ObservableDictionary<string, JsonSchemaProperty> _properties;
         private ObservableDictionary<string, JsonSchemaProperty> _patternProperties;
@@ -81,10 +83,8 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
-        public static string ToolchainVersion => version;
-
-        private static readonly string version = typeof(JsonSchema).Assembly.GetName().Version +
-            " (Newtonsoft.Json v" + typeof(JToken).Assembly.GetName().Version + ")";
+        public static readonly string ToolchainVersion = typeof(JsonSchema).Assembly.GetName().Version +
+            " (System.Text.Json v" + typeof(JsonSerializer).Assembly.GetName().Version + ")";
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>
         /// <param name="filePath">The file path.</param>
@@ -170,7 +170,7 @@ namespace NJsonSchema
         public static Task<JsonSchema> FromJsonAsync(string data, string? documentPath, Func<JsonSchema,
             JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            return JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken);
+            return JsonSchemaSerialization.FromJsonAsync(data, SerializationSchemaType, documentPath, referenceResolverFactory, SerializationConverter.Value, cancellationToken);
         }
 
         /// <summary>Deserializes a JSON string to a <see cref="JsonSchema" />.</summary>
@@ -182,7 +182,7 @@ namespace NJsonSchema
         public static Task<JsonSchema> FromJsonAsync(Stream stream, string? documentPath, Func<JsonSchema,
             JsonReferenceResolver> referenceResolverFactory, CancellationToken cancellationToken = default)
         {
-            return JsonSchemaSerialization.FromJsonAsync(stream, SerializationSchemaType, documentPath, referenceResolverFactory, ContractResolver.Value, cancellationToken);
+            return JsonSchemaSerialization.FromJsonAsync(stream, SerializationSchemaType, documentPath, referenceResolverFactory, SerializationConverter.Value, cancellationToken);
         }
 
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type (using System.Text.Json rules).</summary>
@@ -234,8 +234,14 @@ namespace NJsonSchema
 
         internal static JsonSchema FromJsonWithCurrentSettings(object obj)
         {
-            var json = JsonConvert.SerializeObject(obj, JsonSchemaSerialization.CurrentSerializerSettings);
-            return JsonConvert.DeserializeObject<JsonSchema>(json, JsonSchemaSerialization.CurrentSerializerSettings)!;
+            if (obj is JsonElement element)
+            {
+                var options = JsonSchemaSerialization.CurrentSerializerOptions ?? JsonSchemaSerialization.DefaultSerializerOptions;
+                return element.Deserialize<JsonSchema>(options)!;
+            }
+
+            var json = JsonSerializer.Serialize(obj, obj.GetType(), JsonSchemaSerialization.CurrentSerializerOptions);
+            return JsonSerializer.Deserialize<JsonSchema>(json, JsonSchemaSerialization.CurrentSerializerOptions)!;
         }
 
         /// <summary>Gets a value indicating whether the schema is binary (file or binary format).</summary>
@@ -375,15 +381,21 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the schema. </summary>
-        [JsonProperty("$schema", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 1)]
+        [JsonPropertyName("$schema")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonPropertyOrder(-99)]
         public string? SchemaVersion { get; set; }
 
         /// <summary>Gets or sets the id. </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 2)]
+        [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonPropertyOrder(-98)]
         public string? Id { get; set; }
 
         /// <summary>Gets or sets the title. </summary>
-        [JsonProperty("title", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, Order = -100 + 3)]
+        [JsonPropertyName("title")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonPropertyOrder(-97)]
         public string? Title { get; set; }
 
         /// <summary>Gets a value indicating whether the schema title can be used as type name.</summary>
@@ -391,7 +403,8 @@ namespace NJsonSchema
         public bool HasTypeNameTitle => !string.IsNullOrEmpty(Title) && Regex.IsMatch(Title, "^[a-zA-Z0-9_]*$");
 
         /// <summary>Gets or sets the description. </summary>
-        [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("description")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public virtual string? Description { get; set; }
 
         /// <summary>Gets the object types (as enum flags). </summary>
@@ -418,19 +431,23 @@ namespace NJsonSchema
         public virtual object? Parent { get; set; }
 
         /// <summary>Gets or sets the format string. </summary>
-        [JsonProperty("format", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("format")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Format { get; set; }
 
         /// <summary>Gets or sets the default value. </summary>
-        [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("default")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object? Default { get; set; }
 
         /// <summary>Gets or sets the required multiple of for the number value.</summary>
-        [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("multipleOf")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public decimal? MultipleOf { get; set; }
 
         /// <summary>Gets or sets the maximum allowed value.</summary>
-        [JsonProperty("maximum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("maximum")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public decimal? Maximum { get; set; }
 
         /// <summary>Gets or sets the exclusive maximum value (v6).</summary>
@@ -442,7 +459,8 @@ namespace NJsonSchema
         public bool IsExclusiveMaximum { get; set; }
 
         /// <summary>Gets or sets the minimum allowed value. </summary>
-        [JsonProperty("minimum", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("minimum")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public decimal? Minimum { get; set; }
 
         /// <summary>Gets or sets the exclusive minimum value (v6).</summary>
@@ -454,59 +472,73 @@ namespace NJsonSchema
         public bool IsExclusiveMinimum { get; set; }
 
         /// <summary>Gets or sets the maximum length of the value string. </summary>
-        [JsonProperty("maxLength", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("maxLength")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxLength { get; set; }
 
         /// <summary>Gets or sets the minimum length of the value string. </summary>
-        [JsonProperty("minLength", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("minLength")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinLength { get; set; }
 
         /// <summary>Gets or sets the validation pattern as regular expression. </summary>
-        [JsonProperty("pattern", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("pattern")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Pattern { get; set; }
 
         /// <summary>Gets or sets the maximum length of the array. </summary>
-        [JsonProperty("maxItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("maxItems")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int MaxItems { get; set; }
 
         /// <summary>Gets or sets the minimum length of the array. </summary>
-        [JsonProperty("minItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("minItems")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int MinItems { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the items in the array must be unique. </summary>
-        [JsonProperty("uniqueItems", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("uniqueItems")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool UniqueItems { get; set; }
 
         /// <summary>Gets or sets the maximal number of allowed properties in an object. </summary>
-        [JsonProperty("maxProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("maxProperties")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int MaxProperties { get; set; }
 
         /// <summary>Gets or sets the minimal number of allowed properties in an object. </summary>
-        [JsonProperty("minProperties", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("minProperties")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int MinProperties { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the schema is deprecated (native in Open API 'deprecated', custom in Swagger/JSON Schema 'x-deprecated').</summary>
-        [JsonProperty("x-deprecated", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("x-deprecated")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsDeprecated { get; set; }
 
         /// <summary>Gets or sets a message indicating why the schema is deprecated (custom extension, sets 'x-deprecatedMessage').</summary>
-        [JsonProperty("x-deprecatedMessage", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("x-deprecatedMessage")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? DeprecatedMessage { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the type is abstract, i.e. cannot be instantiated directly (x-abstract).</summary>
-        [JsonProperty("x-abstract", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("x-abstract")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsAbstract { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the schema is nullable (native in Open API 'nullable', custom in Swagger 'x-nullable').</summary>
-        [JsonProperty("x-nullable", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("x-nullable")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? IsNullableRaw { get; set; }
 
         /// <summary>Gets or sets the example (Swagger and Open API only).</summary>
-        [JsonProperty("x-example", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("x-example")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object? Example { get; set; }
 
         /// <summary>Gets or sets a value indicating this is an bit flag enum (custom extension, sets 'x-enumFlags', default: false).</summary>
-        [JsonProperty("x-enumFlags", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("x-enumFlags")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsFlagEnumerable { get; set; }
 
         /// <summary>Gets the collection of required properties. </summary>
@@ -525,7 +557,8 @@ namespace NJsonSchema
         #region Child JSON schemas
 
         /// <summary>Gets or sets the dictionary key schema (x-dictionaryKey, only enum schemas are allowed).</summary>
-        [JsonProperty("x-dictionaryKey", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("x-dictionaryKey")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public JsonSchema? DictionaryKey
         {
             get => _dictionaryKey;
@@ -556,7 +589,8 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the xml object of the schema (used in Swagger specifications). </summary>
-        [JsonProperty("xml", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("xml")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public JsonXmlObject? Xml
         {
             get => _xmlObject;
@@ -631,7 +665,8 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets or sets the schema which must not be valid. </summary>
-        [JsonProperty("not", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("not")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public JsonSchema? Not
         {
             get => _not;
@@ -876,13 +911,13 @@ namespace NJsonSchema
         /// <returns>The JSON string.</returns>
         public string ToJson()
         {
-            return ToJson(Formatting.Indented);
+            return ToJson(true);
         }
 
         /// <summary>Serializes the <see cref="JsonSchema" /> to a JSON string.</summary>
-        /// <param name="formatting">The formatting.</param>
+        /// <param name="writeIndented">Whether to write indented JSON.</param>
         /// <returns>The JSON string.</returns>
-        public string ToJson(Formatting formatting)
+        public string ToJson(bool writeIndented)
         {
             var oldSchema = SchemaVersion;
             if (SchemaVersion == null)
@@ -890,15 +925,15 @@ namespace NJsonSchema
                 SchemaVersion = "http://json-schema.org/draft-04/schema#";
             }
 
-            var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, ContractResolver.Value, formatting);
+            var json = JsonSchemaSerialization.ToJson(this, SerializationSchemaType, SerializationConverter.Value, writeIndented);
 
             SchemaVersion = oldSchema;
             return json;
         }
 
         /// <summary>Generates a sample JSON object from a JSON Schema.</summary>
-        /// <returns>The JSON token.</returns>
-        public JToken ToSampleJson()
+        /// <returns>The JSON node.</returns>
+        public JsonNode? ToSampleJson()
         {
             var generator = new SampleJsonDataGenerator();
             return generator.Generate(this);
@@ -931,28 +966,28 @@ namespace NJsonSchema
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
         /// <param name="settings">The validator settings.</param>
-        /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
+        /// <exception cref="JsonException">Could not deserialize the JSON data.</exception>
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(string jsonData, JsonSchemaValidatorSettings? settings = null)
         {
             var validator = new JsonSchemaValidator(settings);
             return validator.Validate(jsonData, ActualSchema);
         }
-        /// <summary>Validates the given JSON token against this schema.</summary>
-        /// <param name="token">The token to validate. </param>
+        /// <summary>Validates the given JSON node against this schema.</summary>
+        /// <param name="token">The JSON node to validate. </param>
         /// <param name="settings">The validator settings.</param>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(JToken token, JsonSchemaValidatorSettings? settings = null)
+        public ICollection<ValidationError> Validate(JsonNode? token, JsonSchemaValidatorSettings? settings = null)
         {
             var validator = new JsonSchemaValidator(settings);
-            return validator.Validate(token, ActualSchema);
+            var json = token?.ToJsonString() ?? "null";
+            return validator.Validate(json, ActualSchema);
         }
 
         /// <summary>Validates the given JSON data against this schema.</summary>
         /// <param name="jsonData">The JSON data to validate. </param>
         /// <param name="schemaType">The type of the schema.</param>
         /// <param name="settings">The validator settings.</param>
-        /// <exception cref="JsonReaderException">Could not deserialize the JSON data.</exception>
         /// <returns>The collection of validation errors. </returns>
         public ICollection<ValidationError> Validate(string jsonData, SchemaType schemaType, JsonSchemaValidatorSettings? settings = null)
         {
@@ -960,15 +995,16 @@ namespace NJsonSchema
             return validator.Validate(jsonData, ActualSchema, schemaType);
         }
 
-        /// <summary>Validates the given JSON token against this schema.</summary>
-        /// <param name="token">The token to validate. </param>
+        /// <summary>Validates the given JSON node against this schema.</summary>
+        /// <param name="token">The JSON node to validate. </param>
         /// <param name="schemaType">The type of the schema.</param>
         /// <param name="settings">The validator settings.</param>
         /// <returns>The collection of validation errors. </returns>
-        public ICollection<ValidationError> Validate(JToken token, SchemaType schemaType, JsonSchemaValidatorSettings? settings = null)
+        public ICollection<ValidationError> Validate(JsonNode? token, SchemaType schemaType, JsonSchemaValidatorSettings? settings = null)
         {
             var validator = new JsonSchemaValidator(settings);
-            return validator.Validate(token, ActualSchema, schemaType);
+            var json = token?.ToJsonString() ?? "null";
+            return validator.Validate(json, ActualSchema, schemaType);
         }
 
         private static JsonObjectType ConvertStringToJsonObjectType(string? value)

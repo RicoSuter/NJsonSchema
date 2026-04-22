@@ -55,7 +55,7 @@ namespace NJsonSchema.Tests.Serialization
             var schema = await JsonSchema.FromJsonAsync(json);
 
             // Assert
-            Assert.Equal((long)123, schema.ExtensionData["Test"]);
+            Assert.Equal(123, schema.ExtensionData["Test"]);
         }
 
         [Fact]

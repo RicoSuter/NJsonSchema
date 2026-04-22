@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Text.Json.Nodes;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Validation;
 
@@ -89,12 +90,10 @@ namespace NJsonSchema.Tests.Validation
             await InitAsync();
 
             // Act
-            var tokenWithInfo = JToken.Parse(Json, new JsonLoadSettings() { LineInfoHandling = LineInfoHandling.Load });
-            var errorsWithInfo = Schema.Validate(tokenWithInfo);
-            var tokenNoInfoParse = JToken.Parse(Json, new JsonLoadSettings() { LineInfoHandling = LineInfoHandling.Ignore });
-            var errorsNoInfoParse = Schema.Validate(tokenNoInfoParse);
-            var tokenNoInfoDeserialize = JsonConvert.DeserializeObject<JToken>(Json);
-            var errorsNoInfoDeserialize = Schema.Validate(tokenNoInfoDeserialize);
+            var validator = new JsonSchemaValidator();
+            var errorsWithInfo = validator.Validate(Json, Schema);
+            var errorsNoInfoParse = validator.Validate(System.Text.Json.Nodes.JsonNode.Parse(Json), Schema);
+            var errorsNoInfoDeserialize = validator.Validate(System.Text.Json.Nodes.JsonNode.Parse(Json), Schema);
 
             // Assert
             ValidateErrors(errorsWithInfo, true);

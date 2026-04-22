@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="JsonProperty.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace NJsonSchema
 {
@@ -76,12 +76,14 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets a value indicating whether the property is read only (Swagger and Open API only).</summary>
         [DefaultValue(false)]
-        [JsonProperty("x-readOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("x-readOnly")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsReadOnly { get; set; }
 
         /// <summary>Gets or sets a value indicating whether the property is write only (Open API only).</summary>
         [DefaultValue(false)]
-        [JsonProperty("x-writeOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("x-writeOnly")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsWriteOnly { get; set; }
 
         /// <summary>Gets a value indicating whether the property is an inheritance discriminator.</summary>

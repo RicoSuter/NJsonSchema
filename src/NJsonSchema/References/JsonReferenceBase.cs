@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="JsonReferenceBase.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace NJsonSchema.References
 {
@@ -22,8 +22,17 @@ namespace NJsonSchema.References
         public string? DocumentPath { get; set; }
 
         /// <summary>Gets or sets the type reference path ($ref). </summary>
-        [JsonProperty("$ref", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        string? IJsonReferenceBase.ReferencePath { get; set; }
+        [JsonPropertyName("$ref")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonInclude]
+        internal string? ReferencePath { get; set; }
+
+        /// <summary>Gets or sets the type reference path ($ref). </summary>
+        string? IJsonReferenceBase.ReferencePath
+        {
+            get => ReferencePath;
+            set => ReferencePath = value;
+        }
 
         /// <summary>Gets or sets the referenced object.</summary>
         [JsonIgnore]

@@ -88,6 +88,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The C# number literal.</returns>
         public override string GetNumericValue(JsonObjectType type, object value, string? format)
         {
+            // Unwrap JsonElement values that may not have been converted during post-processing
+            if (value is System.Text.Json.JsonElement element)
+            {
+                value = NJsonSchema.Infrastructure.JsonSchemaSerialization.ConvertJsonElement(element) ?? value;
+            }
+
             switch (format)
             {
                 case JsonFormatStrings.Byte:
