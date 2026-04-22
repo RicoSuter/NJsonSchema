@@ -71,6 +71,16 @@ Before the final `v12` → `master` merge, revert the temporary shims that only 
 
 Add items to this checklist as new temporary shims are introduced during v12 development, so nothing leaks into the final release.
 
+### Post-PR-1914 technical debt
+
+Follow-ups deferred out of PR [#1914](https://github.com/RicoSuter/NJsonSchema/pull/1914) to keep that PR focused on the STJ migration itself. Each is safe to land incrementally on `v12` before GA, but none blocks release.
+
+1. **Replace `PropertyFilterConverter<T>` with a `JsonTypeInfoResolver` modifier.** The converter currently round-trips through `JsonNode` in `Read` to apply per-type reverse renames. A modifier that rewrites `JsonPropertyInfo.Name` per type during `JsonTypeInfo` construction would let STJ's default reflection pipeline handle the rest and drop the `JsonNode` round-trip, the walked CLR-type guide, and the `[ThreadStatic]` stripped-options cache. The custom converter would shrink to Write-only (ignore rules, empty-collection filtering, extension-data ordering) — Read could go through standard STJ.
+
+2. **Path-format escaping in `ValidationError.Path` and `BuildPathString`.** The current `#/` path format uses `.` as a property separator, which collides when a JSON property name literally contains a dot. `{"foo.bar": 1}` and `{"foo": {"bar": 1}}` both stringify to `#/foo.bar`. JSON Pointer's `~0` / `~1` escaping (RFC 6901) would disambiguate, but it's a public `Path` contract change — schedule alongside any other public-API churn.
+
+3. **Plumb `SchemaSerializationConverter` through reference resolution explicitly.** `JsonReferenceResolver.ResolveReferenceAsync` and `JsonSchemaSerialization.ConvertJsonElement` read from `[ThreadStatic] CurrentSerializerOptions` today, which throws if a caller reaches those paths outside a `FromJsonAsync` flow. Passing the converter/options through as explicit parameters would remove the thread-local dependency and the "must be set before" contract. Public-API-shaped, so batch with other resolver-surface changes.
+
 ## Changelog and migration guide
 
 See [`changelog_v12.md`](./changelog_v12.md) for the running list of landed changes and the v11 → v12 migration guide. Every PR merged to `v12` that has user-visible impact should update that file (see its `Contributing` section).

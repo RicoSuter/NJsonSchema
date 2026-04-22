@@ -281,7 +281,10 @@ namespace NJsonSchema
             {
                 if (obj is IDictionary)
                 {
-                    var options = JsonSchemaSerialization.CurrentSerializerOptions ?? new JsonSerializerOptions();
+                    var options = JsonSchemaSerialization.CurrentSerializerOptions
+                        ?? throw new InvalidOperationException(
+                            "JsonSchemaSerialization.CurrentSerializerOptions must be set before resolving references. "
+                            + "Use JsonSchema.FromJsonAsync / JsonSchemaSerialization.FromJsonAsync to deserialize.");
                     var json = JsonSerializer.Serialize(obj, obj.GetType(), options);
                     return JsonSerializer.Deserialize(json, targetType, options) as IJsonReference;
                 }

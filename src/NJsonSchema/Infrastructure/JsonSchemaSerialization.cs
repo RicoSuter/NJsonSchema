@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="JsonSchemaSerialization.cs" company="NSwag">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -49,35 +49,17 @@ namespace NJsonSchema.Infrastructure
                 }
             });
 
-        [ThreadStatic]
-        private static SchemaType _currentSchemaType;
-
-        [ThreadStatic]
-        private static bool _isWriting;
-
-        [ThreadStatic]
-        private static JsonSerializerOptions? _currentSerializerOptions;
-
-        /// <summary>Gets or sets the current schema type.</summary>
-        public static SchemaType CurrentSchemaType
-        {
-            get => _currentSchemaType;
-            set => _currentSchemaType = value;
-        }
+        /// <summary>Gets the current schema type.</summary>
+        [field: ThreadStatic]
+        public static SchemaType CurrentSchemaType { get; private set; }
 
         /// <summary>Gets the current serializer options.</summary>
-        public static JsonSerializerOptions? CurrentSerializerOptions
-        {
-            get => _currentSerializerOptions;
-            private set => _currentSerializerOptions = value;
-        }
+        [field: ThreadStatic]
+        public static JsonSerializerOptions? CurrentSerializerOptions { get; private set; }
 
         /// <summary>Gets or sets a value indicating whether the object is currently converted to JSON.</summary>
-        public static bool IsWriting
-        {
-            get => _isWriting;
-            private set => _isWriting = value;
-        }
+        [field: ThreadStatic]
+        public static bool IsWriting { get; private set; }
 
         /// <summary>Serializes an object to a JSON string with reference handling.</summary>
         /// <param name="obj">The object to serialize.</param>
@@ -87,20 +69,27 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The JSON.</returns>
         public static string ToJson(object obj, SchemaType schemaType, SchemaSerializationConverter? converter, bool writeIndented)
         {
+            var previousIsWriting = IsWriting;
+            var previousSchemaType = CurrentSchemaType;
+            var previousOptions = CurrentSerializerOptions;
+
             IsWriting = true;
             CurrentSchemaType = schemaType;
 
             var options = CreateSerializerOptions(converter, writeIndented);
             CurrentSerializerOptions = options;
 
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false);
-
-            var json = JsonSerializer.Serialize(obj, obj.GetType(), options);
-
-            CurrentSerializerOptions = null;
-            CurrentSchemaType = SchemaType.JsonSchema;
-
-            return json;
+            try
+            {
+                JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(obj, false);
+                return JsonSerializer.Serialize(obj, obj.GetType(), options);
+            }
+            finally
+            {
+                CurrentSerializerOptions = previousOptions;
+                CurrentSchemaType = previousSchemaType;
+                IsWriting = previousIsWriting;
+            }
         }
 
         /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
@@ -167,17 +156,19 @@ namespace NJsonSchema.Infrastructure
                     }
                 }
 
+                // Ensure CurrentSerializerOptions is available for both the extension-data
+                // post-processing (which deserializes embedded schemas) and the downstream
+                // reference resolver (which deserializes external refs with the Populate
+                // modifier for getter-only collection properties). FromJson clears it on
+                // exit, so restore/repopulate here.
+                CurrentSerializerOptions ??= CreateSerializerOptions(null, false);
+
                 // Post-process extension data to detect and deserialize embedded schemas
                 // before resolving references (refs may point into extension data)
                 if (schema is IJsonExtensionObject)
                 {
                     PostProcessExtensionData(schema);
                 }
-
-                // Ensure CurrentSerializerOptions is available during reference resolution
-                // (FromJson clears it, but the resolver needs it to deserialize external refs
-                // with the Populate modifier for getter-only collection properties)
-                CurrentSerializerOptions ??= CreateSerializerOptions(null, false);
 
                 await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, cancellationToken).ConfigureAwait(false);
             }
@@ -224,18 +215,13 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The deserialized schema.</returns>
         public static T? FromJson<T>(Stream stream, SchemaSerializationConverter? converter)
         {
-            IsWriting = false;
-            var options = CreateSerializerOptions(converter, false);
-            CurrentSerializerOptions = options;
-
-            try
-            {
-                return JsonSerializer.Deserialize<T>(stream, options);
-            }
-            finally
-            {
-                CurrentSerializerOptions = null;
-            }
+            // Buffer the stream and delegate to the string overload so we get the
+            // lenient-JSON fallback (single quotes, unquoted keys, NBSP, stringified
+            // booleans) that stream callers would otherwise miss. Schema documents
+            // are small enough that forgoing STJ's streaming path is worth the uniform
+            // error-recovery behaviour.
+            using var reader = new StreamReader(stream);
+            return FromJson<T>(reader.ReadToEnd(), converter);
         }
 
         private static JsonSerializerOptions CreateSerializerOptions(SchemaSerializationConverter? converter, bool writeIndented)
@@ -399,8 +385,16 @@ namespace NJsonSchema.Infrastructure
                     {
                         try
                         {
-                            var options = CurrentSerializerOptions ?? DefaultSerializerOptions;
+                            var options = CurrentSerializerOptions
+                                ?? throw new InvalidOperationException(
+                                    "JsonSchemaSerialization.CurrentSerializerOptions must be set before converting "
+                                    + "extension-data schemas. Use JsonSchema.FromJsonAsync / JsonSchemaSerialization.FromJsonAsync "
+                                    + "to deserialize.");
                             return element.Deserialize<JsonSchema>(options);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            throw;
                         }
                         catch
                         {

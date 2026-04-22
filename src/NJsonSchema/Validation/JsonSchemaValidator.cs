@@ -75,7 +75,7 @@ namespace NJsonSchema.Validation
         /// <summary>
         /// Builds a map from JSON paths to line/column positions by scanning the raw JSON with a Utf8JsonReader.
         /// Positions match Newtonsoft.Json's IJsonLineInfo convention: the reader position right after consuming
-        /// the token, measured as an offset from the line start.
+        /// the token, measured as a character offset from the line start.
         /// Two types of entries are stored:
         /// - Value entries (key = "#/path"): position past the end of the value token
         /// - Property entries (key = "#/path\x00prop"): position past the colon of the property name
@@ -91,8 +91,11 @@ namespace NJsonSchema.Validation
             };
             var reader = new Utf8JsonReader(jsonBytes, readerOptions);
 
-            // Precompute line start offsets for quick line/position lookup.
-            var lineStartOffsets = BuildLineStartOffsets(jsonData);
+            // Precompute line start BYTE offsets for quick line/position lookup.
+            // Utf8JsonReader reports byte offsets; the public LinePosition is a character
+            // count per Newtonsoft's IJsonLineInfo convention, so the conversion happens
+            // in GetLineAndPosition using UTF-8 decoding.
+            var lineStartOffsets = BuildLineStartOffsets(jsonBytes);
 
             var currentPath = new List<string>();
             var arrayIndexStack = new Stack<int>();
@@ -111,7 +114,7 @@ namespace NJsonSchema.Validation
                             // Record property-level position (past the colon) before pushing
                             currentPath.Add(pendingPropertyName);
                             var propertyKey = BuildPathString(currentPath) + "\x00prop";
-                            map[propertyKey] = GetLineAndPosition(lineStartOffsets, pendingPropertyEndOffset);
+                            map[propertyKey] = GetLineAndPosition(lineStartOffsets, pendingPropertyEndOffset, jsonBytes);
                             pendingPropertyName = null;
                         }
                         else if (arrayIndexStack.Count > 0)
@@ -124,7 +127,7 @@ namespace NJsonSchema.Validation
                         // Record value-level position for the container (past the opening bracket)
                         var containerPath = BuildPathString(currentPath);
                         var endOffset = reader.TokenStartIndex + 1; // past '{' or '['
-                        map[containerPath] = GetLineAndPosition(lineStartOffsets, endOffset);
+                        map[containerPath] = GetLineAndPosition(lineStartOffsets, endOffset, jsonBytes);
 
                         if (reader.TokenType == JsonTokenType.StartArray)
                         {
@@ -178,7 +181,7 @@ namespace NJsonSchema.Validation
 
                             // Also record property-level position
                             var propertyKey = valuePath + "\x00prop";
-                            map[propertyKey] = GetLineAndPosition(lineStartOffsets, pendingPropertyEndOffset);
+                            map[propertyKey] = GetLineAndPosition(lineStartOffsets, pendingPropertyEndOffset, jsonBytes);
 
                             currentPath.RemoveAt(currentPath.Count - 1);
                             pendingPropertyName = null;
@@ -196,7 +199,7 @@ namespace NJsonSchema.Validation
                             valuePath = BuildPathString(currentPath);
                         }
 
-                        map[valuePath] = GetLineAndPosition(lineStartOffsets, endOffset);
+                        map[valuePath] = GetLineAndPosition(lineStartOffsets, endOffset, jsonBytes);
                         break;
                     }
                 }
@@ -251,12 +254,12 @@ namespace NJsonSchema.Validation
             return index; // position of ':'
         }
 
-        private static List<long> BuildLineStartOffsets(string text)
+        private static List<long> BuildLineStartOffsets(byte[] jsonBytes)
         {
             var offsets = new List<long> { 0 }; // Line 1 starts at offset 0
-            for (var i = 0; i < text.Length; i++)
+            for (var i = 0; i < jsonBytes.Length; i++)
             {
-                if (text[i] == '\n')
+                if (jsonBytes[i] == (byte)'\n')
                 {
                     offsets.Add(i + 1); // Next line starts after '\n'
                 }
@@ -264,9 +267,9 @@ namespace NJsonSchema.Validation
             return offsets;
         }
 
-        private static (int Line, int Position) GetLineAndPosition(List<long> lineStartOffsets, long byteOffset)
+        private static (int Line, int Position) GetLineAndPosition(List<long> lineStartOffsets, long byteOffset, byte[] jsonBytes)
         {
-            // Binary search for the line containing this byte offset.
+            // Find the line containing this byte offset.
             var lineIndex = lineStartOffsets.Count - 1;
             for (var i = lineStartOffsets.Count - 1; i >= 0; i--)
             {
@@ -277,8 +280,15 @@ namespace NJsonSchema.Validation
                 }
             }
 
+            var lineStart = lineStartOffsets[lineIndex];
             var line = lineIndex + 1; // 1-based line number
-            var position = (int)(byteOffset - lineStartOffsets[lineIndex]); // offset from line start (Newtonsoft convention)
+            var byteLength = (int)(byteOffset - lineStart);
+
+            // Convert the byte offset within the line to a character count so LinePosition
+            // matches Newtonsoft's IJsonLineInfo convention (characters, not UTF-8 bytes).
+            var position = byteLength == 0
+                ? 0
+                : System.Text.Encoding.UTF8.GetCharCount(jsonBytes, (int)lineStart, byteLength);
             return (line, position);
         }
 
@@ -363,15 +373,75 @@ namespace NJsonSchema.Validation
 
         private static string ConvertJsonNodePathToValidationPath(string jsonNodePath)
         {
+            // JsonNode.GetPath() returns "$", "$.prop1", "$.prop4[0]", "$[0]", or "$['foo.bar']".
+            // Map uses "#", "#/prop1", "#/prop4[0]", "#/[0]", "#/foo.bar" etc.
             if (jsonNodePath == "$")
             {
                 return "#";
             }
 
-            // JsonNode.GetPath() returns "$.prop1", "$.prop4[0]" etc.
-            // Map uses "#/prop1", "#/prop4[0]" etc.
-            var path = jsonNodePath.Substring(2); // Remove "$."
-            return "#/" + path;
+            var result = new System.Text.StringBuilder("#");
+            var i = 1; // skip the leading '$'
+            var isFirstSegment = true;
+
+            while (i < jsonNodePath.Length)
+            {
+                var c = jsonNodePath[i];
+                if (c == '.')
+                {
+                    // Dotted property name: `.propName` — `#/propName` (first) or `#/<prev>.propName`
+                    i++;
+                    var end = i;
+                    while (end < jsonNodePath.Length && jsonNodePath[end] != '.' && jsonNodePath[end] != '[')
+                    {
+                        end++;
+                    }
+                    result.Append(isFirstSegment ? "/" : ".");
+                    result.Append(jsonNodePath, i, end - i);
+                    i = end;
+                    isFirstSegment = false;
+                }
+                else if (c == '[')
+                {
+                    // Either bracket-quoted property name `['foo.bar']` or array index `[0]`.
+                    if (i + 1 < jsonNodePath.Length && jsonNodePath[i + 1] == '\'')
+                    {
+                        var closeQuote = jsonNodePath.IndexOf('\'', i + 2);
+                        if (closeQuote < 0)
+                        {
+                            break;
+                        }
+                        var propName = jsonNodePath.Substring(i + 2, closeQuote - (i + 2));
+                        result.Append(isFirstSegment ? "/" : ".");
+                        result.Append(propName);
+                        i = closeQuote + 2; // past `']`
+                        isFirstSegment = false;
+                    }
+                    else
+                    {
+                        // Array index — preserve `[n]` and keep as its own segment.
+                        if (isFirstSegment)
+                        {
+                            result.Append('/');
+                            isFirstSegment = false;
+                        }
+                        var end = jsonNodePath.IndexOf(']', i);
+                        if (end < 0)
+                        {
+                            break;
+                        }
+                        result.Append(jsonNodePath, i, end - i + 1);
+                        i = end + 1;
+                    }
+                }
+                else
+                {
+                    // Unexpected character — bail out so we don't produce a malformed path.
+                    break;
+                }
+            }
+
+            return result.ToString();
         }
 
         /// <summary>Validates the given JSON token.</summary>
