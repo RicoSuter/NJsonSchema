@@ -146,7 +146,7 @@ namespace NJsonSchema.Generation
 
             if (originalType == typeof(Guid))
             {
-                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Guid);
+                return JsonTypeDescription.Create(contextualType, JsonObjectType.String, false, JsonFormatStrings.Uuid);
             }
 
             // Date & time types
