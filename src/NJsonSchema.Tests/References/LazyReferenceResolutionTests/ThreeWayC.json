@@ -1,0 +1,7 @@
+{
+  "type": "object",
+  "properties": {
+    "flag": { "type": "boolean" },
+    "a": { "$ref": "ThreeWayA.json" }
+  }
+}

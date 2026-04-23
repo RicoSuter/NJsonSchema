@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "definitions": {
+    "group": {
+      "nested": {
+        "item": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "data": { "$ref": "#/definitions/group/nested/item" }
+  }
+}

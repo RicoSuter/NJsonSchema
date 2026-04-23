@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "definitions": {
+    "Foo": {
+      "type": "object",
+      "properties": {
+        "value": { "type": "integer" },
+        "bar": { "$ref": "CircularFragmentA.json#/definitions/Bar" }
+      }
+    }
+  }
+}

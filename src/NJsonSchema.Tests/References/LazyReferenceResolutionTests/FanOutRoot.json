@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "definitions": {
+    "rootDef": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" }
+      }
+    }
+  },
+  "properties": {
+    "child1": { "$ref": "FanOutChild1.json" },
+    "child2": { "$ref": "FanOutChild2.json" },
+    "child3": { "$ref": "FanOutChild3.json" }
+  }
+}
