@@ -64,6 +64,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
         public override bool IsNullable => (_settings.GenerateOptionalPropertiesAsNullable && !_property.IsRequired) || base.IsNullable;
 
+        /// <summary>Gets a value indicating whether the property is rendered with the C# <c>required</c> keyword.</summary>
+        public bool HasRequiredKeyword => _settings.UseRequiredKeyword && _property.IsRequired;
+
         /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
         public bool AllowEmptyStrings =>
             _property.ActualTypeSchema.Type.IsString() &&
