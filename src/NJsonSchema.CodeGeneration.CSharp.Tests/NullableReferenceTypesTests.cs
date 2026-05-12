@@ -244,6 +244,46 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             CSharpCompiler.AssertCompile(code);
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task When_UseRequiredKeyword_is_set_then_only_required_properties_get_required_keyword(bool useRequiredKeyword)
+        {
+            // Arrange
+            var schemaJson = @"
+            {
+                ""type"": ""object"",
+                ""required"": [
+                    ""RequiredProperty""
+                ],
+                ""properties"": {
+                    ""RequiredProperty"": {
+                        ""type"": ""string""
+                    },
+                    ""OptionalProperty"": {
+                        ""type"": ""string""
+                    }
+                }
+            }
+            ";
+
+            var schema = await JsonSchema.FromJsonAsync(schemaJson);
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.OpenApi3,
+                UseRequiredKeyword = useRequiredKeyword,
+                GenerateNullableReferenceTypes = true
+            });
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            await VerifyHelper.Verify(code).UseParameters(useRequiredKeyword);
+            CSharpCompiler.AssertCompile(code);
+        }
+
         [Fact]
         public async Task When_generating_string_property_with_reference_is_optional_and_GenerateNullableOptionalProperties_is_set()
         {
