@@ -21,6 +21,9 @@ namespace MyNamespace
         [Newtonsoft.Json.JsonProperty("OptionalProperty", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string OptionalProperty { get; set; } = default!;
 
+        [Newtonsoft.Json.JsonProperty("OptionalPropertyWithDefault", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int OptionalPropertyWithDefault { get; set; } = 3;
+
         private System.Collections.Generic.IDictionary<string, object>? _additionalProperties;
 
         [Newtonsoft.Json.JsonExtensionData]

@@ -250,6 +250,11 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         public async Task When_UseRequiredKeyword_is_set_then_only_required_properties_get_required_keyword(bool useRequiredKeyword)
         {
             // Arrange
+            // RequiredProperty           -> gets the 'required' keyword (when enabled) and no initializer.
+            // OptionalProperty           -> no 'required' keyword; keeps its '= default!' nullable initializer.
+            // OptionalPropertyWithDefault -> no 'required' keyword; keeps its schema default value initializer.
+            //   The value type is the key case: it only gets an initializer because of its default, so it proves
+            //   non-required properties no longer lose their default values when UseRequiredKeyword is enabled.
             var schemaJson = @"
             {
                 ""type"": ""object"",
@@ -262,6 +267,10 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
                     },
                     ""OptionalProperty"": {
                         ""type"": ""string""
+                    },
+                    ""OptionalPropertyWithDefault"": {
+                        ""type"": ""integer"",
+                        ""default"": 3
                     }
                 }
             }
