@@ -176,6 +176,20 @@ namespace NJsonSchema.Tests.Generation.SystemTextJson
             Assert.Null(schema.Properties["Name"].MinLength);
         }
 
+        [Fact]
+        public void When_property_has_required_keyword_and_nullable_type_then_it_is_nullable_in_Swagger2()
+        {
+            // Act
+            var schema = JsonSchema.FromType<ClassWithRequiredNullableKeyword>(
+                new SystemTextJsonSchemaGeneratorSettings { SchemaType = SchemaType.Swagger2 });
+
+            // Assert: the required keyword forces the nullable property into Swagger2's required
+            // array, which by itself would signal "non-null". x-nullable must be emitted so the
+            // declared nullability is not silently lost.
+            Assert.Contains("Name", schema.RequiredProperties);
+            Assert.True(schema.Properties["Name"].IsNullable(SchemaType.Swagger2));
+        }
+
         public class ClassWithJsonRequired
         {
             [System.Text.Json.Serialization.JsonRequired]

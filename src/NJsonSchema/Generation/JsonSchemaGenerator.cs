@@ -1222,9 +1222,17 @@ namespace NJsonSchema.Generation
                     propertySchema.MinLength = 1;
                 }
 
-                if (!isNullable && Settings.SchemaType == SchemaType.Swagger2)
+                if (Settings.SchemaType == SchemaType.Swagger2)
                 {
-                    if (!parentSchema.RequiredProperties.Contains(propertyName))
+                    if (parentSchema.RequiredProperties.Contains(propertyName))
+                    {
+                        if (isNullable)
+                        {
+                            // Swagger2 has no native nullable
+                            propertySchema.IsNullableRaw = true;
+                        }
+                    }
+                    else if (!isNullable)
                     {
                         parentSchema.RequiredProperties.Add(propertyName);
                     }
