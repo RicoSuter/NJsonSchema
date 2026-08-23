@@ -15,6 +15,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         public CSharpGeneratorSettings()
         {
             AnyType = "object";
+            AdditionalPropertiesValueType = "object";
             Namespace = "MyNamespace";
 
             DateType = "System.DateTimeOffset";
@@ -74,6 +75,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the any type (default: "object").</summary>
         public string AnyType { get; set; }
+
+        /// <summary>Gets or sets the .NET type used for the values of the additional properties dictionary.</summary>
+        public string AdditionalPropertiesValueType { get; set; }
 
         /// <summary>Gets or sets the date .NET type (default: 'DateTimeOffset').</summary>
         public string DateType { get; set; }

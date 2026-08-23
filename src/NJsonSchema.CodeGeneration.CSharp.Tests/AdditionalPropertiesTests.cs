@@ -212,6 +212,67 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             CSharpCompiler.AssertCompile(code);
         }
         
+        [Fact]
+        public async Task When_AdditionalPropertiesValueType_is_set_with_NewtonsoftJson_then_extension_data_dictionary_uses_it()
+        {
+            // Arrange
+            var json =
+                @"{
+    ""type"": ""object"",
+    ""properties"": {
+        ""id"": {
+            ""type"": ""integer""
+        }
+    },
+    ""additionalProperties"": true
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings()
+            {
+                AdditionalPropertiesValueType = "Newtonsoft.Json.Linq.JToken"
+            });
+            var code = generator.GenerateFile("Person");
+
+            // Assert
+            Assert.Contains("System.Collections.Generic.IDictionary<string, Newtonsoft.Json.Linq.JToken> AdditionalProperties", code);
+
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Fact]
+        public async Task When_AdditionalPropertiesValueType_is_set_with_SystemTextJson_then_extension_data_dictionary_uses_it()
+        {
+            // Arrange
+            var json =
+                @"{
+    ""type"": ""object"",
+    ""properties"": {
+        ""id"": {
+            ""type"": ""integer""
+        }
+    },
+    ""additionalProperties"": true
+}";
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Act
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings()
+            {
+                JsonLibrary = CSharpJsonLibrary.SystemTextJson,
+                AdditionalPropertiesValueType = "System.Text.Json.JsonElement"
+            });
+            var code = generator.GenerateFile("Person");
+
+            // Assert
+            Assert.Contains("System.Collections.Generic.IDictionary<string, System.Text.Json.JsonElement> AdditionalProperties", code);
+
+            await VerifyHelper.Verify(code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
         public class Page
         {
         }
