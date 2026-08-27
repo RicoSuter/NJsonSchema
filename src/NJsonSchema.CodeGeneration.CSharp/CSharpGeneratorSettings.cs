@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="CSharpGeneratorSettings.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -21,6 +21,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
             DateTimeType = "System.DateTimeOffset";
             TimeType = "System.TimeSpan";
             TimeSpanType = "System.TimeSpan";
+
+            CustomStringFormatTypes = new Dictionary<string, string>(StringComparer.Ordinal);
             
             IntegerType = "int";
 
@@ -86,6 +88,12 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets the time span .NET type (default: 'TimeSpan').</summary>
         public string TimeSpanType { get; set; }
+
+        /// <summary>Gets or sets the .NET type to use for a given custom string format (default: empty).
+        /// Only consulted for formats which are not handled natively (i.e. not 'date', 'date-time', 'time',
+        /// 'duration', 'time-span', 'uri', 'guid'/'uuid', 'base64'/'byte'), so configuring a format which
+        /// NJsonSchema already knows has no effect. An unconfigured format keeps falling back to 'string'.</summary>
+        public IDictionary<string, string> CustomStringFormatTypes { get; set; }
         
         /// <summary>Gets or sets the integer .NET type (default: "int"). This setting applies only to integer properties without an explicit format (e.g., not byte, long, or ulong).</summary>
         public string IntegerType { get; set; }

@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="CSharpTypeResolver.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -207,6 +207,15 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
 
 #pragma warning restore 618
+
+            if (schema.Format is { Length: > 0 } format &&
+                Settings.CustomStringFormatTypes?.TryGetValue(format, out var customType) == true &&
+                !string.IsNullOrWhiteSpace(customType))
+            {
+                return isNullable && !string.Equals(customType, "string", StringComparison.OrdinalIgnoreCase)
+                    ? customType + "?"
+                    : customType + nullableReferenceType;
+            }
 
             return "string" + nullableReferenceType;
         }
