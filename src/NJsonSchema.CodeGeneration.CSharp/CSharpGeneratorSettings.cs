@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="CSharpGeneratorSettings.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -190,5 +190,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
         
         /// <summary>Gets a value indicating whether the constructor parameters should be sorted alphabetically (default: true).</summary>
         public bool SortConstructorParameters { get; set; }
+
+        /// <summary>Gets or sets the factory which creates additional attributes rendered on generated properties (default: null).</summary>
+        public IPropertyAttributeFactory? PropertyAttributeFactory { get; set; }
     }
 }

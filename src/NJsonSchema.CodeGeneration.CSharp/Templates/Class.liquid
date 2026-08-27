@@ -106,6 +106,9 @@
 {%-   if property.IsDeprecated -%}
     [System.Obsolete{% if property.HasDeprecatedMessage %}({{ property.DeprecatedMessage | literal }}){% endif %}]
 {%-   endif -%}
+{%-   for attribute in property.AdditionalAttributes -%}
+    {{ attribute }}
+{%-   endfor -%}
     {%- template Class.Property.Annotations %}
     public {% if property.HasRequiredKeyword %}required {% endif %}{{ property.Type }} {{ property.PropertyName }}{% if RenderInpc == false and RenderPrism == false %} { get; {% if property.HasSetter and RenderRecord == false %}{{ WriteAccessor }}; {% elsif RenderRecord and GenerateNativeRecords %}init; {% endif %}}{% if property.HasDefaultValue and RenderRecord == false and property.HasRequiredKeyword == false %} = {{ property.DefaultValue }};{% elsif GenerateNullableReferenceTypes and RenderRecord == false and property.HasRequiredKeyword == false %} = default!;{% endif %}
 {%- else -%}

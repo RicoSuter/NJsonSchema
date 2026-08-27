@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="PropertyModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -57,6 +57,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets the description.</summary>
         public string? Description => _property.Description;
+
+        /// <summary>Gets the additional attributes created by the <see cref="CSharpGeneratorSettings.PropertyAttributeFactory"/>.</summary>
+        public IEnumerable<string> AdditionalAttributes =>
+            _settings.PropertyAttributeFactory?.CreateAttributes(this, _property) ?? [];
 
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => _settings.FieldNamePrefix + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
