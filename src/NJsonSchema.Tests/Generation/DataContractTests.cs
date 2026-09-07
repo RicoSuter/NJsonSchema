@@ -41,7 +41,7 @@ namespace NJsonSchema.Tests.Generation
         }
 
         [Fact]
-        public void When_DataContractRequired_is_set_property_is_not_nullable_in_Swagger2()
+        public void When_DataContractRequired_is_set_property_is_nullable_in_Swagger2()
         {
             // Act
             var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = SchemaType.Swagger2 });
@@ -49,11 +49,11 @@ namespace NJsonSchema.Tests.Generation
 
             // Assert
             Assert.True(schema.ActualProperties["middleName"].IsRequired);
-            Assert.False(schema.ActualProperties["middleName"].IsNullable(SchemaType.Swagger2));
+            Assert.True(schema.ActualProperties["middleName"].IsNullable(SchemaType.Swagger2));
 
-            // not nullable, because Swagger2 does not know null but it has to set "required" 
-            // because not setting the property would result in a serialization error, 
-            // see When_DataContractRequired_is_set_then_undefined_is_not_allowed
+            // The property must be "required" because not setting it would result in a serialization
+            // error, but its value may still be null. Swagger2 has no native null, so x-nullable 
+            // is emitted to express that the required value can be null.
         }
     }
 }

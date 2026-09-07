@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------
 // <copyright file="PropertyModel.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -58,11 +58,18 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets the description.</summary>
         public string? Description => _property.Description;
 
+        /// <summary>Gets the additional attributes created by the <see cref="CSharpGeneratorSettings.PropertyAttributeFactory"/>.</summary>
+        public IEnumerable<string> AdditionalAttributes =>
+            _settings.PropertyAttributeFactory?.CreateAttributes(this, _property) ?? [];
+
         /// <summary>Gets the name of the field.</summary>
         public string FieldName => _settings.FieldNamePrefix + ConversionUtilities.ConvertToLowerCamelCase(PropertyName, true);
 
         /// <summary>Gets a value indicating whether the property is nullable.</summary>
         public override bool IsNullable => (_settings.GenerateOptionalPropertiesAsNullable && !_property.IsRequired) || base.IsNullable;
+
+        /// <summary>Gets a value indicating whether the property is rendered with the C# <c>required</c> keyword.</summary>
+        public bool HasRequiredKeyword => _settings.UseRequiredKeyword && _property.IsRequired;
 
         /// <summary>Gets or sets a value indicating whether empty strings are allowed.</summary>
         public bool AllowEmptyStrings =>
