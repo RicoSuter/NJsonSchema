@@ -91,7 +91,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool GenerateAdditionalPropertiesProperty => HasAdditionalPropertiesType && !HasAdditionalPropertiesTypeInBaseClass;
 
         /// <summary>Gets the type of the additional properties.</summary>
-        public string? AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries
+        public string? AdditionalPropertiesType => HasAdditionalPropertiesType ? _settings.AdditionalPropertiesValueType : null; // TODO: Find a way to use typed dictionaries
         //public string AdditionalPropertiesType => HasAdditionalPropertiesType ? _resolver.Resolve(
         //    _schema.AdditionalPropertiesSchema,
         //    _schema.AdditionalPropertiesSchema.IsNullable(_settings.SchemaType),
