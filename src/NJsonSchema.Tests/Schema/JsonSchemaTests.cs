@@ -412,14 +412,26 @@ namespace NJsonSchema.Tests.Schema
             // https://github.com/NJsonSchema/NJsonSchema/issues/288
 
             // Arrange
-
+            // Resolving the external venue reference adds a definition while Team is being visited.
+            var path = Path.Combine(AppContext.BaseDirectory, "References", "CollectionModified", "team_profile.json");
 
             // Act
-            var schema = await JsonSchema.FromUrlAsync("http://schemas.sportradar.com/bsa/json/v1/endpoints/soccer/team_profile.json");
+            var schema = await JsonSchema.FromFileAsync(path);
             var json = schema.ToJson();
+            var roundTrippedSchema = await JsonSchema.FromJsonAsync(json);
 
             // Assert
-            Assert.NotNull(json);
+            Assert.Equal(2, schema.Definitions.Count);
+            var team = schema.Properties["team"].ActualSchema;
+            var venue = schema.Definitions["Venue"];
+            Assert.Same(venue, team.Properties["venue"].ActualSchema);
+            Assert.Same(venue, team.Properties["trainingVenue"].ActualSchema);
+            Assert.Equal(JsonObjectType.String, venue.Properties["name"].Type);
+
+            var roundTrippedTeam = roundTrippedSchema.Properties["team"].ActualSchema;
+            Assert.Equal(2, roundTrippedSchema.Definitions.Count);
+            Assert.Same(roundTrippedSchema.Definitions["Venue"], roundTrippedTeam.Properties["venue"].ActualSchema);
+            Assert.Same(roundTrippedSchema.Definitions["Venue"], roundTrippedTeam.Properties["trainingVenue"].ActualSchema);
         }
 
         [Fact]

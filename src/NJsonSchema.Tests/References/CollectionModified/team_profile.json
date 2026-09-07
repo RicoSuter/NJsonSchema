@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "team": {
+      "$ref": "#/definitions/Team"
+    }
+  },
+  "definitions": {
+    "Team": {
+      "type": "object",
+      "properties": {
+        "venue": {
+          "$ref": "venue.json"
+        },
+        "trainingVenue": {
+          "$ref": "venue.json"
+        }
+      }
+    }
+  }
+}

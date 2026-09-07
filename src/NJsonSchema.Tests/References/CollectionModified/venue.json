@@ -1,0 +1,9 @@
+{
+  "title": "Venue",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    }
+  }
+}
