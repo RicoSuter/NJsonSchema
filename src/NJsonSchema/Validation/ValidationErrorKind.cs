@@ -145,5 +145,8 @@ namespace NJsonSchema.Validation
 
         /// <summary>A valid UUID is expected. </summary>
         UuidExpected,
+
+        /// <summary>The value does not match the const value. </summary>
+        ConstMismatch,
     }
 }

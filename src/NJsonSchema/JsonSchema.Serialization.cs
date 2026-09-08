@@ -73,6 +73,12 @@ namespace NJsonSchema
         internal void OnDeserialized(StreamingContext ctx)
         {
             Initialize();
+
+            if (ExtensionData != null && ExtensionData.TryGetValue("const", out var constValue))
+            {
+                Const = constValue;
+                HasConst = true;
+            }
         }
 
         /// <summary>Gets the discriminator property (Swagger only).</summary>
