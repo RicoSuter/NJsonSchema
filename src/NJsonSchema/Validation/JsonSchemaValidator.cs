@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using NJsonSchema.Infrastructure;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
@@ -1000,19 +1001,7 @@ namespace NJsonSchema.Validation
                 return false;
             }
 
-            // Check if it's an integer type
-            if (value.TryGetValue<long>(out _) || value.TryGetValue<int>(out _))
-            {
-                return true;
-            }
-
-            // Also check if a double value is actually a whole number
-            if (value.TryGetValue<double>(out var d) && d == Math.Truncate(d) && !double.IsInfinity(d))
-            {
-                return true;
-            }
-
-            return false;
+            return JsonNumber.TryCreate(value, out var number) && number!.IsInteger;
         }
 
         private static decimal GetDecimalValue(JsonNode token)

@@ -25,6 +25,8 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
+- Recognize integer JSON values exactly: whole-valued forms such as `1.0`, `1e0`, and large positive exponents are accepted; precise fractions and tiny nonzero fractions are rejected without floating point rounding. Non-finite CLR numeric nodes are rejected using System.Text.Json serialization rules.
+
 - Preserve literal `default`, `example`, and `enum` objects when they contain schema-shaped keys such as `type` or `properties`. Preserve precise JSON numbers during deserialization and roundtrip serialization, including defaults consumed by C# numeric code generation.
 
 ---
