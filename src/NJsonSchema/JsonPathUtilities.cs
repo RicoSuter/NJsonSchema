@@ -90,7 +90,8 @@ namespace NJsonSchema
             checkedObjects.Add(obj);
 
             var pathAndSeparator = basePath + "/";
-            if (JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out var entries))
+            var isDictionary = JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out var entries);
+            if (isDictionary)
             {
                 foreach (var pair in entries)
                 {
@@ -126,13 +127,9 @@ namespace NJsonSchema
                     i++;
                 }
             }
-            else
+            if (obj is not IEnumerable || (isDictionary && type.GetCustomAttribute<JsonConverterAttribute>(true) != null))
             {
                 var isExtensionObject = obj is IJsonExtensionObject;
-
-                // Look up the converter once for this object's properties (not per-property)
-                var converter = JsonSchemaSerialization.CurrentSerializerOptions?.Converters
-                    .OfType<SchemaSerializationConverter>().FirstOrDefault();
 
                 // Order properties so that settable properties (with a setter) are processed before
                 // getter-only properties. This ensures that when two properties return the same object
@@ -146,15 +143,16 @@ namespace NJsonSchema
                 {
                     var jsonIgnoreAttr = property.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>();
                     if ((jsonIgnoreAttr != null && jsonIgnoreAttr.Condition == JsonIgnoreCondition.Always) ||
-                        property.PropertyInfo.GetMethod?.IsStatic == true)
+                        property.PropertyInfo.GetMethod?.IsStatic == true ||
+                        (isDictionary && property.MemberInfo.DeclaringType != type))
                     {
                         continue;
                     }
 
                     // Check if the property is ignored by the current SchemaSerializationConverter
                     // (e.g., "components" is ignored for Swagger2, "definitions" for OpenApi3)
-                    var jsonName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
-                    if (converter != null && converter.IsPropertyIgnored(type, jsonName))
+                    var originalName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
+                    if (!JsonObjectGraphUtilities.TryGetSerializedPropertyName(type, originalName, out var jsonName))
                     {
                         continue;
                     }

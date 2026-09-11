@@ -6,6 +6,24 @@ namespace NJsonSchema.Infrastructure;
 
 internal static class JsonObjectGraphUtilities
 {
+    internal static bool TryGetSerializedPropertyName(Type runtimeType, string originalJsonName, out string serializedName)
+    {
+        var converter = JsonSchemaSerialization.CurrentSerializerOptions?.Converters
+            .OfType<SchemaSerializationConverter>().FirstOrDefault();
+        serializedName = originalJsonName;
+        if (converter?.IsPropertyIgnored(runtimeType, originalJsonName) == true)
+        {
+            return false;
+        }
+
+        var renames = converter?.GetMergedRenames(runtimeType);
+        if (renames?.TryGetValue(originalJsonName, out var renamed) == true)
+        {
+            serializedName = renamed;
+        }
+        return true;
+    }
+
     internal static bool TryGetDictionaryEntries(object value, out IReadOnlyList<DictionaryEntryAccessor> entries)
     {
         var snapshot = new List<DictionaryEntryAccessor>();

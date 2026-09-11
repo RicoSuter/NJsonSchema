@@ -314,15 +314,71 @@ namespace NJsonSchema.Infrastructure
                 }
 
                 // Only structural schema members are traversed; default/example/enum remain literal data.
-                foreach (var child in new object?[]
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "properties", out _) && schema.Properties != null)
                 {
-                    schema.Properties, schema.PatternProperties, schema.Definitions, schema.Items,
-                    schema.AllOf, schema.AnyOf, schema.OneOf, schema.Item, schema.DictionaryKey,
-                    schema.AdditionalPropertiesSchema, schema.AdditionalItemsSchema, schema.Not,
-                    schema.Reference, schema.DiscriminatorRaw
-                })
+                    PostProcessExtensionData(schema.Properties, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "patternProperties", out _) && schema.PatternProperties != null)
                 {
-                    if (child != null) PostProcessExtensionData(child, visited);
+                    PostProcessExtensionData(schema.PatternProperties, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "definitions", out _) && schema.Definitions != null)
+                {
+                    PostProcessExtensionData(schema.Definitions, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "items", out _) && schema.Items != null)
+                {
+                    PostProcessExtensionData(schema.Items, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "allOf", out _) && schema.AllOf != null)
+                {
+                    PostProcessExtensionData(schema.AllOf, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "anyOf", out _) && schema.AnyOf != null)
+                {
+                    PostProcessExtensionData(schema.AnyOf, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "oneOf", out _) && schema.OneOf != null)
+                {
+                    PostProcessExtensionData(schema.OneOf, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "items", out _) && schema.Item != null)
+                {
+                    PostProcessExtensionData(schema.Item, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "x-dictionaryKey", out _) && schema.DictionaryKey != null)
+                {
+                    PostProcessExtensionData(schema.DictionaryKey, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "additionalProperties", out _) && schema.AdditionalPropertiesSchema != null)
+                {
+                    PostProcessExtensionData(schema.AdditionalPropertiesSchema, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "additionalItems", out _) && schema.AdditionalItemsSchema != null)
+                {
+                    PostProcessExtensionData(schema.AdditionalItemsSchema, visited);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "not", out _) && schema.Not != null)
+                {
+                    PostProcessExtensionData(schema.Not, visited);
+                }
+
+                if (schema.Reference != null) PostProcessExtensionData(schema.Reference, visited);
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "discriminator", out _) && schema.DiscriminatorRaw != null)
+                {
+                    PostProcessExtensionData(schema.DiscriminatorRaw, visited);
                 }
             }
 
@@ -353,6 +409,12 @@ namespace NJsonSchema.Infrastructure
                     (obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(property.Name)) ||
                     (isDictionary && (property.DeclaringType != obj.GetType() ||
                         obj.GetType().GetCustomAttribute<JsonConverterAttribute>(true) == null)))
+                {
+                    continue;
+                }
+
+                var originalName = property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
+                if (!JsonObjectGraphUtilities.TryGetSerializedPropertyName(obj.GetType(), originalName, out _))
                 {
                     continue;
                 }

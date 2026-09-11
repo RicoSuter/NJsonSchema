@@ -77,87 +77,108 @@ namespace NJsonSchema.Visitors
                     Visit(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema)o);
                 }
 
-                if (schema.AdditionalItemsSchema != null)
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "additionalItems", out var additionalItemsSchemaName) && schema.AdditionalItemsSchema != null)
                 {
-                    Visit(schema.AdditionalItemsSchema, $"{path}/additionalItems", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema)o);
+                    Visit(schema.AdditionalItemsSchema, $"{path}/{additionalItemsSchemaName}", null, checkedObjects, o => schema.AdditionalItemsSchema = (JsonSchema)o);
                 }
 
-                if (schema.AdditionalPropertiesSchema != null)
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "additionalProperties", out var additionalPropertiesSchemaName) && schema.AdditionalPropertiesSchema != null)
                 {
-                    Visit(schema.AdditionalPropertiesSchema, $"{path}/additionalProperties", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema)o);
+                    Visit(schema.AdditionalPropertiesSchema, $"{path}/{additionalPropertiesSchemaName}", null, checkedObjects, o => schema.AdditionalPropertiesSchema = (JsonSchema)o);
                 }
 
-                if (schema.Item != null)
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "items", out var itemName) && schema.Item != null)
                 {
-                    Visit(schema.Item, $"{path}/items", null, checkedObjects, o => schema.Item = (JsonSchema)o);
+                    Visit(schema.Item, $"{path}/{itemName}", null, checkedObjects, o => schema.Item = (JsonSchema)o);
                 }
 
-                var items = schema._items;
-                for (var i = 0; i < items.Count; i++)
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "items", out var itemsName))
                 {
-                    var index = i;
-                    Visit(items[i], $"{path}/items[{i}]", null, checkedObjects, o => ReplaceOrDelete(items, index, (JsonSchema)o));
-                }
-
-                var allOf = schema._allOf;
-                for (var i = 0; i < allOf.Count; i++)
-                {
-                    var index = i;
-                    Visit(allOf[i], $"{path}/allOf[{i}]", null, checkedObjects, o => ReplaceOrDelete(allOf, index, (JsonSchema)o));
-                }
-
-                var anyOf = schema._anyOf;
-                for (var i = 0; i < anyOf.Count; i++)
-                {
-                    var index = i;
-                    Visit(anyOf[i], $"{path}/anyOf[{i}]", null, checkedObjects, o => ReplaceOrDelete(anyOf, index, (JsonSchema)o));
-                }
-
-                var oneOf = schema._oneOf;
-                for (var i = 0; i < oneOf.Count; i++)
-                {
-                    var index = i;
-                    Visit(oneOf[i], $"{path}/oneOf[{i}]", null, checkedObjects, o => ReplaceOrDelete(oneOf, index, (JsonSchema)o));
-                }
-
-                if (schema.Not != null)
-                {
-                    Visit(schema.Not, $"{path}/not", null, checkedObjects, o => schema.Not = (JsonSchema)o);
-                }
-
-                if (schema.DictionaryKey != null)
-                {
-                    Visit(schema.DictionaryKey, $"{path}/x-dictionaryKey", null, checkedObjects, o => schema.DictionaryKey = (JsonSchema)o);
-                }
-
-                if (schema.DiscriminatorRaw != null)
-                {
-                    Visit(schema.DiscriminatorRaw, $"{path}/discriminator", null, checkedObjects, o => schema.DiscriminatorRaw = o);
-                }
-
-                foreach (var p in schema.Properties.ToArray())
-                {
-                    Visit(p.Value, $"{path}/properties/{p.Key}", p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o);
-                }
-
-                foreach (var p in schema.PatternProperties.ToArray())
-                {
-                    Visit(p.Value, $"{path}/patternProperties/{p.Key}", null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o);
-                }
-
-                foreach (var p in schema.Definitions.ToArray())
-                {
-                    Visit(p.Value, $"{path}/definitions/{p.Key}", p.Key, checkedObjects, o =>
+                    var items = schema._items;
+                    for (var i = 0; i < items.Count; i++)
                     {
-                        if (o != null)
+                        var index = i;
+                        Visit(items[i], $"{path}/{itemsName}[{i}]", null, checkedObjects, o => ReplaceOrDelete(items, index, (JsonSchema)o));
+                    }
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "allOf", out var allOfName))
+                {
+                    var allOf = schema._allOf;
+                    for (var i = 0; i < allOf.Count; i++)
+                    {
+                        var index = i;
+                        Visit(allOf[i], $"{path}/{allOfName}[{i}]", null, checkedObjects, o => ReplaceOrDelete(allOf, index, (JsonSchema)o));
+                    }
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "anyOf", out var anyOfName))
+                {
+                    var anyOf = schema._anyOf;
+                    for (var i = 0; i < anyOf.Count; i++)
+                    {
+                        var index = i;
+                        Visit(anyOf[i], $"{path}/{anyOfName}[{i}]", null, checkedObjects, o => ReplaceOrDelete(anyOf, index, (JsonSchema)o));
+                    }
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "oneOf", out var oneOfName))
+                {
+                    var oneOf = schema._oneOf;
+                    for (var i = 0; i < oneOf.Count; i++)
+                    {
+                        var index = i;
+                        Visit(oneOf[i], $"{path}/{oneOfName}[{i}]", null, checkedObjects, o => ReplaceOrDelete(oneOf, index, (JsonSchema)o));
+                    }
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "not", out var notName) && schema.Not != null)
+                {
+                    Visit(schema.Not, $"{path}/{notName}", null, checkedObjects, o => schema.Not = (JsonSchema)o);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "x-dictionaryKey", out var dictionaryKeyName) && schema.DictionaryKey != null)
+                {
+                    Visit(schema.DictionaryKey, $"{path}/{dictionaryKeyName}", null, checkedObjects, o => schema.DictionaryKey = (JsonSchema)o);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "discriminator", out var discriminatorRawName) && schema.DiscriminatorRaw != null)
+                {
+                    Visit(schema.DiscriminatorRaw, $"{path}/{discriminatorRawName}", null, checkedObjects, o => schema.DiscriminatorRaw = o);
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "properties", out var propertiesName))
+                {
+                    foreach (var p in schema.Properties.ToArray())
+                    {
+                        Visit(p.Value, $"{path}/{propertiesName}/{p.Key}", p.Key, checkedObjects, o => schema.Properties[p.Key] = (JsonSchemaProperty)o);
+                    }
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "patternProperties", out var patternPropertiesName))
+                {
+                    foreach (var p in schema.PatternProperties.ToArray())
+                    {
+                        Visit(p.Value, $"{path}/{patternPropertiesName}/{p.Key}", null, checkedObjects, o => schema.PatternProperties[p.Key] = (JsonSchemaProperty)o);
+                    }
+                }
+
+                if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(schema.GetType(), "definitions", out var definitionsName))
+                {
+                    foreach (var p in schema.Definitions.ToArray())
+                    {
+                        Visit(p.Value, $"{path}/{definitionsName}/{p.Key}", p.Key, checkedObjects, o =>
                         {
-                            schema.Definitions[p.Key] = (JsonSchema)o;
-                        }
-                        else
-                        {
-                            schema.Definitions.Remove(p.Key);
-                        }
-                    });
+                            if (o != null)
+                            {
+                                schema.Definitions[p.Key] = (JsonSchema)o;
+                            }
+                            else
+                            {
+                                schema.Definitions.Remove(p.Key);
+                            }
+                        });
+                    }
                 }
             }
 
@@ -183,12 +204,19 @@ namespace NJsonSchema.Visitors
                                 !(property.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>() is { Condition: JsonIgnoreCondition.Always }) &&
                                 property.PropertyType.Type != typeof(string) &&
                                 !property.PropertyType.Type.IsValueType &&
+                                property.PropertyInfo.GetMethod?.IsStatic != true &&
                                 property.PropertyInfo.GetIndexParameters().Length == 0)
                             {
+                                var originalName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
+                                if (!JsonObjectGraphUtilities.TryGetSerializedPropertyName(obj.GetType(), originalName, out var jsonName))
+                                {
+                                    continue;
+                                }
+
                                 var value = property.GetValue(obj);
                                 if (value != null)
                                 {
-                                    Visit(value, $"{path}/{property.Name}", property.Name, checkedObjects, o => property.SetValue(obj, o));
+                                    Visit(value, $"{path}/{jsonName}", jsonName, checkedObjects, o => property.SetValue(obj, o));
                                 }
                             }
                         }
@@ -229,10 +257,15 @@ namespace NJsonSchema.Visitors
                             continue;
                         }
 
+                        var originalName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
+                        if (!JsonObjectGraphUtilities.TryGetSerializedPropertyName(obj.GetType(), originalName, out var jsonName))
+                        {
+                            continue;
+                        }
+
                         var value = property.GetValue(obj);
                         if (value != null)
                         {
-                            var jsonName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
                             Visit(value, $"{path}/{jsonName}", jsonName, checkedObjects, o => property.SetValue(obj, o));
                         }
                     }
