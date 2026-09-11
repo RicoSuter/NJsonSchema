@@ -25,6 +25,8 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
+- Preserve supported single-quoted and unquoted-key schema inputs without changing literal strings, escaped text, or non-breaking spaces within values. Coerce quoted booleans only through typed serialization contracts, preserve custom converter precedence, and parse quoted exclusive bounds invariantly instead of silently discarding them.
+
 - Restore XML metadata deserialization, property converter precedence (including discriminator mappings), ignored-input filtering, and derived schema members in base-typed containers. Filtered serialization preserves runtime metadata customizations and explicit converter contracts.
 
 - Preserve object-valued or mixed vendor enum-description metadata under its original alias while retaining the string-array API. Keep lazily materialized reference targets attached to their original containers, preserving shared child schemas, nested references, and literal normalization.

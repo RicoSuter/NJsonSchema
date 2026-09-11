@@ -13,7 +13,6 @@ using System.Text.Json.Nodes;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using System.Text.RegularExpressions;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Infrastructure
@@ -250,6 +249,8 @@ namespace NJsonSchema.Infrastructure
                 options.Converters.Add(converter);
             }
 
+            // Caller and property converters retain precedence over this schema-only leniency.
+            options.Converters.Add(new LenientBooleanConverter());
             return options;
         }
 
@@ -536,20 +537,20 @@ namespace NJsonSchema.Infrastructure
         /// <summary>Fixes lenient JSON (single quotes, unquoted property names) to be valid JSON.</summary>
         internal static string FixLenientJson(string json)
         {
-            // Replace non-breaking spaces (U+00A0) with regular spaces — Newtonsoft tolerated them, STJ does not
-            var fixedJson = json.Replace('\u00A0', ' ');
+            return LenientJsonSyntaxNormalizer.Normalize(json);
+        }
 
-            // Convert string booleans to real booleans (common in real-world Swagger specs,
-            // e.g., "readOnly": "true" instead of "readOnly": true).
-            // Only match at end of line or before comma/brace to avoid matching inside strings.
-            fixedJson = Regex.Replace(fixedJson, @":\s*""(true|false)""(?=\s*[,}\]\r\n])", m =>
-                ": " + m.Groups[1].Value);
+        private sealed class LenientBooleanConverter : JsonConverter<bool>
+        {
+            public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                if (reader.TokenType == JsonTokenType.True) return true;
+                if (reader.TokenType == JsonTokenType.False) return false;
+                if (reader.TokenType == JsonTokenType.String && bool.TryParse(reader.GetString(), out var value)) return value;
+                throw new JsonException("Invalid boolean schema value.");
+            }
 
-            // Replace single-quoted strings with double-quoted, but only at JSON value positions.
-            // Uses a positive lookbehind to only match at positions after JSON structural characters.
-            fixedJson = Regex.Replace(fixedJson, @"(?<=[:,\[\{]\s*)'([^']*)'(?=\s*[,}\]\r\n:])", "\"$1\"");
-            fixedJson = Regex.Replace(fixedJson, @"(?<=[\{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:", "\"$1\":");
-            return fixedJson;
+            public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options) => writer.WriteBooleanValue(value);
         }
     }
 }

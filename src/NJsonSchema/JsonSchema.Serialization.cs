@@ -180,6 +180,22 @@ namespace NJsonSchema
                     {
                         ExclusiveMaximum = element.GetDecimal();
                     }
+                    else if (element.ValueKind == JsonValueKind.String)
+                    {
+                        var text = element.GetString();
+                        if (bool.TryParse(text, out var boolean))
+                        {
+                            IsExclusiveMaximum = boolean;
+                        }
+                        else if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
+                        {
+                            ExclusiveMaximum = number;
+                        }
+                        else
+                        {
+                            throw new JsonException("Invalid exclusive bound.");
+                        }
+                    }
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
                 {
@@ -218,6 +234,22 @@ namespace NJsonSchema
                     else if (element.ValueKind == JsonValueKind.Number)
                     {
                         ExclusiveMinimum = element.GetDecimal();
+                    }
+                    else if (element.ValueKind == JsonValueKind.String)
+                    {
+                        var text = element.GetString();
+                        if (bool.TryParse(text, out var boolean))
+                        {
+                            IsExclusiveMinimum = boolean;
+                        }
+                        else if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
+                        {
+                            ExclusiveMinimum = number;
+                        }
+                        else
+                        {
+                            throw new JsonException("Invalid exclusive bound.");
+                        }
                     }
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
