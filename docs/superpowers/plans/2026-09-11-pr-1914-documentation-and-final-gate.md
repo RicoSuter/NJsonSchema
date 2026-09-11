@@ -18,10 +18,11 @@
 - Existing March migration docs are historical. The approved stabilization roadmap governs remaining repairs.
 - No new public type solely to make a documentation example possible. Example code must only use public supported APIs.
 
-## Task 1: correct migration guidance and inventory (D1)
+## Task 1: preserve the toolchain getter and correct migration guidance (A1, D1)
 
-Files: `docs/changelog_v12.md`, the stabilization design and phase checklists; add concise migration examples to an appropriate existing test file only if they provide an enduring public-contract regression. Otherwise compile temporary example projects outside the tracked tree.
+Files: `src/NJsonSchema/JsonSchema.cs`, an appropriate core API contract test file, `docs/changelog_v12.md`, the stabilization design and phase checklists; add concise migration examples to an appropriate existing test file only if they provide an enduring public-contract regression. Otherwise compile temporary example projects outside the tracked tree.
 
+- [ ] Restore `JsonSchema.ToolchainVersion` as a public static get-only property (A1), retaining cached initialization and the STJ version text. Baseline master `18ba2ccf` exposes a getter; the migration changed it to a field unnecessarily. Add a failing public API regression that verifies the getter/property contract, then restore it and run covering tests. If feasible, compile a baseline consumer using the getter and run it with the repaired assembly to verify the restored member binding. Do not list this repaired change as an intentional break.
 - [ ] Inventory public removals/signature changes, constructors, virtual members, annotations, runtime types, exception contracts, and package/TFM changes between the pre-migration base and the repaired head. Verify claims against source or built assemblies; report source compatibility separately from binary compatibility.
 - [ ] Correct the Newtonsoft adapter description: it provides reflection/generation support, not automatic restoration of direct Newtonsoft serialization of all STJ-annotated core types.
 - [ ] Replace the invalid settings example with actual v11/v12 supported settings/generator APIs. Verify the old snippet against the baseline and the new snippet against the repaired source. Do not instantiate abstract settings or use a nonexistent `SerializerSettings` member.

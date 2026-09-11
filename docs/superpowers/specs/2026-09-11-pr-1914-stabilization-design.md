@@ -41,7 +41,7 @@ A resolver-modifier rewrite is not a prerequisite. If a repair cannot be made wi
 
 ## Findings and acceptance criteria
 
-The IDs below preserve the review's identifiers. The original review has 26 findings; implementation added V11 and G3 below. The original six P1 findings are: S1, S2, S3, V1, V2, R1. The reproductions are summarized here so execution does not depend on temporary probe directories or a local review artifact.
+The IDs below preserve the review's identifiers. The original review has 26 findings; implementation added V11, G3, and A1 below. The original six P1 findings are: S1, S2, S3, V1, V2, R1. The reproductions are summarized here so execution does not depend on temporary probe directories or a local review artifact.
 
 ### Phase 1: literal values and validation semantics
 
@@ -119,6 +119,7 @@ Detailed execution plan: [Phase 5](../plans/2026-09-11-pr-1914-documentation-and
 
 | ID | Required behavior / regression test |
 | --- | --- |
+| A1 | Preserve the public static `JsonSchema.ToolchainVersion` getter; STJ migration does not require changing a property to a field. Verify the member contract before documenting final API differences. |
 | D1 P2 | Correct `docs/changelog_v12.md`: construct the actual settings type, remove nonexistent `SerializerSettings` usage, describe discriminator mappings with their actual types, and correct date/numeric/runtime-value claims. Compile API migration examples against the intended packages. |
 
 Refresh the PR description using `.github/pull_request_template.md`, with explicit sections for source/binary API breaks, serialized JSON/schema contracts, validation/runtime behavior, generated client contracts, and NSwag actions. Distinguish intentional breaks from fixed regressions and unresolved decisions. Do not mark a finding fixed until its test and implementation land.

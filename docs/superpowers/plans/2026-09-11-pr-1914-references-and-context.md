@@ -208,7 +208,7 @@ Record fixes in changelog and commit the task's actual files with `fix: traverse
 
 **Interfaces:** Internal `TryGetSerializedPropertyName(Type runtimeType, string originalJsonName, out string serializedName)` returns false for converter-ignored properties, otherwise applies existing `GetMergedRenames` using the active `SchemaSerializationConverter`. Original name comes from `JsonPropertyNameAttribute` or the existing fallback property name. Preserve public APIs and existing configuration precedence.
 
-- [ ] Add the write-side rename test using this fixture and assertions:
+- [x] Add the write-side rename test using this fixture and assertions:
 
 ```csharp
 public sealed class RenamedRoot
@@ -231,15 +231,15 @@ Assert.Equal("#/definitions/X", parsed.RootElement.GetProperty("use").GetPropert
 
 Repeat with inherited rename configuration and a derived override, and with an ignored original name that is also renamed; omission wins. Verify the emitted pointer by navigating the emitted JSON object rather than using custom-rename deserialization, whose baseline failure is explicitly outside R2. Keep existing getter-only alias/settable precedence tests passing.
 
-- [ ] Add ignored dangling reference fixtures. A root has `[JsonPropertyName("callbacks")] public JsonSchema Callbacks { get; set; }`; initialize it with `new JsonSchema { Reference = new JsonSchema() }`, configure `IgnoreProperty(typeof(rootType), "callbacks")`, and serialize successfully with no callbacks member. Control: without the ignore, serialization still throws because the target is missing from the root graph. Repeat under Swagger2 and OpenApi3 with explicit custom ignore configuration, on a derived schema member, and on an additional property of a converter-decorated dictionary. Test callback-shaped generic dictionary containment from Task 2. An ignored property's getter may throw: reference collection must not evaluate it.
+- [x] Add ignored dangling reference fixtures. A root has `[JsonPropertyName("callbacks")] public JsonSchema Callbacks { get; set; }`; initialize it with `new JsonSchema { Reference = new JsonSchema() }`, configure `IgnoreProperty(typeof(rootType), "callbacks")`, and serialize successfully with no callbacks member. Control: without the ignore, serialization still throws because the target is missing from the root graph. Repeat under Swagger2 and OpenApi3 with explicit custom ignore configuration, on a derived schema member, and on an additional property of a converter-decorated dictionary. Test callback-shaped generic dictionary containment from Task 2. An ignored property's getter may throw: reference collection must not evaluate it.
 
-- [ ] Run red:
+- [x] Run red:
 
 ```bash
 dotnet test src/NJsonSchema.Tests/NJsonSchema.Tests.csproj -f net9.0 --filter 'FullyQualifiedName~ReferencePathContractTests'
 ```
 
-- [ ] Implement the helper using the existing converter configuration:
+- [x] Implement the helper using the existing converter configuration:
 
 ```csharp
 var converter = JsonSchemaSerialization.CurrentSerializerOptions?.Converters
@@ -259,7 +259,7 @@ return true;
 
 Use it after static/indexer/attribute filtering and before reading property values in path discovery and visitor reflection branches, including custom dictionary additional properties. Preserve flattening of `[JsonExtensionData]`, which uses dictionary keys rather than the CLR `ExtensionData` property name. Check known-schema fast-path properties against converter ignores too, so an ignored `properties`/`definitions` subtree cannot introduce references collected nowhere in emitted JSON. Keep reference edge traversal and special union keyword behavior intact. Apply renames where constructing serialized paths; do not replace the resolver's read-side name lookup with an untested reverse-mapping redesign. Do not bypass attribute converter precedence or evaluate computed `ActualSchema` properties. Postprocessing should share visibility filtering without interpreting literal objects as properties.
 
-- [ ] Re-run focused regressions and all core supported local targets:
+- [x] Re-run focused regressions and all core supported local targets:
 
 ```bash
 dotnet test src/NJsonSchema.Tests/NJsonSchema.Tests.csproj -f net9.0 --filter 'FullyQualifiedName~ReferencePathContractTests|FullyQualifiedName~ReferenceGraphTraversalTests|FullyQualifiedName~SerializationContextTests|FullyQualifiedName~JsonPathUtilities|FullyQualifiedName~SchemaSerializationConverterTests'
@@ -271,7 +271,9 @@ Windows CI must additionally run net472. Investigate semantic snapshot differenc
 
 ## Phase boundary evidence and deferred downstream gate
 
-- [ ] Review the diff for accidental public API changes and unchanged virtual contracts; record actual test counts/targets and resolved IDs. Check Phase 1 literal regressions still pass. Run `git diff --check` before each commit.
-- [ ] Record S2/S7 as Task 1, S3/R1 as Task 2, R2/R3 as Task 3 only after implementation and regressions pass; writing this plan alone resolves none of them.
+- [x] Review the diff for accidental public API changes and unchanged virtual contracts; record actual test counts/targets and resolved IDs. Check Phase 1 literal regressions still pass. Run `git diff --check` before each commit.
+- [x] Record S2/S7 as Task 1, S3/R1 as Task 2, R2/R3 as Task 3 only after implementation and regressions pass; writing this plan alone resolves none of them.
 - [ ] Keep actual NSwag callback integration pending for the authorized later companion PR. On that STJ branch, use an OpenAPI 3 document whose `paths./subscribe.post.callbacks.onEvent.{$request.body#/url}.post.responses.200.content.application/json.schema.$ref` points to `#/components/schemas/Value`, with Value type string. Assert the callback response `ActualSchema.Type` is String after load and its serialized pointer targets emitted components. Also serialize a Swagger2 operation with an ignored dangling callback reference; no callback output or reference-collection failure is allowed. Verify the parameter `ActualSchema` override and client generation there. Record both exact repo heads and `UseLocalNJsonSchemaProjects=true`; run its full downstream suite only in that later gate.
 - [ ] Controller updates the `CLAUDE.md` document index and reports any newly discovered limitation. Broader serializer property conversion, read-side ignores (S6), derived member serialization (S9), and custom-rename read behavior stay in their assigned phases/scope; no wholesale resolver or serializer rewrite is required here.
+
+Phase 2 implementation checkpoint: `3f420f22`. All task and integration reviews passed. Full core net8:807 passed/7 skipped; net9:810 passed/7 skipped; core production TFMs build without warnings/errors. PayPal vendor metadata and lazy reference target fixes retain all source references; snapshot changes are ordering only. Windows/Ubuntu CI for the published checkpoint and the later NSwag integration gate remain separate.
