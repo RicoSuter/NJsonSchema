@@ -7,6 +7,9 @@
 //-----------------------------------------------------------------------
 
 using System.Linq;
+using System.Collections;
+using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -161,10 +164,7 @@ namespace NJsonSchema.Infrastructure
 
                 // Post-process extension data to detect and deserialize embedded schemas
                 // before resolving references (refs may point into extension data)
-                if (schema is IJsonExtensionObject)
-                {
-                    PostProcessExtensionData(schema);
-                }
+                PostProcessExtensionData(schema);
 
                 await JsonSchemaReferenceUtilities.UpdateSchemaReferencesAsync(schema, referenceResolver, cancellationToken).ConfigureAwait(false);
             }
@@ -257,12 +257,12 @@ namespace NJsonSchema.Infrastructure
         /// that look like schemas (have "type" or "properties") into JsonSchema instances.</summary>
         internal static void PostProcessExtensionData(object obj)
         {
-            PostProcessExtensionData(obj, []);
+            PostProcessExtensionData(obj, new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance));
         }
 
         private static void PostProcessExtensionData(object obj, HashSet<object> visited)
         {
-            if (obj == null || !visited.Add(obj))
+            if (obj == null || obj is string || obj is JsonNode || obj.GetType().IsValueType || !visited.Add(obj))
             {
                 return;
             }
@@ -271,7 +271,12 @@ namespace NJsonSchema.Infrastructure
             {
                 foreach (var pair in extensionObj.ExtensionData.ToArray())
                 {
-                    extensionObj.ExtensionData[pair.Key] = TryDeserializeValueSchemas(pair.Value);
+                    var value = TryDeserializeValueSchemas(pair.Value);
+                    extensionObj.ExtensionData[pair.Key] = value;
+                    if (value != null)
+                    {
+                        PostProcessExtensionData(value, visited);
+                    }
                 }
             }
 
@@ -308,50 +313,52 @@ namespace NJsonSchema.Infrastructure
                     }
                 }
 
-                foreach (var prop in schema.Properties.Values)
+                // Only structural schema members are traversed; default/example/enum remain literal data.
+                foreach (var child in new object?[]
                 {
-                    PostProcessExtensionData(prop, visited);
+                    schema.Properties, schema.PatternProperties, schema.Definitions, schema.Items,
+                    schema.AllOf, schema.AnyOf, schema.OneOf, schema.Item, schema.DictionaryKey,
+                    schema.AdditionalPropertiesSchema, schema.AdditionalItemsSchema, schema.Not,
+                    schema.Reference, schema.DiscriminatorRaw
+                })
+                {
+                    if (child != null) PostProcessExtensionData(child, visited);
+                }
+            }
+
+            var isDictionary = JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out var entries);
+            if (isDictionary)
+            {
+                foreach (var entry in entries)
+                {
+                    if (entry.Value != null) PostProcessExtensionData(entry.Value, visited);
+                }
+            }
+            else if (obj is IEnumerable enumerable)
+            {
+                foreach (var child in enumerable)
+                {
+                    if (child != null) PostProcessExtensionData(child, visited);
+                }
+                return;
+            }
+
+            // Match the visitors' existing exclusions for typed documents and derived schemas.
+            foreach (var property in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (property.GetMethod == null || property.GetIndexParameters().Length != 0 ||
+                    property.PropertyType == typeof(string) || property.PropertyType.IsValueType ||
+                    property.GetCustomAttribute<JsonIgnoreAttribute>() is { Condition: JsonIgnoreCondition.Always } ||
+                    property.GetCustomAttribute<JsonExtensionDataAttribute>() != null ||
+                    (obj is JsonSchema && JsonSchema.JsonSchemaPropertiesCache.Contains(property.Name)) ||
+                    (isDictionary && (property.DeclaringType != obj.GetType() ||
+                        obj.GetType().GetCustomAttribute<JsonConverterAttribute>(true) == null)))
+                {
+                    continue;
                 }
 
-                foreach (var def in schema.Definitions.Values)
-                {
-                    PostProcessExtensionData(def, visited);
-                }
-
-                foreach (var item in schema.AllOf)
-                {
-                    PostProcessExtensionData(item, visited);
-                }
-
-                foreach (var item in schema.AnyOf)
-                {
-                    PostProcessExtensionData(item, visited);
-                }
-
-                foreach (var item in schema.OneOf)
-                {
-                    PostProcessExtensionData(item, visited);
-                }
-
-                if (schema.Item != null)
-                {
-                    PostProcessExtensionData(schema.Item, visited);
-                }
-
-                if (schema.AdditionalPropertiesSchema != null)
-                {
-                    PostProcessExtensionData(schema.AdditionalPropertiesSchema, visited);
-                }
-
-                if (schema.AdditionalItemsSchema != null)
-                {
-                    PostProcessExtensionData(schema.AdditionalItemsSchema, visited);
-                }
-
-                if (schema.Not != null)
-                {
-                    PostProcessExtensionData(schema.Not, visited);
-                }
+                var child = property.GetValue(obj);
+                if (child != null) PostProcessExtensionData(child, visited);
             }
         }
 

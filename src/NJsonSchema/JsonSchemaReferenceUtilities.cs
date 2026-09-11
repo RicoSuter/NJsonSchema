@@ -8,6 +8,7 @@
 
 using System.Linq;
 using NJsonSchema.References;
+using NJsonSchema.Infrastructure;
 using NJsonSchema.Visitors;
 
 namespace NJsonSchema
@@ -40,12 +41,12 @@ namespace NJsonSchema
         /// <param name="removeExternalReferences">Specifies whether to remove external references (otherwise they are inlined).</param>
         public static void UpdateSchemaReferencePaths(object rootObject, bool removeExternalReferences)
         {
-            var schemaReferences = new Dictionary<IJsonReference, IJsonReference>();
+            var schemaReferences = new Dictionary<IJsonReference, IJsonReference>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance);
 
             var updater = new JsonReferencePathUpdater(rootObject, schemaReferences, removeExternalReferences);
             updater.Visit(rootObject);
 
-            var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct();
+            var searchedSchemas = schemaReferences.Select(p => p.Value).Distinct(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance);
             var result = JsonPathUtilities.GetJsonPaths(rootObject, searchedSchemas);
 
             foreach (var p in schemaReferences)

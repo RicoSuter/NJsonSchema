@@ -14,6 +14,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Namotion.Reflection;
 using NJsonSchema.References;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Visitors
 {
@@ -30,7 +31,7 @@ namespace NJsonSchema.Visitors
         /// <returns>The task.</returns>
         public virtual void Visit(object obj)
         {
-            Visit(obj, "#", null, new HashSet<object>(), o => throw new NotSupportedException("Cannot replace the root."));
+            Visit(obj, "#", null, new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance), o => throw new NotSupportedException("Cannot replace the root."));
         }
 
         /// <summary>Called when a <see cref="IJsonReference"/> is visited.</summary>
@@ -66,6 +67,11 @@ namespace NJsonSchema.Visitors
 
             if (obj is JsonSchema schema)
             {
+                if (schema.ExtensionData != null)
+                {
+                    Visit(schema.ExtensionData, path, null, checkedObjects, o => throw new NotSupportedException("Cannot replace extension data."));
+                }
+
                 if (schema.Reference != null)
                 {
                     Visit(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema)o);
@@ -157,24 +163,13 @@ namespace NJsonSchema.Visitors
 
             if (obj is not string && obj is not JsonNode && obj.GetType() != typeof(JsonSchema)) // Reflection fallback
             {
-                if (obj is IDictionary dictionary)
+                if (JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out var entries))
                 {
-                    foreach (var key in dictionary.Keys.OfType<object>().ToArray())
+                    foreach (var entry in entries)
                     {
-                        var value = dictionary[key];
-                        if (value != null)
+                        if (entry.Value != null)
                         {
-                            Visit(value, $"{path}/{key}", key.ToString(), checkedObjects, o =>
-                            {
-                                if (o != null)
-                                {
-                                    dictionary[key] = (JsonSchema)o;
-                                }
-                                else
-                                {
-                                    dictionary.Remove(key);
-                                }
-                            });
+                            Visit(entry.Value, $"{path}/{entry.Key}", entry.Key, checkedObjects, o => entry.ReplaceOrRemove(o));
                         }
                     }
 
@@ -201,7 +196,7 @@ namespace NJsonSchema.Visitors
                 }
                 else if (obj is IList list)
                 {
-                    var listItems = list.OfType<object>().ToArray();
+                    var listItems = list.Cast<object>().ToArray();
                     for (var i = 0; i < listItems.Length; i++)
                     {
                         var index = i;
@@ -210,7 +205,7 @@ namespace NJsonSchema.Visitors
                 }
                 else if (obj is IEnumerable enumerable)
                 {
-                    var enumItems = enumerable.OfType<object>().ToArray();
+                    var enumItems = enumerable.Cast<object>().ToArray();
                     for (var i = 0; i < enumItems.Length; i++)
                     {
                         Visit(enumItems[i], $"{path}[{i}]", null, checkedObjects, o => throw new NotSupportedException("Cannot replace enumerable item."));

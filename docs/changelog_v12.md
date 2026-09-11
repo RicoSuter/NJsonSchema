@@ -25,6 +25,8 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
+- Normalize embedded schemas throughout typed document graphs, including pattern properties, tuple items, dictionary keys, and nested extensions, while preserving literal defaults, examples, and enum values. Traverse and resolve generic-only reference dictionaries by key, support non-schema reference replacements, retain collection indices across nulls, and distinguish shared or equal-valued objects by reference identity.
+
 - Preserve serialization options, dialect, and read/write state throughout asynchronous reference resolution and restore the caller context after nested operations, failures, and cancellation. Embedded schemas retain configured converters, including OpenAPI nullable conversion; independent concurrent loads keep their own operation context.
 
 - Validate all CLR primitive numeric `JsonValue` backings consistently, including unsigned integers and single-precision values, and enforce numeric constraints on direct and generated nodes. Custom converter boolean and numeric scalars (including numeric enums and primitive converters overriding the serialized number) also obey JSON type and numeric constraints. Direct GUID, date/time, duration, URI, character, and customized object/array/null values validate using their serialized JSON shape, including nested values and string format/length constraints, without mutating caller nodes or reparsing whole documents.

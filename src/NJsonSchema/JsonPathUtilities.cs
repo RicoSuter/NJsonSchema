@@ -43,8 +43,8 @@ namespace NJsonSchema
                 throw new ArgumentNullException(nameof(rootObject));
             }
 
-            var mappings = searchedObjects.ToDictionary(o => o, o => (string?)null);
-            FindJsonPaths(rootObject, mappings, "#", []);
+            var mappings = searchedObjects.ToDictionary(o => o, o => (string?)null, JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance);
+            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance));
 
             if (mappings.Any(p => p.Value == null))
             {
@@ -90,9 +90,9 @@ namespace NJsonSchema
             checkedObjects.Add(obj);
 
             var pathAndSeparator = basePath + "/";
-            if (obj is IDictionary dictionary)
+            if (JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out var entries))
             {
-                foreach (DictionaryEntry pair in dictionary)
+                foreach (var pair in entries)
                 {
                     if (pair.Value != null &&
                         FindJsonPaths(pair.Value, searchedObjects, pathAndSeparator + pair.Key, checkedObjects))

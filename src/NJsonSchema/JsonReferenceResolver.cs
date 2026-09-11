@@ -114,7 +114,7 @@ namespace NJsonSchema
                 allSegments[i] = UnescapeReferenceSegment(allSegments[i]);
             }
 
-            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, [])
+            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance))
                          ?? throw new InvalidOperationException($"Could not resolve the path '{jsonPath}'.");
 
             return schema;
@@ -279,7 +279,7 @@ namespace NJsonSchema
         {
             if (segments.Count == 0)
             {
-                if (obj is IDictionary)
+                if (obj is not IJsonReference && JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out _))
                 {
                     var options = JsonSchemaSerialization.CurrentSerializerOptions
                         ?? throw new InvalidOperationException(
@@ -297,11 +297,12 @@ namespace NJsonSchema
             checkedObjects.Add(obj);
             var firstSegment = segments[0];
 
-            if (obj is IDictionary dictionary)
+            if (JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out var entries))
             {
-                if (dictionary.Contains(firstSegment))
+                var entry = entries.FirstOrDefault(item => item.Key == firstSegment);
+                if (entry?.Value != null)
                 {
-                    return ResolveDocumentReference(dictionary[firstSegment]!, segments.Skip(1).ToList(), targetType, checkedObjects);
+                    return ResolveDocumentReference(entry.Value, segments.Skip(1).ToList(), targetType, checkedObjects);
                 }
             }
             else if (obj is IEnumerable)
@@ -309,7 +310,7 @@ namespace NJsonSchema
                 if (int.TryParse(firstSegment, out var index))
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
-                    if (enumerable.Length > index)
+                    if (index >= 0 && enumerable.Length > index)
                     {
                         return ResolveDocumentReference(enumerable[index], segments.Skip(1).ToList(), targetType, checkedObjects);
                     }
