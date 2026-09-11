@@ -20,6 +20,8 @@ internal sealed class JsonValueComparer : IEqualityComparer<JsonNode?>
 
     public bool Equals(JsonNode? left, JsonNode? right)
     {
+        left = JsonValueNormalization.Normalize(left);
+        right = JsonValueNormalization.Normalize(right);
         if (left == null || right == null)
         {
             return left == null && right == null;
@@ -65,6 +67,7 @@ internal sealed class JsonValueComparer : IEqualityComparer<JsonNode?>
 
     public int GetHashCode(JsonNode? value)
     {
+        value = JsonValueNormalization.Normalize(value);
         if (value == null)
         {
             return (int)JsonValueKind.Null;

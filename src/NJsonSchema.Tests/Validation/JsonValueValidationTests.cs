@@ -130,4 +130,71 @@ public class JsonValueValidationTests
         Assert.Empty(errors);
         Assert.Contains(schema.Validate("[1,2,3,true,null,4]"), error => error.Kind == ValidationErrorKind.NotInEnumeration);
     }
+
+    public static IEnumerable<object[]> CustomizedValueCases()
+    {
+        foreach (var kind in new[] { "char", "guid", "dateTime", "dictionary", "array" })
+        {
+            yield return new object[] { kind, false };
+            yield return new object[] { kind, true };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(CustomizedValueCases))]
+    public void Enum_CustomizedJsonValues_CompareTheirJsonRepresentation(string kind, bool customizedInstance)
+    {
+        // Arrange
+        var customized = CreateCustomizedValue(kind);
+        var owner = new JsonObject { ["value"] = customized };
+        var parsed = JsonNode.Parse(customized.ToJsonString());
+        var schema = new JsonSchema();
+        schema.Enumeration.Add(customizedInstance ? parsed : customized);
+        var instance = customizedInstance ? customized : parsed;
+
+        // Act
+        var errors = new JsonSchemaValidator().Validate(instance, schema);
+
+        // Assert
+        Assert.Empty(errors);
+        Assert.Same(owner, customized.Parent);
+        Assert.Same(customized, owner["value"]);
+        Assert.Contains(schema.Validate("12345"), error => error.Kind == ValidationErrorKind.NotInEnumeration);
+    }
+
+    [Theory]
+    [MemberData(nameof(CustomizedValueCases))]
+    public void UniqueItems_CustomizedJsonValues_CompareTheirJsonRepresentation(string kind, bool nested)
+    {
+        // Arrange
+        var customized = CreateCustomizedValue(kind);
+        JsonNode item = nested ? new JsonObject { ["nested"] = customized } : customized;
+        var parsed = JsonNode.Parse(item.ToJsonString());
+        var array = new JsonArray(item, parsed);
+        var schema = new JsonSchema { Type = JsonObjectType.Array, UniqueItems = true };
+
+        // Act
+        var errors = new JsonSchemaValidator().Validate(array, schema);
+
+        // Assert
+        Assert.Contains(errors, error => error.Kind == ValidationErrorKind.ItemsNotUnique);
+        Assert.Same(array, item.Parent);
+        Assert.Same(nested ? item : array, customized.Parent);
+        array[1] = JsonValue.Create(12345);
+        Assert.Empty(new JsonSchemaValidator().Validate(array, schema));
+    }
+
+    private static JsonValue CreateCustomizedValue(string kind) => kind switch
+    {
+        "char" => JsonValue.Create('a'),
+        "guid" => JsonValue.Create(Guid.Empty),
+        "dateTime" => JsonValue.Create(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)),
+        "dictionary" => JsonValue.Create(new Dictionary<string, object>
+        {
+            ["a"] = new object[] { 'a', 1m }, ["b"] = null
+        }),
+        "array" => JsonValue.Create(new object[] { new Dictionary<string, object> { ["a"] = 1m }, 'a' }),
+        _ => throw new ArgumentOutOfRangeException(nameof(kind))
+    };
+
 }
