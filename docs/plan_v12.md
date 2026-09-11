@@ -71,15 +71,17 @@ Before the final `v12` → `master` merge, revert the temporary shims that only 
 
 Add items to this checklist as new temporary shims are introduced during v12 development, so nothing leaks into the final release.
 
-### Post-PR-1914 technical debt
+### PR #1914 stabilization and subsequent technical debt
 
-Follow-ups deferred out of PR [#1914](https://github.com/RicoSuter/NJsonSchema/pull/1914) to keep that PR focused on the STJ migration itself. Each is safe to land incrementally on `v12` before GA, but none blocks release.
+The [PR #1914 stabilization roadmap](./superpowers/specs/2026-09-11-pr-1914-stabilization-design.md) records the migration review findings and proposed repair sequence. Passing the existing suite does not establish migration compatibility: literal-value loss, async context failures, incomplete traversal, and validation regressions need repairs before merging the migration. The [first implementation plan](./superpowers/plans/2026-09-11-pr-1914-values-and-validation.md) covers values and validation.
+
+Distinguish those correctness repairs from optional architectural follow-ups:
 
 1. **Replace `PropertyFilterConverter<T>` with a `JsonTypeInfoResolver` modifier.** The converter currently round-trips through `JsonNode` in `Read` to apply per-type reverse renames. A modifier that rewrites `JsonPropertyInfo.Name` per type during `JsonTypeInfo` construction would let STJ's default reflection pipeline handle the rest and drop the `JsonNode` round-trip, the walked CLR-type guide, and the `[ThreadStatic]` stripped-options cache. The custom converter would shrink to Write-only (ignore rules, empty-collection filtering, extension-data ordering) — Read could go through standard STJ.
 
 2. **Path-format escaping in `ValidationError.Path` and `BuildPathString`.** The current `#/` path format uses `.` as a property separator, which collides when a JSON property name literally contains a dot. `{"foo.bar": 1}` and `{"foo": {"bar": 1}}` both stringify to `#/foo.bar`. JSON Pointer's `~0` / `~1` escaping (RFC 6901) would disambiguate, but it's a public `Path` contract change — schedule alongside any other public-API churn.
 
-3. **Plumb `SchemaSerializationConverter` through reference resolution explicitly.** `JsonReferenceResolver.ResolveReferenceAsync` and `JsonSchemaSerialization.ConvertJsonElement` read from `[ThreadStatic] CurrentSerializerOptions` today, which throws if a caller reaches those paths outside a `FromJsonAsync` flow. Passing the converter/options through as explicit parameters would remove the thread-local dependency and the "must be set before" contract. Public-API-shaped, so batch with other resolver-surface changes.
+3. **Preserve serializer context across asynchronous reference resolution (migration blocker).** The thread-local options dependency can fail inside a valid `FromJsonAsync` flow after an awaited external resolver. Stabilization Phase 2 must repair context lifetime, dialect retention, and concurrent-call isolation. Explicit context plumbing is preferred; any resulting public API changes need an inventory and NSwag cross-check. A broader resolver API redesign can remain separate after correctness is restored.
 
 ## Changelog and migration guide
 

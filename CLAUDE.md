@@ -39,6 +39,8 @@ Reference resolution (`ActualSchema` vs `ActualTypeSchema`, `$ref` semantics, si
 |------|-----------|
 | `docs/references.md` | Touching reference resolution, `ActualSchema` / `ActualTypeSchema`, `$ref` handling, or virtual members NSwag overrides |
 | `docs/plan_v12.md` | Working on the `v12` branch — scope, branch model, pre-release cleanup checklist |
+| `docs/superpowers/specs/2026-09-11-pr-1914-stabilization-design.md` | Stabilizing PR #1914 — compatibility policy, all review findings, phase order, and merge gates |
+| `docs/superpowers/plans/2026-09-11-pr-1914-values-and-validation.md` | Implementing the first PR #1914 repair batch — literal values, exact numeric comparison, and validation |
 | `docs/changelog_v12.md` | Landing any user-visible change on `v12` — **must be updated** (Breaking / New / Fixes + Migration guide entry if the change breaks v11 consumers) |
 | `../NSwag/docs/plan_v15.md` | Cross-checking how an NJsonSchema v12 change lands in NSwag v15 |
 | `../NSwag/docs/changelog_v15.md` | Understanding how an NJsonSchema v12 breaking change is absorbed downstream |
