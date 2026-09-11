@@ -119,6 +119,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 case JsonFormatStrings.Decimal:
                     return ConvertNumberToString(value) + "M";
                 default:
+                    if (type.IsInteger() && value is System.Text.Json.JsonElement integerElement &&
+                        integerElement.ValueKind == System.Text.Json.JsonValueKind.Number &&
+                        NJsonSchema.Infrastructure.JsonNumber.Parse(integerElement).TryGetIntegerLiteral(20, out var integerLiteral))
+                    {
+                        // Twenty characters cover ulong.MaxValue and signed long.MinValue. Normalize
+                        // exact integers only, without expanding unbounded exponents or rounding fractions.
+                        return integerLiteral!;
+                    }
                     return type.IsInteger() ?
                         ConvertNumberToString(value) :
                         ConvertNumberToString(value) + "D";
