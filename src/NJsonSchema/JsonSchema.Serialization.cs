@@ -564,30 +564,58 @@ namespace NJsonSchema
             set => EnumerationNames = value != null ? new ObservableCollection<string>(value) : [];
         }
 
-        /// <summary>Gets or sets the enumeration descriptions (used for deserialization only).</summary>
+        // Vendor enum metadata may use objects instead of the supported string-array contract.
+        // Keep incompatible payloads separate from ExtensionData so schema inference never visits them.
+        private object? _enumerationDescriptionsRaw;
+        private object? _enumerationDescriptionsDashedRaw;
+
+        /// <summary>Gets or sets the enumeration descriptions using the camel-case alias.</summary>
         [JsonPropertyName("x-enumDescriptions")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonInclude]
-        internal string[]? EnumerationDescriptionsRaw
+        internal object? EnumerationDescriptionsRaw
         {
-            get => null;
-            set => EnumerationDescriptionsDashedRaw = value;
+            get => _enumerationDescriptionsRaw;
+            set => SetEnumerationDescriptions(value, ref _enumerationDescriptionsRaw);
         }
 
         /// <summary>Gets or sets the enumeration descriptions (optional, draft v5).</summary>
         [JsonPropertyName("x-enum-descriptions")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonInclude]
-        internal string?[]? EnumerationDescriptionsDashedRaw
+        internal object? EnumerationDescriptionsDashedRaw
         {
-            get => EnumerationDescriptions is { Count: > 0 } ? EnumerationDescriptions.ToArray() : null;
-            set
+            get => _enumerationDescriptionsDashedRaw ??
+                (EnumerationDescriptions is { Count: > 0 } ? EnumerationDescriptions.ToArray() : null);
+            set => SetEnumerationDescriptions(value, ref _enumerationDescriptionsDashedRaw);
+        }
+
+        private void SetEnumerationDescriptions(object? value, ref object? literalValue)
+        {
+            if (value is JsonElement element)
             {
-                var converted = ConvertPossibleStringArray(value);
-                if (converted != null)
+                if (element.ValueKind == JsonValueKind.Null)
                 {
-                    EnumerationDescriptions = new ObservableCollection<string?>(converted);
+                    return;
                 }
+
+                if (element.ValueKind == JsonValueKind.Array &&
+                    element.EnumerateArray().All(item => item.ValueKind is JsonValueKind.String or JsonValueKind.Null))
+                {
+                    value = element.EnumerateArray().Select(item =>
+                        item.ValueKind == JsonValueKind.Null ? null : item.GetString()).ToArray();
+                }
+                else
+                {
+                    literalValue = element.Clone();
+                    return;
+                }
+            }
+
+            var converted = ConvertPossibleStringArray(value as string?[]);
+            if (converted != null)
+            {
+                EnumerationDescriptions = new ObservableCollection<string?>(converted);
             }
         }
 

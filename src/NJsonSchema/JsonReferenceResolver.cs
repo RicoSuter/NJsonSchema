@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using Namotion.Reflection;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
+using System.Text.Json.Nodes;
 
 namespace NJsonSchema
 {
@@ -275,6 +276,113 @@ namespace NJsonSchema
             return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, checkedObjects);
         }
 
+        private static void PreserveMaterializedReferences(object? value, string path,
+            Dictionary<string, IJsonReference> children, bool restore, Action<object?>? replace,
+            HashSet<object> ancestors)
+        {
+            if (value == null || value is string || value is JsonNode || value.GetType().IsValueType)
+            {
+                return;
+            }
+
+            if (value is IJsonReference reference)
+            {
+                if (!restore)
+                {
+                    children[path] = reference;
+                    return;
+                }
+                if (children.TryGetValue(path, out var child))
+                {
+                    replace?.Invoke(child);
+                    return;
+                }
+            }
+
+            if (!ancestors.Add(value))
+            {
+                return;
+            }
+
+            try
+            {
+                // JSON Pointer escaping is internal here; protected visitor path syntax is unchanged.
+                void VisitChild(object? child, string key, Action<object?>? setter) =>
+                    PreserveMaterializedReferences(child, path + "/" + key.Replace("~", "~0").Replace("/", "~1"),
+                        children, restore, setter, ancestors);
+
+                if (JsonObjectGraphUtilities.TryGetDictionaryEntries(value, out var entries))
+                {
+                    foreach (var entry in entries) VisitChild(entry.Value, entry.Key, entry.ReplaceOrRemove);
+                    return;
+                }
+
+                if (value is IEnumerable enumerable)
+                {
+                    var index = 0;
+                    foreach (var item in enumerable.Cast<object?>().ToArray())
+                    {
+                        var currentIndex = index++;
+                        VisitChild(item, currentIndex.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            value is IList list ? replacement => list[currentIndex] = replacement : null);
+                    }
+                    return;
+                }
+
+                if (value is IJsonExtensionObject extension && extension.ExtensionData != null)
+                {
+                    foreach (var pair in extension.ExtensionData.ToArray())
+                    {
+                        VisitChild(pair.Value, pair.Key, replacement => extension.ExtensionData[pair.Key] = replacement);
+                    }
+                }
+
+                foreach (var member in value.GetType().GetContextualAccessors())
+                {
+                    if (member.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>() is { Condition: JsonIgnoreCondition.Always } ||
+                        member.MemberInfo.GetCustomAttribute<JsonExtensionDataAttribute>() != null)
+                    {
+                        continue;
+                    }
+                    if (member.MemberInfo is PropertyInfo property &&
+                        (property.GetMethod == null || property.GetMethod.IsStatic ||
+                         property.GetIndexParameters().Length != 0 ||
+                         (!property.GetMethod.IsPublic && property.GetCustomAttribute<JsonIncludeAttribute>() == null)))
+                    {
+                        continue;
+                    }
+                    if (member.MemberInfo is FieldInfo field &&
+                        (field.IsStatic || field.GetCustomAttribute<JsonIncludeAttribute>() == null))
+                    {
+                        continue;
+                    }
+
+                    var originalName = member.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? member.GetName();
+                    if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(value.GetType(), originalName, out var name))
+                    {
+                        VisitChild(member.GetValue(value), name, replacement => member.SetValue(value, replacement));
+                    }
+                }
+            }
+            finally
+            {
+                ancestors.Remove(value);
+            }
+        }
+
+        private IJsonReference? ResolveChildReference(object child, List<string> segments, Type targetType,
+            HashSet<object> checkedObjects, Action<object?>? replace)
+        {
+            var resolved = ResolveDocumentReference(child, segments, targetType, checkedObjects);
+            if (segments.Count == 0 && child is not IJsonReference && resolved != null)
+            {
+                // A dictionary materialized as a reference target must stay reachable at its source path.
+                replace?.Invoke(resolved);
+            }
+
+            return resolved;
+        }
+
         private IJsonReference? ResolveDocumentReferenceWithoutDereferencing(object obj, List<string> segments, Type targetType, HashSet<object> checkedObjects)
         {
             if (segments.Count == 0)
@@ -285,8 +393,19 @@ namespace NJsonSchema
                         ?? throw new InvalidOperationException(
                             "JsonSchemaSerialization.CurrentSerializerOptions must be set before resolving references. "
                             + "Use JsonSchema.FromJsonAsync / JsonSchemaSerialization.FromJsonAsync to deserialize.");
+                    // Rehydration must not clone already-materialized children: their resolved references
+                    // and shared identity are not represented by the temporary JSON payload.
+                    var children = new Dictionary<string, IJsonReference>();
+                    PreserveMaterializedReferences(obj, "#", children, false, null, new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance));
                     var json = JsonSerializer.Serialize(obj, obj.GetType(), options);
-                    return JsonSerializer.Deserialize(json, targetType, options) as IJsonReference;
+                    var result = JsonSerializer.Deserialize(json, targetType, options) as IJsonReference;
+                    if (result != null)
+                    {
+                        JsonSchemaSerialization.PostProcessExtensionData(result);
+                        PreserveMaterializedReferences(result, "#", children, true, null, new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance));
+                    }
+
+                    return result;
                 }
                 else
                 {
@@ -302,7 +421,7 @@ namespace NJsonSchema
                 var entry = entries.FirstOrDefault(item => item.Key == firstSegment);
                 if (entry?.Value != null)
                 {
-                    return ResolveDocumentReference(entry.Value, segments.Skip(1).ToList(), targetType, checkedObjects);
+                    return ResolveChildReference(entry.Value, segments.Skip(1).ToList(), targetType, checkedObjects, entry.ReplaceOrRemove);
                 }
             }
             else if (obj is IEnumerable)
@@ -312,7 +431,8 @@ namespace NJsonSchema
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
                     if (index >= 0 && enumerable.Length > index)
                     {
-                        return ResolveDocumentReference(enumerable[index], segments.Skip(1).ToList(), targetType, checkedObjects);
+                        return ResolveChildReference(enumerable[index], segments.Skip(1).ToList(), targetType, checkedObjects,
+                            obj is IList list ? value => list[index] = value : null);
                     }
                 }
             }
@@ -321,7 +441,8 @@ namespace NJsonSchema
                 var extensionObj = obj as IJsonExtensionObject;
                 if (extensionObj?.ExtensionData?.ContainsKey(firstSegment) == true)
                 {
-                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment]!, segments.Skip(1).ToList(), targetType, checkedObjects);
+                    return ResolveChildReference(extensionObj.ExtensionData[firstSegment]!, segments.Skip(1).ToList(), targetType, checkedObjects,
+                        value => extensionObj.ExtensionData[firstSegment] = value);
                 }
 
                 IEnumerable<ContextualAccessorInfo> properties;
@@ -349,7 +470,8 @@ namespace NJsonSchema
                         var value = member.GetValue(obj);
                         if (value != null)
                         {
-                            return ResolveDocumentReference(value, segments.Skip(1).ToList(), targetType, checkedObjects);
+                            return ResolveChildReference(value, segments.Skip(1).ToList(), targetType, checkedObjects,
+                                replacement => member.SetValue(obj, replacement));
                         }
                     }
                 }

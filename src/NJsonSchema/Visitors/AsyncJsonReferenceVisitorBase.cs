@@ -72,6 +72,11 @@ namespace NJsonSchema.Visitors
 
             if (obj is JsonSchema schema)
             {
+                if (schema.Reference != null)
+                {
+                    await VisitAsync(schema.Reference, path, null, checkedObjects, o => schema.Reference = (JsonSchema)o, cancellationToken).ConfigureAwait(false);
+                }
+
                 if (schema.ExtensionData != null)
                 {
                     await VisitAsync(schema.ExtensionData, path, null, checkedObjects, o => throw new NotSupportedException("Cannot replace extension data."), cancellationToken).ConfigureAwait(false);

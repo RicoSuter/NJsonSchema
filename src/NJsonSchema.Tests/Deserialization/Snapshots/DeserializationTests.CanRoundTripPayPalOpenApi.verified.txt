@@ -3075,8 +3075,12 @@
       },
       "application_context": {
         "title": "Application Context",
-        "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
         "type": "object",
+        "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
+        "required": [
+          "return_url",
+          "cancel_url"
+        ],
         "properties": {
           "brand_name": {
             "type": "string",
@@ -3092,10 +3096,10 @@
           "shipping_preference": {
             "type": "string",
             "description": "The location from which the shipping address is derived.",
-            "minLength": 1,
-            "maxLength": 24,
-            "pattern": "^[A-Z_]+$",
             "default": "GET_FROM_FILE",
+            "maxLength": 24,
+            "minLength": 1,
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "GET_FROM_FILE",
@@ -3120,10 +3124,10 @@
           "user_action": {
             "type": "string",
             "description": "Configures the label name to `Continue` or `Subscribe Now` for subscription consent experience.",
-            "minLength": 1,
-            "maxLength": 24,
-            "pattern": "^[A-Z_]+$",
             "default": "SUBSCRIBE_NOW",
+            "maxLength": 24,
+            "minLength": 1,
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "CONTINUE",
@@ -3164,11 +3168,7 @@
             "maxLength": 4000,
             "minLength": 10
           }
-        },
-        "required": [
-          "return_url",
-          "cancel_url"
-        ]
+        }
       },
       "authentication_response": {
         "title": "Authentication Response",
@@ -3185,8 +3185,13 @@
       },
       "billing_cycle": {
         "title": "Billing Cycle",
-        "description": "The billing cycle details.",
         "type": "object",
+        "description": "The billing cycle details.",
+        "required": [
+          "frequency",
+          "tenure_type",
+          "sequence"
+        ],
         "properties": {
           "pricing_scheme": {
             "description": "The active pricing scheme for this billing cycle. A free trial billing cycle does not require a pricing scheme.",
@@ -3199,8 +3204,8 @@
           "tenure_type": {
             "type": "string",
             "description": "The tenure type of the billing cycle. In case of a plan having trial cycle, only 2 trial cycles are allowed per plan.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -3230,12 +3235,7 @@
             "maximum": 999,
             "minimum": 0
           }
-        },
-        "required": [
-          "frequency",
-          "tenure_type",
-          "sequence"
-        ]
+        }
       },
       "billing_cycle_list": {
         "type": "array",
@@ -3337,11 +3337,11 @@
         }
       },
       "card_brand": {
-        "type": "string",
         "title": "Card Brand",
+        "type": "string",
         "description": "The card network or brand. Applies to credit, debit, gift, and payment cards.",
-        "minLength": 1,
         "maxLength": 255,
+        "minLength": 1,
         "pattern": "^[A-Z_]+$",
         "x-enumDescriptions": [
           {
@@ -3614,11 +3614,11 @@
         ]
       },
       "card_type": {
-        "type": "string",
         "title": "Card Type",
+        "type": "string",
         "description": "Type of card. i.e Credit, Debit and so on.",
-        "minLength": 1,
         "maxLength": 255,
+        "minLength": 1,
         "pattern": "^[A-Z_]+$",
         "x-enumDescriptions": [
           {
@@ -3651,17 +3651,17 @@
         ]
       },
       "card_verification": {
-        "type": "object",
         "title": "Card Verification",
+        "type": "object",
         "description": "The API caller can opt in to verify the card through PayPal offered verification services (e.g. Smart Dollar Auth, 3DS).",
         "properties": {
           "method": {
-            "description": "The method used for card verification.",
             "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "pattern": "^[0-9A-Z_]+$",
+            "description": "The method used for card verification.",
             "default": "SCA_WHEN_REQUIRED",
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "^[0-9A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "SCA_ALWAYS",
@@ -3734,14 +3734,19 @@
       },
       "cycle_execution": {
         "title": "Billing Cycle Execution Details",
-        "description": "The regular and trial execution details for a billing cycle.",
         "type": "object",
+        "description": "The regular and trial execution details for a billing cycle.",
+        "required": [
+          "tenure_type",
+          "sequence",
+          "cycles_completed"
+        ],
         "properties": {
           "tenure_type": {
             "type": "string",
             "description": "The type of the billing cycle.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -3753,11 +3758,11 @@
                 "description": "A trial billing cycle."
               }
             ],
-            "readOnly": true,
             "enum": [
               "REGULAR",
               "TRIAL"
-            ]
+            ],
+            "readOnly": true
           },
           "sequence": {
             "type": "integer",
@@ -3793,12 +3798,7 @@
             "minimum": 0,
             "readOnly": true
           }
-        },
-        "required": [
-          "tenure_type",
-          "sequence",
-          "cycles_completed"
-        ]
+        }
       },
       "cycle_execution_list": {
         "type": "array",
@@ -3852,10 +3852,10 @@
       },
       "enrolled": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "pattern": "^[0-9A-Z_]+$",
         "description": "Status of Authentication eligibility.",
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": "^[0-9A-Z_]+$",
         "x-enumDescriptions": [
           {
             "value": "Y",
@@ -4331,24 +4331,28 @@
       },
       "failed_payment_details": {
         "title": "Failed Payment Details",
-        "description": "The details for the failed payment of the subscription.",
         "type": "object",
+        "description": "The details for the failed payment of the subscription.",
+        "required": [
+          "amount",
+          "time"
+        ],
         "properties": {
           "amount": {
             "description": "The failed payment amount.",
-            "readOnly": true,
-            "$ref": "#/components/schemas/money"
+            "$ref": "#/components/schemas/money",
+            "readOnly": true
           },
           "time": {
             "description": "The date and time when the failed payment was made, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
-            "$ref": "#/components/schemas/date_time"
+            "$ref": "#/components/schemas/date_time",
+            "readOnly": true
           },
           "reason_code": {
             "type": "string",
             "description": "The reason code for the payment failure.",
-            "minLength": 1,
             "maxLength": 120,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -4384,7 +4388,6 @@
                 "description": "The transaction is declined due to a currency mismatch."
               }
             ],
-            "readOnly": true,
             "enum": [
               "PAYMENT_DENIED",
               "INTERNAL_SERVER_ERROR",
@@ -4394,29 +4397,29 @@
               "SENDING_LIMIT_EXCEEDED",
               "TRANSACTION_RECEIVING_LIMIT_EXCEEDED",
               "CURRENCY_MISMATCH"
-            ]
+            ],
+            "readOnly": true
           },
           "next_payment_retry_time": {
             "description": "The time when the retry attempt for the failed payment occurs, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
-            "$ref": "#/components/schemas/date_time"
+            "$ref": "#/components/schemas/date_time",
+            "readOnly": true
           }
-        },
-        "required": [
-          "amount",
-          "time"
-        ]
+        }
       },
       "frequency": {
         "title": "Billing Cycle Frequency",
-        "description": "The frequency of the billing cycle.",
         "type": "object",
+        "description": "The frequency of the billing cycle.",
+        "required": [
+          "interval_unit"
+        ],
         "properties": {
           "interval_unit": {
             "type": "string",
             "description": "The interval at which the subscription is charged or billed.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -4450,10 +4453,7 @@
             "maximum": 365,
             "minimum": 1
           }
-        },
-        "required": [
-          "interval_unit"
-        ]
+        }
       },
       "language": {
         "type": "string",
@@ -4490,10 +4490,10 @@
       },
       "liability_shift": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "pattern": "^[0-9A-Z_]+$",
         "description": "Liability shift indicator. The outcome of the issuer's authentication.",
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": "^[0-9A-Z_]+$",
         "x-enumDescriptions": [
           {
             "value": "NO",
@@ -4624,10 +4624,10 @@
       },
       "pares_status": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "pattern": "^[0-9A-Z_]+$",
         "description": "Transactions status result identifier. The outcome of the issuer's authentication.",
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": "^[0-9A-Z_]+$",
         "x-enumDescriptions": [
           {
             "value": "Y",
@@ -4674,9 +4674,12 @@
         ]
       },
       "patch": {
-        "type": "object",
         "title": "Patch",
+        "type": "object",
         "description": "The JSON patch object to apply partial updates to resources.",
+        "required": [
+          "op"
+        ],
         "properties": {
           "op": {
             "type": "string",
@@ -4728,10 +4731,7 @@
             "type": "string",
             "description": "The <a href=\"https://tools.ietf.org/html/rfc6901\">JSON Pointer</a> to the target document location from which to move the value. Required for the <code>move</code> operation."
           }
-        },
-        "required": [
-          "op"
-        ]
+        }
       },
       "patch_request": {
         "title": "Patch Request",
@@ -4744,10 +4744,10 @@
       "payee_payment_method_preference": {
         "type": "string",
         "description": "The merchant-preferred payment methods.",
-        "minLength": 1,
-        "maxLength": 255,
-        "pattern": "^[0-9A-Z_]+$",
         "default": "UNRESTRICTED",
+        "maxLength": 255,
+        "minLength": 1,
+        "pattern": "^[0-9A-Z_]+$",
         "x-enumDescriptions": [
           {
             "value": "UNRESTRICTED",
@@ -4782,8 +4782,8 @@
       },
       "payment_preferences": {
         "title": "Payment Preferences",
-        "description": "The payment preferences for a subscription.",
         "type": "object",
+        "description": "The payment preferences for a subscription.",
         "properties": {
           "auto_bill_outstanding": {
             "type": "boolean",
@@ -4797,10 +4797,10 @@
           "setup_fee_failure_action": {
             "type": "string",
             "description": "The action to take on the subscription if the initial payment for the setup fails.",
-            "minLength": 1,
-            "maxLength": 24,
-            "pattern": "^[A-Z_]+$",
             "default": "CANCEL",
+            "maxLength": 24,
+            "minLength": 1,
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "CONTINUE",
@@ -4827,8 +4827,8 @@
       },
       "payment_preferences_override": {
         "title": "Payment Preferences Override",
-        "description": "The payment preferences to override at subscription level.",
         "type": "object",
+        "description": "The payment preferences to override at subscription level.",
         "properties": {
           "auto_bill_outstanding": {
             "type": "boolean",
@@ -4841,8 +4841,8 @@
           "setup_fee_failure_action": {
             "type": "string",
             "description": "The action to take on the subscription if the initial payment for the setup fails.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -5016,8 +5016,8 @@
       },
       "plan": {
         "title": "Plan",
-        "description": "The plan details.",
         "type": "object",
+        "description": "The plan details.",
         "properties": {
           "id": {
             "type": "string",
@@ -5044,8 +5044,8 @@
           "status": {
             "type": "string",
             "description": "The plan status.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -5090,13 +5090,13 @@
           },
           "create_time": {
             "description": "The date and time when the plan was created, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
-            "$ref": "#/components/schemas/date_time"
+            "$ref": "#/components/schemas/date_time",
+            "readOnly": true
           },
           "update_time": {
             "description": "The date and time when the plan was last updated, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
-            "$ref": "#/components/schemas/date_time"
+            "$ref": "#/components/schemas/date_time",
+            "readOnly": true
           },
           "links": {
             "$ref": "#/components/schemas/link_description_list"
@@ -5154,8 +5154,14 @@
       },
       "plan_request_POST": {
         "title": "Create Plan Request",
-        "description": "The create plan request details.",
         "type": "object",
+        "description": "The create plan request details.",
+        "required": [
+          "name",
+          "billing_cycles",
+          "payment_preferences",
+          "product_id"
+        ],
         "properties": {
           "product_id": {
             "type": "string",
@@ -5174,10 +5180,10 @@
           "status": {
             "type": "string",
             "description": "The initial state of the plan. Allowed input values are CREATED and ACTIVE.",
-            "minLength": 1,
-            "maxLength": 24,
-            "pattern": "^[A-Z_]+$",
             "default": "ACTIVE",
+            "maxLength": 24,
+            "minLength": 1,
+            "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
                 "value": "CREATED",
@@ -5219,13 +5225,7 @@
             "description": "Indicates whether you can subscribe to this plan by providing a quantity for the goods or service.",
             "default": false
           }
-        },
-        "required": [
-          "name",
-          "billing_cycles",
-          "payment_preferences",
-          "product_id"
-        ]
+        }
       },
       "plans.activate-422": {
         "properties": {
@@ -5833,8 +5833,8 @@
       },
       "pricing_scheme": {
         "title": "Pricing Scheme",
-        "description": "The pricing scheme details.",
         "type": "object",
+        "description": "The pricing scheme details.",
         "properties": {
           "version": {
             "type": "integer",
@@ -5850,8 +5850,8 @@
           "pricing_model": {
             "type": "string",
             "description": "The pricing model for tiered plan. The `tiers` parameter is required.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -5873,13 +5873,13 @@
           },
           "create_time": {
             "description": "The date and time when this pricing scheme was created, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
-            "$ref": "#/components/schemas/date_time"
+            "$ref": "#/components/schemas/date_time",
+            "readOnly": true
           },
           "update_time": {
             "description": "The date and time when this pricing scheme was last updated, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
-            "$ref": "#/components/schemas/date_time"
+            "$ref": "#/components/schemas/date_time",
+            "readOnly": true
           }
         }
       },
@@ -5937,9 +5937,9 @@
         }
       },
       "shipping_detail": {
+        "title": "Shipping Details",
         "type": "object",
         "description": "The shipping details.",
-        "title": "Shipping Details",
         "properties": {
           "name": {
             "title": "Name",
@@ -5955,10 +5955,10 @@
           },
           "type": {
             "title": "Fullfillment Type",
-            "description": "A classification for the method of purchase fulfillment (e.g shipping, in-store pickup, etc). Either `type` or `options` may be present, but not both.",
             "type": "string",
-            "minLength": 1,
+            "description": "A classification for the method of purchase fulfillment (e.g shipping, in-store pickup, etc). Either `type` or `options` may be present, but not both.",
             "maxLength": 255,
+            "minLength": 1,
             "pattern": "^[0-9A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -6072,8 +6072,8 @@
         }
       },
       "shipping_type": {
-        "type": "string",
         "title": "Shipping Type",
+        "type": "string",
         "description": "A classification for the method of purchase fulfillment.",
         "x-enumDescriptions": [
           {
@@ -6104,8 +6104,8 @@
       "store_in_vault_instruction": {
         "type": "string",
         "description": "Defines how and when the payment source gets vaulted.",
-        "minLength": 1,
         "maxLength": 255,
+        "minLength": 1,
         "pattern": "^[0-9A-Z_]+$",
         "x-enumDescriptions": [
           {
@@ -6416,8 +6416,13 @@
       },
       "subscription_capture_request": {
         "title": "Charge Amount from Subscriber",
-        "description": "The charge amount from the subscriber.",
         "type": "object",
+        "description": "The charge amount from the subscriber.",
+        "required": [
+          "note",
+          "capture_type",
+          "amount"
+        ],
         "properties": {
           "note": {
             "type": "string",
@@ -6429,8 +6434,8 @@
           "capture_type": {
             "type": "string",
             "description": "The type of capture.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -6443,15 +6448,10 @@
             ]
           },
           "amount": {
-            "$ref": "#/components/schemas/money",
-            "description": "The amount of the outstanding balance. This value cannot be greater than the current outstanding balance amount."
+            "description": "The amount of the outstanding balance. This value cannot be greater than the current outstanding balance amount.",
+            "$ref": "#/components/schemas/money"
           }
-        },
-        "required": [
-          "note",
-          "capture_type",
-          "amount"
-        ]
+        }
       },
       "subscription_request_post": {
         "title": "Create Subscription Request",
@@ -6515,8 +6515,8 @@
       },
       "subscription_revise_request": {
         "title": "Subscription Modify Plan Request",
-        "description": "The request to update the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the `shipping_amount` and `shipping_address` values for the subscription. This type of update requires the buyer's consent.",
         "type": "object",
+        "description": "The request to update the quantity of the product or service in a subscription. You can also use this method to switch the plan and update the `shipping_amount` and `shipping_address` values for the subscription. This type of update requires the buyer's consent.",
         "properties": {
           "plan_id": {
             "type": "string",
@@ -6542,8 +6542,12 @@
           },
           "application_context": {
             "title": "Application Context",
-            "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
             "type": "object",
+            "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
+            "required": [
+              "return_url",
+              "cancel_url"
+            ],
             "properties": {
               "brand_name": {
                 "type": "string",
@@ -6559,10 +6563,10 @@
               "shipping_preference": {
                 "type": "string",
                 "description": "The location from which the shipping address is derived.",
-                "minLength": 1,
-                "maxLength": 24,
-                "pattern": "^[A-Z_]+$",
                 "default": "GET_FROM_FILE",
+                "maxLength": 24,
+                "minLength": 1,
+                "pattern": "^[A-Z_]+$",
                 "x-enumDescriptions": [
                   {
                     "value": "GET_FROM_FILE",
@@ -6608,11 +6612,7 @@
                 "maxLength": 4000,
                 "minLength": 10
               }
-            },
-            "required": [
-              "return_url",
-              "cancel_url"
-            ]
+            }
           },
           "plan": {
             "description": "An inline plan object to customise the subscription. You can override plan level default attributes by providing customised values for the subscription in this object. Any existing overrides will not be carried forward during subscription revise.",
@@ -6671,14 +6671,14 @@
       },
       "subscription_status": {
         "title": "Subscription Status",
-        "description": "The subscription status details.",
         "type": "object",
+        "description": "The subscription status details.",
         "properties": {
           "status": {
             "type": "string",
             "description": "The status of the subscription.",
-            "minLength": 1,
             "maxLength": 24,
+            "minLength": 1,
             "pattern": "^[A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -6723,8 +6723,8 @@
             "pattern": "^.*$"
           },
           "status_update_time": {
-            "readOnly": true,
-            "$ref": "#/components/schemas/date_time"
+            "$ref": "#/components/schemas/date_time",
+            "readOnly": true
           }
         }
       },
@@ -8569,14 +8569,19 @@
         }
       },
       "transaction": {
-        "type": "object",
         "title": "Transaction Details",
+        "type": "object",
         "description": "The transaction details.",
+        "required": [
+          "id",
+          "amount_with_breakdown",
+          "time"
+        ],
         "properties": {
           "status": {
             "title": "Capture Status",
-            "description": "The status of the captured payment.",
             "type": "string",
+            "description": "The status of the captured payment.",
             "x-enumDescriptions": [
               {
                 "value": "COMPLETED",
@@ -8603,7 +8608,6 @@
                 "description": "There was an error while capturing payment."
               }
             ],
-            "readOnly": true,
             "enum": [
               "COMPLETED",
               "DECLINED",
@@ -8611,7 +8615,8 @@
               "PENDING",
               "REFUNDED",
               "FAILED"
-            ]
+            ],
+            "readOnly": true
           },
           "id": {
             "type": "string",
@@ -8625,25 +8630,20 @@
           },
           "payer_name": {
             "description": "The name of the customer.",
-            "readOnly": true,
-            "$ref": "#/components/schemas/name"
+            "$ref": "#/components/schemas/name",
+            "readOnly": true
           },
           "payer_email": {
             "description": "The email ID of the customer.",
-            "readOnly": true,
-            "$ref": "#/components/schemas/email_address"
+            "$ref": "#/components/schemas/email_address",
+            "readOnly": true
           },
           "time": {
             "description": "The date and time when the transaction was processed, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "readOnly": true,
-            "$ref": "#/components/schemas/date_time"
+            "$ref": "#/components/schemas/date_time",
+            "readOnly": true
           }
-        },
-        "required": [
-          "id",
-          "amount_with_breakdown",
-          "time"
-        ]
+        }
       },
       "transaction_list": {
         "type": "array",
@@ -8731,8 +8731,8 @@
         }
       },
       "vault_response": {
-        "type": "object",
         "title": "Vault Response",
+        "type": "object",
         "description": "The details about a saved payment source.",
         "properties": {
           "id": {
@@ -8745,8 +8745,8 @@
             "title": "Vault Status",
             "type": "string",
             "description": "The vault status.",
-            "minLength": 1,
             "maxLength": 255,
+            "minLength": 1,
             "pattern": "^[0-9A-Z_]+$",
             "x-enumDescriptions": [
               {
@@ -8762,12 +8762,12 @@
                 "description": "Customer has approved the action of saving the specified payment_source into their vault. Use v3/vault/payment-tokens with given setup_token to save the payment source in the vault"
               }
             ],
-            "deprecated": true,
             "enum": [
               "VAULTED",
               "CREATED",
               "APPROVED"
-            ]
+            ],
+            "deprecated": true
           },
           "customer": {
             "title": "Customer Information",
