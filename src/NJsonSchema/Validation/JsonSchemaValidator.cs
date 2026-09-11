@@ -998,36 +998,9 @@ namespace NJsonSchema.Validation
             return JsonNumber.TryCreate(value, out var number) && number!.IsInteger;
         }
 
-        private static object GetNumericValue(JsonNode token)
-        {
-            if (token is JsonValue value && IsNumericValue(value))
-            {
-                // Parsed numbers retain their original precision; CLR primitives retain their backing type.
-                if (value.TryGetValue<JsonElement>(out var element)) return element;
-                if (value.TryGetValue<sbyte>(out var signedByte)) return signedByte;
-                if (value.TryGetValue<byte>(out var unsignedByte)) return unsignedByte;
-                if (value.TryGetValue<short>(out var signedShort)) return signedShort;
-                if (value.TryGetValue<ushort>(out var unsignedShort)) return unsignedShort;
-                if (value.TryGetValue<int>(out var signedInteger)) return signedInteger;
-                if (value.TryGetValue<uint>(out var unsignedInteger)) return unsignedInteger;
-                if (value.TryGetValue<long>(out var signedLong)) return signedLong;
-                if (value.TryGetValue<ulong>(out var unsignedLong)) return unsignedLong;
-                if (value.TryGetValue<float>(out var single)) return single;
-                if (value.TryGetValue<double>(out var number)) return number;
-                if (value.TryGetValue<decimal>(out var decimalNumber)) return decimalNumber;
-
-                // A converter (including the default enum converter) can write a number
-                // from another CLR type. Adapt only this scalar, retaining its exact JSON text.
-                return JsonSerializer.Deserialize<JsonElement>(value.ToJsonString());
-            }
-
-            throw new InvalidOperationException("Cannot get numeric value from token.");
-        }
-
         private static decimal GetDecimalValue(JsonNode token)
         {
-            var number = GetNumericValue(token);
-            if (number is JsonElement element)
+            if (token is JsonValue jsonValue && jsonValue.TryGetValue<JsonElement>(out var element))
             {
                 if (element.TryGetDecimal(out var value))
                 {
@@ -1038,28 +1011,19 @@ namespace NJsonSchema.Validation
                 throw new OverflowException();
             }
 
-            // The JSON spelling is the value being validated. CLR casts round floats/doubles
-            // to fewer decimal digits and can change bounds or multipleOf at exact boundaries.
-            if (number is float || number is double)
-            {
-                return decimal.Parse(token.ToJsonString(), NumberStyles.Float, CultureInfo.InvariantCulture);
-            }
-
-            return Convert.ToDecimal(number, CultureInfo.InvariantCulture);
+            // Validate the serialized numeric meaning for every CLR backing, including custom
+            // primitive converters. This also avoids the rounding of CLR floating-point casts.
+            return decimal.Parse(token.ToJsonString(), NumberStyles.Float, CultureInfo.InvariantCulture);
         }
 
         private static double GetDoubleValue(JsonNode token)
         {
-            var number = GetNumericValue(token);
-            if (number is JsonElement element)
+            if (token is JsonValue jsonValue && jsonValue.TryGetValue<JsonElement>(out var element))
             {
                 return element.GetDouble();
             }
 
-            // A float's JSON spelling can differ from its exact promotion to double.
-            return number is float
-                ? double.Parse(token.ToJsonString(), NumberStyles.Float, CultureInfo.InvariantCulture)
-                : Convert.ToDouble(number, CultureInfo.InvariantCulture);
+            return double.Parse(token.ToJsonString(), NumberStyles.Float, CultureInfo.InvariantCulture);
         }
     }
 }

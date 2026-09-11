@@ -25,7 +25,7 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
-- Validate all CLR primitive numeric `JsonValue` backings consistently, including unsigned integers and single-precision values, and enforce numeric constraints on direct and generated nodes. Custom converter boolean and numeric scalars (including numeric enums) also obey JSON type and numeric constraints. Direct GUID, date/time, duration, URI, character, and customized object/array/null values validate using their serialized JSON shape, including nested values and string format/length constraints, without mutating caller nodes or reparsing whole documents.
+- Validate all CLR primitive numeric `JsonValue` backings consistently, including unsigned integers and single-precision values, and enforce numeric constraints on direct and generated nodes. Custom converter boolean and numeric scalars (including numeric enums and primitive converters overriding the serialized number) also obey JSON type and numeric constraints. Direct GUID, date/time, duration, URI, character, and customized object/array/null values validate using their serialized JSON shape, including nested values and string format/length constraints, without mutating caller nodes or reparsing whole documents.
 
 - Compare `enum` and `uniqueItems` as JSON values: numbers use exact mathematical equality, objects ignore member order, arrays retain element order, and strings remain distinct from numbers and booleans. This fixes boolean and structured enum validation and prevents distinct large integers from being treated as duplicate items. CLR-backed `JsonValue` strings (including characters, GUIDs and dates) and customized object/array values compare using their serialized JSON representation without changing caller-owned nodes.
 

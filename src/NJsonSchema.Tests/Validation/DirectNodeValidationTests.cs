@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Text.Json.Nodes;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
@@ -79,6 +80,25 @@ public class DirectNodeValidationTests
         // Arrange
         var node = JsonValue.Create(NumericChoice.Second)!;
         AssertScalarParity(node);
+    }
+
+    [Fact]
+    public void CustomizedPrimitiveNumber_UsesSerializedValueForBoundsAndIntegrality()
+    {
+        // Arrange
+        var options = new JsonSerializerOptions { TypeInfoResolver = new DefaultJsonTypeInfoResolver() };
+        options.Converters.Add(new FractionalIntegerConverter());
+        var node = JsonValue.Create(42, (JsonTypeInfo<int>)options.GetTypeInfo(typeof(int)))!;
+
+        // Act / Assert
+        AssertScalarParity(node);
+    }
+
+    public sealed class FractionalIntegerConverter : JsonConverter<int>
+    {
+        public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => throw new NotSupportedException();
+
+        public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options) => writer.WriteNumberValue(1.5M);
     }
 
     private static void AssertScalarParity(JsonNode node)
