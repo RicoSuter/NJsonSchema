@@ -713,7 +713,7 @@ namespace NJsonSchema.Validation
 
         private static void ValidateBoolean(JsonNode? token, JsonSchema schema, JsonObjectType type, string? propertyName, string propertyPath, List<ValidationError> errors)
         {
-            if (type.IsBoolean() && !(token is JsonValue bv && bv.TryGetValue<bool>(out _)))
+            if (type.IsBoolean() && token?.GetValueKind() is not (JsonValueKind.True or JsonValueKind.False))
             {
                 errors.Add(new ValidationError(ValidationErrorKind.BooleanExpected, propertyName, propertyPath, token, schema));
             }
@@ -1015,6 +1015,10 @@ namespace NJsonSchema.Validation
                 if (value.TryGetValue<float>(out var single)) return single;
                 if (value.TryGetValue<double>(out var number)) return number;
                 if (value.TryGetValue<decimal>(out var decimalNumber)) return decimalNumber;
+
+                // A converter (including the default enum converter) can write a number
+                // from another CLR type. Adapt only this scalar, retaining its exact JSON text.
+                return JsonSerializer.Deserialize<JsonElement>(value.ToJsonString());
             }
 
             throw new InvalidOperationException("Cannot get numeric value from token.");

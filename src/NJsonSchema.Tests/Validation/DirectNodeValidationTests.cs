@@ -59,6 +59,94 @@ public class DirectNodeValidationTests
             }
         }
     }
+    [Theory]
+    [InlineData("true")]
+    [InlineData("false")]
+    [InlineData("1")]
+    [InlineData("1.5")]
+    [InlineData("9007199254740993")]
+    [InlineData("1.00000000000000001")]
+    public void CustomizedScalars_MatchParsedValidationWithoutMutation(string json)
+    {
+        // Arrange
+        var node = JsonValue.Create(new SerializedScalar(json))!;
+        AssertScalarParity(node);
+    }
+
+    [Fact]
+    public void EnumBackedNumber_MatchesParsedValidationWithoutMutation()
+    {
+        // Arrange
+        var node = JsonValue.Create(NumericChoice.Second)!;
+        AssertScalarParity(node);
+    }
+
+    private static void AssertScalarParity(JsonNode node)
+    {
+        // Arrange
+        var validator = new JsonSchemaValidator();
+        var enumSchema = new JsonSchema();
+        enumSchema.Enumeration.Add(true);
+        enumSchema.Enumeration.Add(1);
+        enumSchema.Enumeration.Add(9007199254740993L);
+        var schemas = new[] { new JsonSchema { Type = JsonObjectType.Boolean },
+            new JsonSchema { Type = JsonObjectType.Integer }, new JsonSchema { Type = JsonObjectType.Number },
+            new JsonSchema { Minimum = 5 }, new JsonSchema { Maximum = 0 },
+            new JsonSchema { MultipleOf = 2 }, enumSchema };
+        var originalJson = node.ToJsonString();
+        var parent = new JsonObject { ["value"] = node };
+        var array = new JsonArray(parent);
+
+        foreach (var schema in schemas)
+        {
+            var objectSchema = new JsonSchema { Type = JsonObjectType.Object };
+            objectSchema.Properties["value"] = new JsonSchemaProperty { Reference = schema };
+            var arraySchema = new JsonSchema { Type = JsonObjectType.Array, Item = objectSchema };
+
+            // Act
+            var expected = validator.Validate(originalJson, schema).Select(error => error.Kind).ToArray();
+            var actual = validator.Validate(node, schema).Select(error => error.Kind).ToArray();
+            var expectedNested = validator.Validate(array.ToJsonString(), arraySchema).Select(error => error.Kind).ToArray();
+            var actualNested = validator.Validate(array, arraySchema).Select(error => error.Kind).ToArray();
+
+            // Assert
+            Assert.Equal(expected, actual);
+            Assert.Equal(expectedNested, actualNested);
+            Assert.Same(node, parent["value"]);
+            Assert.Same(parent, node.Parent);
+            Assert.Equal(originalJson, node.ToJsonString());
+        }
+    }
+
+    [Theory]
+    [InlineData("NaN")]
+    [InlineData("Infinity")]
+    [InlineData("1e+")]
+    public void CustomizedScalar_WithInvalidNumericJson_IsRejected(string json)
+    {
+        // Arrange
+        var node = JsonValue.Create(new SerializedScalar(json))!;
+        var schema = new JsonSchema { Type = JsonObjectType.Number, Maximum = 5 };
+
+        // Act
+        var exception = Record.Exception(() => new JsonSchemaValidator().Validate(node, schema));
+
+        // Assert
+        Assert.IsAssignableFrom<JsonException>(exception);
+    }
+
+    public enum NumericChoice { First, Second }
+
+    [JsonConverter(typeof(SerializedScalarConverter))]
+    public sealed record SerializedScalar(string Json);
+
+    public sealed class SerializedScalarConverter : JsonConverter<SerializedScalar>
+    {
+        public override SerializedScalar Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => throw new NotSupportedException();
+
+        public override void Write(Utf8JsonWriter writer, SerializedScalar value, JsonSerializerOptions options) => writer.WriteRawValue(value.Json);
+    }
+
     [JsonConverter(typeof(SerializedNullConverter))]
     public sealed class SerializedNull;
 
