@@ -357,51 +357,67 @@ namespace NJsonSchema.Infrastructure
 
         private static object? TryDeserializeValueSchemas(object? value)
         {
-            if (value is JsonElement element)
+            if (value is not JsonElement element)
             {
-                return ConvertJsonElement(element);
+                return value;
             }
 
-            return value;
+            if (element.ValueKind == JsonValueKind.Object)
+            {
+                var hasType = element.TryGetProperty("type", out _);
+                var hasProperties = element.TryGetProperty("properties", out _);
+                var isSchema = hasType || hasProperties;
+
+                if (isSchema && element.TryGetProperty("required", out var req) &&
+                    (req.ValueKind == JsonValueKind.True || req.ValueKind == JsonValueKind.False))
+                {
+                    isSchema = false;
+                }
+
+                if (isSchema)
+                {
+                    try
+                    {
+                        var options = CurrentSerializerOptions
+                            ?? throw new InvalidOperationException(
+                                "JsonSchemaSerialization.CurrentSerializerOptions must be set before converting "
+                                + "extension-data schemas. Use JsonSchema.FromJsonAsync / JsonSchemaSerialization.FromJsonAsync "
+                                + "to deserialize.");
+                        return element.Deserialize<JsonSchema>(options);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        throw;
+                    }
+                    catch
+                    {
+                        // object was probably not a JSON Schema
+                    }
+                }
+
+                var dictionary = new Dictionary<string, object?>();
+                foreach (var property in element.EnumerateObject())
+                {
+                    dictionary[property.Name] = TryDeserializeValueSchemas(property.Value);
+                }
+                return dictionary;
+            }
+
+            if (element.ValueKind == JsonValueKind.Array)
+            {
+                return element.EnumerateArray().Select(item => TryDeserializeValueSchemas(item)).ToArray();
+            }
+
+            return ConvertJsonElement(element);
         }
 
+        // Literal values must never be interpreted as schemas, including nested objects.
         internal static object? ConvertJsonElement(JsonElement element)
         {
             switch (element.ValueKind)
             {
                 case JsonValueKind.Object:
                 {
-                    var hasType = element.TryGetProperty("type", out _);
-                    var hasProperties = element.TryGetProperty("properties", out _);
-                    var isSchema = hasType || hasProperties;
-
-                    if (isSchema && element.TryGetProperty("required", out var req) &&
-                        (req.ValueKind == JsonValueKind.True || req.ValueKind == JsonValueKind.False))
-                    {
-                        isSchema = false;
-                    }
-
-                    if (isSchema)
-                    {
-                        try
-                        {
-                            var options = CurrentSerializerOptions
-                                ?? throw new InvalidOperationException(
-                                    "JsonSchemaSerialization.CurrentSerializerOptions must be set before converting "
-                                    + "extension-data schemas. Use JsonSchema.FromJsonAsync / JsonSchemaSerialization.FromJsonAsync "
-                                    + "to deserialize.");
-                            return element.Deserialize<JsonSchema>(options);
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            throw;
-                        }
-                        catch
-                        {
-                            // object was probably not a JSON Schema
-                        }
-                    }
-
                     var dictionary = new Dictionary<string, object?>();
                     foreach (var prop in element.EnumerateObject())
                     {
@@ -425,7 +441,16 @@ namespace NJsonSchema.Infrastructure
                     {
                         return longValue;
                     }
-                    return element.GetDouble();
+                    // Retain the existing double mapping only when writing it cannot change the
+                    // JSON number. A cloned element preserves other spellings and arbitrary precision
+                    // independently of the source document's lifetime.
+                    if (element.TryGetDouble(out var doubleValue) &&
+                        !double.IsInfinity(doubleValue) &&
+                        JsonSerializer.Serialize(doubleValue) == element.GetRawText())
+                    {
+                        return doubleValue;
+                    }
+                    return element.Clone();
 
                 case JsonValueKind.True:
                     return true;

@@ -92,6 +92,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
             if (value is System.Text.Json.JsonElement element)
             {
                 value = NJsonSchema.Infrastructure.JsonSchemaSerialization.ConvertJsonElement(element) ?? value;
+                if (value is System.Text.Json.JsonElement number && number.ValueKind == System.Text.Json.JsonValueKind.Number &&
+                    (format == JsonFormatStrings.Byte || format == JsonFormatStrings.Integer ||
+                     format == JsonFormatStrings.Long || format == JsonFormatStrings.ULong))
+                {
+                    // Integer formats need a convertible value; decimal retains the entire ulong range
+                    // and accepts exponent notation without rounding through double.
+                    value = number.GetDecimal();
+                }
             }
 
             switch (format)

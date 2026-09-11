@@ -25,7 +25,7 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
-*(to be filled as PRs merge)*
+- Preserve literal `default`, `example`, and `enum` objects when they contain schema-shaped keys such as `type` or `properties`. Preserve precise JSON numbers during deserialization and roundtrip serialization, including defaults consumed by C# numeric code generation.
 
 ---
 
@@ -36,6 +36,8 @@ Intended as a running "how do I upgrade" companion. Each section is added as bre
 ### System.Text.Json replaces Newtonsoft.Json in the core
 
 The `NJsonSchema` core package no longer depends on `Newtonsoft.Json`. All serialization, deserialization, and validation go through `System.Text.Json` (STJ). If you rely on Newtonsoft.Json attributes (`[JsonProperty]`), contract resolvers, or `JToken`-based APIs, install the **`NJsonSchema.NewtonsoftJson`** package — it restores the legacy behavior by replacing the reflection/serialization services.
+
+Numeric values in object-valued schema data retain `int`/`long` and lossless roundtripping `double` values where possible. Numbers whose original spelling cannot roundtrip through those mappings are retained as independent `JsonElement` values, including high-precision decimals and some exponent spellings. Consumers inspecting runtime types should support `JsonElement` rather than assuming every nonintegral number is a `double`.
 
 #### Breaking API changes at a glance
 
