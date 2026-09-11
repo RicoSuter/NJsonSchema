@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Repair S4, S5, S6, S8, S9, S10, G1, and G2 in PR #1914 while preserving supported schema wire contracts and generated declarations.
+**Goal:** Repair S4, S5, S6, S8, S9, S10, G1, G2, and the additional G3 enum regression in PR #1914 while preserving supported schema wire contracts and generated declarations.
 
 **Architecture:** Repair the existing property-filter converter and raw keyword readers, without replacing the serialization pipeline. Keep syntax recovery separate from typed keyword coercion, and retain the existing special-type generation branch for both STJ and Newtonsoft DOM types. Complete these three tasks sequentially after the value/context repair batches; re-read their changes before editing shared files.
 
@@ -196,7 +196,7 @@ dotnet test src/NJsonSchema.Tests/NJsonSchema.Tests.csproj -c Release -f net8.0 
 
 Update changelog to state preserved leniency and literal values, not stricter input policy. Review/commit only Task 2 files as `fix: scope lenient schema parsing to supported tokens`.
 
-### Task 3: Restore readonly generation and Newtonsoft token contracts (G1, G2)
+### Task 3: Restore readonly, enum, and Newtonsoft token contracts (G1, G2, G3)
 
 **Files:** Modify `Infrastructure/JsonSchemaSerialization.cs`, `Infrastructure/SchemaSerializationConverter.cs`, `Generation/JsonSchemaGenerator.cs`; create `Generation/NewtonsoftTokenContractTests.cs`; extend TypeScript and CSharp `DictionaryTests.cs`; update affected individual snapshots and changelog.
 
@@ -222,7 +222,7 @@ TypeScriptCompiler.AssertCompile(output);
 
 Cover class output where readonly is supported, and retain existing constructor/initialization behavior. Generate the same repaired schema using `new CSharpGenerator(schema).GenerateFile("Container")` in CSharp `DictionaryTests`; use `CSharpCompiler.AssertCompile(output)`. Do not impose a new C# setter policy; compare the existing baseline contract.
 
-- [ ] Reproduce the additional numeric consumer risk found during Phase 1: C# integer enum `InternalValue` uses `ToString()`, flag parsing omits retained `JsonElement`, and enum default lookup uses CLR `IndexOf`. Add compiled C#/TypeScript enum fixtures with `1e0`/`1.0`, named default members, flags, and representable long values. Verify independently specified initialized values. Normalize integral enum literals using the shared exact helper and match defaults using JSON value equality where needed, without rounding or expanding huge exponents. Files additionally in scope: `src/NJsonSchema.CodeGeneration.CSharp/Models/EnumTemplateModel.cs`, `src/NJsonSchema.CodeGeneration.TypeScript/Models/EnumTemplateModel.cs`, `src/NJsonSchema.CodeGeneration/ValueGeneratorBase.cs`, and their enum tests. Record this as G3 if reproduced; it must be resolved before final verification.
+- [ ] Reproduce the additional numeric consumer risk found during Phase 1: C# integer enum `InternalValue` uses `ToString()`, flag parsing omits retained `JsonElement`, and enum default lookup uses CLR `IndexOf`. Add compiled C#/TypeScript enum fixtures with `1e0`/`1.0`, named default members, flags, and representable long values. Verify independently specified initialized values. Normalize integral enum literals and default numeric member names using the shared exact helper (preserve names generated before the migration, including when `x-enumNames` is absent), and match defaults using JSON value equality where needed, without rounding or expanding huge exponents. Files additionally in scope: `src/NJsonSchema.CodeGeneration.CSharp/Models/EnumTemplateModel.cs`, `src/NJsonSchema.CodeGeneration.TypeScript/Models/EnumTemplateModel.cs`, `src/NJsonSchema.CodeGeneration/ValueGeneratorBase.cs`, and their enum tests. Record this as G3 if reproduced; it must be resolved before final verification.
 
 - [ ] Add adapter regressions with `typeof(Newtonsoft.Json.Linq.JObject)` and `typeof(Newtonsoft.Json.Linq.JToken)` as roots and as properties of a fixture. For each SchemaType create `new NewtonsoftJsonSchemaGeneratorSettings { SchemaType = schemaType }`, call adapter `FromType`, and inspect parsed `ToJson` output plus in-memory `ActualSchema`. Assert no inferred token title, no reflected token members/definitions, no unintended array type; assert Swagger2 `AllowAdditionalProperties == false` in memory and the precise pre-migration wire representation. The review's `additionalProperties:false` observation must be checked separately from the dialect serializer, which may omit false on Swagger2 output. JSONSchema/OpenApi3 preserve the corresponding permissive baseline. Use JArray and JsonArray controls to retain array handling, JsonObject/JsonNode controls to retain the new STJ behavior, and a user TypeMapper for JObject to prove explicit mappers still win.
 

@@ -41,7 +41,7 @@ A resolver-modifier rewrite is not a prerequisite. If a repair cannot be made wi
 
 ## Findings and acceptance criteria
 
-The IDs below preserve the review's identifiers. There are 26 findings, including six P1 findings: S1, S2, S3, V1, V2, R1. The reproductions are summarized here so execution does not depend on temporary probe directories or a local review artifact.
+The IDs below preserve the review's identifiers. The original review has 26 findings; implementation added V11 and G3 below. The original six P1 findings are: S1, S2, S3, V1, V2, R1. The reproductions are summarized here so execution does not depend on temporary probe directories or a local review artifact.
 
 ### Phase 1: literal values and validation semantics
 
@@ -54,6 +54,12 @@ Detailed execution plan: [Phase 1](../plans/2026-09-11-pr-1914-values-and-valida
 | V2 P1 | Direct `JsonSchemaValidator.Validate` supports CLR-backed numeric `JsonValue` instances without throwing or bypassing bounds. Include all integral CLR types, float, double, decimal, and generated sample nodes. |
 | V3 P2 | `uniqueItems` accepts `[9007199254740992,9007199254740993]`, rejects numerically equal alternate spellings, and applies structural equality to objects and arrays. |
 | V4 P2 | Integer validation rejects `1.00000000000000001` and `1e-1000`; accepts mathematically whole `1.0` and `1e0`. Recognition does not use lossy double truncation. |
+
+Additional regression discovered and repaired during Phase 1:
+
+| ID | Required behavior / regression test |
+| --- | --- |
+| V11 | Direct CLR-backed and customized `JsonValue` instances validate and compare according to their serialized JSON value, including non-string CLR values serialized as strings, custom objects/arrays/nulls, booleans, numbers, enums, and primitive type-info converters. Preserve caller-owned nodes. |
 
 ### Phase 2: serializer context and reference graph
 
@@ -87,6 +93,7 @@ Primary files: `JsonXmlObject.cs`, `Infrastructure/SchemaSerializationConverter.
 | S9 P2 | Derived schema members serialize in nested definitions and other declared-base-type containers, with supported STJ attributes/customization. Test root and nested instances. |
 | S10 P2 | Quoted exclusive bounds retain the chosen compatibility behavior. No silently discarded `"1.5"` or `"true"`; cover numeric and draft-4 boolean forms. |
 | G1 P2 | `readOnly` is recognized under the existing case-insensitive input contract, and TypeScript dictionary properties retain `readonly`. Audit semantic snapshot changes separately from ordering. |
+| G3 | Retained exact numeric values preserve generated integer enum member names, integer literals, flags, and named defaults. Cover `1e0`, `1.0`, and representable long values in compiled C# and TypeScript output; compare baseline behavior without `x-enumNames` as well as explicit names. |
 | G2 P2 | Newtonsoft adapter generation for `JObject`/`JToken` retains the intended free-form object schema under Swagger 2 and other supported modes. Cover both root and property cases. |
 
 Gate: compare parsed schema outputs and generated declarations with the pre-migration baseline. Explain every remaining semantic snapshot change. Compile representative generated C# and TypeScript using the existing test infrastructure.
