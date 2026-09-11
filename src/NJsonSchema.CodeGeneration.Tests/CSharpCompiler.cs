@@ -16,6 +16,7 @@ public class CSharpCompiler
             .Append(MetadataReference.CreateFromFile(typeof(System.ComponentModel.DataAnnotations.RangeAttribute).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(System.Collections.ObjectModel.ObservableCollection<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(System.Text.Json.Serialization.JsonConverter).Assembly.Location))
+            .Append(MetadataReference.CreateFromFile(typeof(Newtonsoft.Json.JsonConverter).Assembly.Location))
             .ToList();
 
         CSharpCompilation compilation = CSharpCompilation.Create(
