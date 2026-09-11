@@ -222,6 +222,23 @@ namespace NJsonSchema.Infrastructure
                 SchemaSerializationConverter factory, JsonSerializerOptions strippedOptions,
                 HashSet<JsonObject> visited)
             {
+                JsonTypeInfo typeInfo;
+                try
+                {
+                    typeInfo = strippedOptions.GetTypeInfo(targetType);
+                }
+                catch
+                {
+                    return;
+                }
+
+                // Explicit converters own their entire JSON representation, including
+                // keys that coincide with the CLR type's ignore or rename rules.
+                if (typeInfo.Kind == JsonTypeInfoKind.None)
+                {
+                    return;
+                }
+
                 if (node is JsonObject obj)
                 {
                     if (!visited.Add(obj))
@@ -275,16 +292,6 @@ namespace NJsonSchema.Infrastructure
 
                     // Recurse into typed properties, but skip extension data (which is
                     // free-form user content, not part of our type model).
-                    JsonTypeInfo typeInfo;
-                    try
-                    {
-                        typeInfo = strippedOptions.GetTypeInfo(targetType);
-                    }
-                    catch
-                    {
-                        return;
-                    }
-
                     foreach (var propertyInfo in typeInfo.Properties)
                     {
                         if (propertyInfo.IsExtensionData || propertyInfo.CustomConverter != null)
@@ -314,6 +321,13 @@ namespace NJsonSchema.Infrastructure
                 HashSet<JsonObject> visited)
             {
                 if (child == null)
+                {
+                    return;
+                }
+
+                // Check ownership before classifying collections: their converter may
+                // use an object shape unrelated to the declared dictionary/element types.
+                if (strippedOptions.GetTypeInfo(propertyType).Kind == JsonTypeInfoKind.None)
                 {
                     return;
                 }

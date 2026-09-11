@@ -205,6 +205,85 @@ public class SerializationContractRegressionTests
         Assert.True(result.ExtensionData == null || result.ExtensionData.Count == 0);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Nested_type_and_options_converters_receive_unchanged_input(bool useOptionsConverter)
+    {
+        // Arrange
+        var converter = new SchemaSerializationConverter();
+        var payloadType = useOptionsConverter ? typeof(OptionsPayload) : typeof(AttributedPayload);
+        converter.IgnoreProperty(payloadType, "secret");
+        converter.RenameProperty(payloadType, "original", "renamed");
+        converter.IgnoreProperty(typeof(RawHolder<AttributedPayload>));
+        converter.IgnoreProperty(typeof(RawHolder<OptionsPayload>));
+        if (useOptionsConverter) converter.AddConverter(new RawPayloadConverter<OptionsPayload>());
+        const string payload = """{"secret":"literal","renamed":9}""";
+        var json = "{\"Value\":" + payload + "}";
+
+        // Act
+        var captured = useOptionsConverter
+            ? JsonSchemaSerialization.FromJson<RawHolder<OptionsPayload>>(json, converter)!.Value.Payload
+            : JsonSchemaSerialization.FromJson<RawHolder<AttributedPayload>>(json, converter)!.Value.Payload;
+
+        // Assert
+        Assert.True(JsonNode.DeepEquals(JsonNode.Parse(payload), JsonNode.Parse(captured)));
+    }
+
+    [Fact]
+    public void Converter_owned_dictionary_payload_is_not_traversed_as_dictionary_values()
+    {
+        // Arrange
+        var converter = new SchemaSerializationConverter();
+        converter.IgnoreProperty(typeof(RawHolder<RawDictionary>));
+        converter.IgnoreProperty(typeof(IgnoredHolder), "secret");
+        converter.RenameProperty(typeof(IgnoredHolder), "original", "renamed");
+        converter.AddConverter(new RawPayloadConverter<RawDictionary>());
+        const string payload = """{"entry":{"secret":"literal","renamed":9}}""";
+        var json = "{\"Value\":" + payload + "}";
+
+        // Act
+        var result = JsonSchemaSerialization.FromJson<RawHolder<RawDictionary>>(json, converter)!;
+
+        // Assert
+        Assert.True(JsonNode.DeepEquals(JsonNode.Parse(payload), JsonNode.Parse(result.Value.Payload)));
+    }
+
+    public interface IRawPayload
+    {
+        string Payload { get; set; }
+    }
+    [JsonConverter(typeof(RawPayloadConverter<AttributedPayload>))]
+    public class AttributedPayload : IRawPayload
+    {
+        public string Payload { get; set; } = "{}";
+    }
+    public class OptionsPayload : IRawPayload
+    {
+        public string Payload { get; set; } = "{}";
+    }
+    public class RawDictionary : Dictionary<string, IgnoredHolder>, IRawPayload
+    {
+        public string Payload { get; set; } = "{}";
+    }
+    public class RawHolder<T> where T : new()
+    {
+        public T Value { get; set; } = new();
+    }
+    public class RawPayloadConverter<T> : JsonConverter<T> where T : IRawPayload, new()
+    {
+        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            using var document = JsonDocument.ParseValue(ref reader);
+            return new T { Payload = document.RootElement.GetRawText() };
+        }
+        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+        {
+            using var document = JsonDocument.Parse(value.Payload);
+            document.RootElement.WriteTo(writer);
+        }
+    }
+
     public class BaseSchemaHolder
     {
         public JsonSchema Value { get; set; } = new();
