@@ -8,11 +8,11 @@ namespace NJsonSchema.Tests.Infrastructure;
 public class JsonSchemaSerializationTests
 {
     [Fact]
-    public void ToJson_restores_thread_static_state_on_exception()
+    public void ToJson_restores_operation_state_on_exception()
     {
         // Arrange
         // A converter registered via AddConverter is applied to every serializer options
-        // build; make it throw on write and observe the thread-static state afterwards.
+        // build; make it throw on write and observe the operation state afterwards.
         var converter = JsonSchema.CreateSchemaSerializationConverter(SchemaType.OpenApi3);
         converter.AddConverter(new ThrowingStringConverter());
 
@@ -37,7 +37,7 @@ public class JsonSchemaSerializationTests
     {
         // Arrange
         // Construct a resolver and hit the IDictionary path with an empty segment list
-        // (what jsonPath "#" expands to). CurrentSerializerOptions is [ThreadStatic]-null
+        // (what jsonPath "#" expands to). CurrentSerializerOptions is null
         // unless a higher-level FromJsonAsync call has set it.
         Assert.Null(JsonSchemaSerialization.CurrentSerializerOptions);
 

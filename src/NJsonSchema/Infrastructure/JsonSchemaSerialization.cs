@@ -49,17 +49,23 @@ namespace NJsonSchema.Infrastructure
                 }
             });
 
+        private static readonly AsyncLocal<SerializationContext?> CurrentContext = new();
+
+        private sealed class SerializationContext(SchemaType schemaType, JsonSerializerOptions options, bool isWriting)
+        {
+            public SchemaType SchemaType { get; } = schemaType;
+            public JsonSerializerOptions Options { get; } = options;
+            public bool IsWriting { get; } = isWriting;
+        }
+
         /// <summary>Gets the current schema type.</summary>
-        [field: ThreadStatic]
-        public static SchemaType CurrentSchemaType { get; private set; }
+        public static SchemaType CurrentSchemaType => CurrentContext.Value?.SchemaType ?? SchemaType.JsonSchema;
 
         /// <summary>Gets the current serializer options.</summary>
-        [field: ThreadStatic]
-        public static JsonSerializerOptions? CurrentSerializerOptions { get; private set; }
+        public static JsonSerializerOptions? CurrentSerializerOptions => CurrentContext.Value?.Options;
 
-        /// <summary>Gets or sets a value indicating whether the object is currently converted to JSON.</summary>
-        [field: ThreadStatic]
-        public static bool IsWriting { get; private set; }
+        /// <summary>Gets a value indicating whether the object is currently converted to JSON.</summary>
+        public static bool IsWriting => CurrentContext.Value?.IsWriting ?? false;
 
         /// <summary>Serializes an object to a JSON string with reference handling.</summary>
         /// <param name="obj">The object to serialize.</param>
@@ -69,15 +75,9 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The JSON.</returns>
         public static string ToJson(object obj, SchemaType schemaType, SchemaSerializationConverter? converter, bool writeIndented)
         {
-            var previousIsWriting = IsWriting;
-            var previousSchemaType = CurrentSchemaType;
-            var previousOptions = CurrentSerializerOptions;
-
-            IsWriting = true;
-            CurrentSchemaType = schemaType;
-
             var options = CreateSerializerOptions(converter, writeIndented);
-            CurrentSerializerOptions = options;
+            var previous = CurrentContext.Value;
+            CurrentContext.Value = new SerializationContext(schemaType, options, true);
 
             try
             {
@@ -86,9 +86,7 @@ namespace NJsonSchema.Infrastructure
             }
             finally
             {
-                CurrentSerializerOptions = previousOptions;
-                CurrentSchemaType = previousSchemaType;
-                IsWriting = previousIsWriting;
+                CurrentContext.Value = previous;
             }
         }
 
@@ -104,8 +102,9 @@ namespace NJsonSchema.Infrastructure
             Func<T, JsonReferenceResolver> referenceResolverFactory, SchemaSerializationConverter? converter, CancellationToken cancellationToken = default)
             where T : notnull
         {
-            var loader = () => FromJson<T>(json, converter)!;
-            return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, cancellationToken);
+            var options = CreateSerializerOptions(converter, false);
+            var loader = () => Deserialize<T>(json, options)!;
+            return FromJsonWithLoaderAsync(loader, options, schemaType, documentPath, referenceResolverFactory, cancellationToken);
         }
 
         /// <summary>Deserializes JSON data to a schema with reference handling.</summary>
@@ -120,12 +119,18 @@ namespace NJsonSchema.Infrastructure
             Func<T, JsonReferenceResolver> referenceResolverFactory, SchemaSerializationConverter? converter, CancellationToken cancellationToken = default)
             where T : notnull
         {
-            var loader = () => FromJson<T>(stream, converter)!;
-            return FromJsonWithLoaderAsync(loader, schemaType, documentPath, referenceResolverFactory, cancellationToken);
+            var options = CreateSerializerOptions(converter, false);
+            var loader = () =>
+            {
+                using var reader = new StreamReader(stream);
+                return Deserialize<T>(reader.ReadToEnd(), options)!;
+            };
+            return FromJsonWithLoaderAsync(loader, options, schemaType, documentPath, referenceResolverFactory, cancellationToken);
         }
 
         private static async Task<T> FromJsonWithLoaderAsync<T>(
             Func<T> loader,
+            JsonSerializerOptions options,
             SchemaType schemaType,
             string? documentPath,
             Func<T, JsonReferenceResolver> referenceResolverFactory,
@@ -133,12 +138,10 @@ namespace NJsonSchema.Infrastructure
             where T : notnull
         {
             cancellationToken.ThrowIfCancellationRequested();
-            CurrentSchemaType = schemaType;
+            var previous = CurrentContext.Value;
+            CurrentContext.Value = new SerializationContext(schemaType, options, false);
 
             T schema;
-            // Save/restore CurrentSerializerOptions to handle nested calls
-            // (external file resolution triggers nested FromJsonAsync)
-            var previousOptions = CurrentSerializerOptions;
             try
             {
                 schema = loader();
@@ -156,13 +159,6 @@ namespace NJsonSchema.Infrastructure
                     }
                 }
 
-                // Ensure CurrentSerializerOptions is available for both the extension-data
-                // post-processing (which deserializes embedded schemas) and the downstream
-                // reference resolver (which deserializes external refs with the Populate
-                // modifier for getter-only collection properties). FromJson clears it on
-                // exit, so restore/repopulate here.
-                CurrentSerializerOptions ??= CreateSerializerOptions(null, false);
-
                 // Post-process extension data to detect and deserialize embedded schemas
                 // before resolving references (refs may point into extension data)
                 if (schema is IJsonExtensionObject)
@@ -174,8 +170,7 @@ namespace NJsonSchema.Infrastructure
             }
             finally
             {
-                CurrentSerializerOptions = previousOptions;
-                CurrentSchemaType = SchemaType.JsonSchema;
+                CurrentContext.Value = previous;
             }
 
             return schema;
@@ -187,25 +182,30 @@ namespace NJsonSchema.Infrastructure
         /// <returns>The deserialized schema.</returns>
         public static T? FromJson<T>(string json, SchemaSerializationConverter? converter)
         {
-            IsWriting = false;
             var options = CreateSerializerOptions(converter, false);
-            CurrentSerializerOptions = options;
+            var previous = CurrentContext.Value;
+            CurrentContext.Value = new SerializationContext(CurrentSchemaType, options, false);
 
             try
             {
-                try
-                {
-                    return JsonSerializer.Deserialize<T>(json, options);
-                }
-                catch (JsonException)
-                {
-                    var fixedJson = FixLenientJson(json);
-                    return JsonSerializer.Deserialize<T>(fixedJson, options);
-                }
+                return Deserialize<T>(json, options);
             }
             finally
             {
-                CurrentSerializerOptions = null;
+                CurrentContext.Value = previous;
+            }
+        }
+
+        private static T? Deserialize<T>(string json, JsonSerializerOptions options)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<T>(json, options);
+            }
+            catch (JsonException)
+            {
+                var fixedJson = FixLenientJson(json);
+                return JsonSerializer.Deserialize<T>(fixedJson, options);
             }
         }
 
