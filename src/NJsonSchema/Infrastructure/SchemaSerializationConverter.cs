@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -228,9 +229,37 @@ namespace NJsonSchema.Infrastructure
                         return;
                     }
 
+                    // Drop ignored inputs before examining their values, including both
+                    // original and renamed wire names. They must not become extension data.
+                    var comparison = strippedOptions.PropertyNameCaseInsensitive
+                        ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+                    var renames = factory.GetMergedRenames(targetType);
+                    foreach (var key in obj.Select(property => property.Key).ToArray())
+                    {
+                        var originalName = renames?.FirstOrDefault(rename =>
+                            string.Equals(rename.Value, key, comparison)).Key ?? key;
+                        var effectiveName = renames?.FirstOrDefault(rename =>
+                            string.Equals(rename.Key, originalName, comparison)).Value ?? originalName;
+                        var ignored = false;
+                        for (var type = targetType; type != null; type = type.BaseType)
+                        {
+                            if (factory._ignores.TryGetValue(type, out var names) &&
+                                names.Any(name => string.Equals(name, key, comparison) ||
+                                    string.Equals(name, originalName, comparison) ||
+                                    string.Equals(name, effectiveName, comparison)))
+                            {
+                                ignored = true;
+                                break;
+                            }
+                        }
+                        if (ignored)
+                        {
+                            obj.Remove(key);
+                        }
+                    }
+
                     // Apply this type's reverse renames: the JSON key is the renamed form,
                     // the CLR property expects the original form.
-                    var renames = factory.GetMergedRenames(targetType);
                     if (renames != null)
                     {
                         foreach (var kvp in renames)
@@ -258,7 +287,7 @@ namespace NJsonSchema.Infrastructure
 
                     foreach (var propertyInfo in typeInfo.Properties)
                     {
-                        if (propertyInfo.IsExtensionData)
+                        if (propertyInfo.IsExtensionData || propertyInfo.CustomConverter != null)
                         {
                             continue;
                         }
@@ -363,10 +392,20 @@ namespace NJsonSchema.Infrastructure
 
             public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
             {
-                // Get the type info from stripped options to enumerate properties
-                // without re-entering this converter for type T.
+                var runtimeType = value is JsonSchema ? value.GetType() : typeof(T);
+                if (runtimeType != typeof(T) &&
+                    (runtimeType.IsDefined(typeof(JsonConverterAttribute), false) ||
+                     options.Converters.Any(converter => converter is not SchemaSerializationConverter && converter.CanConvert(runtimeType))))
+                {
+                    JsonSerializer.Serialize(writer, value, runtimeType, options);
+                    return;
+                }
+
+                // Inspect the runtime schema contract without constructing a converter-owned
+                // JsonTypeInfo, whose property list is empty for resolver modifiers.
                 var optionsWithout = GetOrCreateOptionsWithout(options);
-                var typeInfo = (JsonTypeInfo<T>)optionsWithout.GetTypeInfo(typeof(T));
+                var typeInfo = optionsWithout.GetTypeInfo(runtimeType);
+                var renames = runtimeType == typeof(T) ? _renames : _factory.GetMergedRenames(runtimeType);
 
                 writer.WriteStartObject();
 
@@ -384,7 +423,7 @@ namespace NJsonSchema.Infrastructure
                     var jsonName = property.Name;
 
                     // Apply ignores
-                    if (_ignores?.Contains(jsonName) == true)
+                    if (_ignores?.Contains(jsonName) == true || _factory.IsPropertyIgnored(runtimeType, jsonName))
                     {
                         continue;
                     }
@@ -439,12 +478,18 @@ namespace NJsonSchema.Infrastructure
                     }
 
                     // Apply renames
-                    if (_renames?.TryGetValue(jsonName, out var renamed) == true)
+                    if (renames?.TryGetValue(jsonName, out var renamed) == true)
                     {
                         jsonName = renamed;
                     }
 
                     writer.WritePropertyName(jsonName);
+
+                    if (property.CustomConverter != null)
+                    {
+                        WriteConvertedProperty(writer, propValue, property, options);
+                        continue;
+                    }
 
                     // Serialize the property value using FULL options so nested types
                     // get their own SchemaSerializationConverter filters applied.
@@ -475,6 +520,18 @@ namespace NJsonSchema.Infrastructure
                 }
 
                 writer.WriteEndObject();
+            }
+
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1869:Cache and reuse JsonSerializerOptions instances",
+                Justification = "Property converters require isolated options to preserve precedence without affecting siblings.")]
+            private static void WriteConvertedProperty(Utf8JsonWriter writer, object value,
+                JsonPropertyInfo property, JsonSerializerOptions options)
+            {
+                // Isolate property converters (including factories) from sibling properties.
+                // STJ resolves the converter against the declared property type.
+                var propertyOptions = new JsonSerializerOptions(options);
+                propertyOptions.Converters.Insert(0, property.CustomConverter!);
+                JsonSerializer.Serialize(writer, value, property.PropertyType, propertyOptions);
             }
 
             private static void RemoveNullCollectionProperties(JsonObject obj, Type targetType)

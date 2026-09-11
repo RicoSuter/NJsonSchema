@@ -41,6 +41,7 @@ namespace NJsonSchema
         public static SchemaSerializationConverter CreateSchemaSerializationConverter(SchemaType schemaType)
         {
             var converter = new SchemaSerializationConverter();
+            converter.IgnoreProperty(typeof(JsonSchema));
 
             if (schemaType == SchemaType.OpenApi3)
             {
