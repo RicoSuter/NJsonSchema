@@ -57,6 +57,8 @@ Detailed execution plan: [Phase 1](../plans/2026-09-11-pr-1914-values-and-valida
 
 ### Phase 2: serializer context and reference graph
 
+Detailed execution plan: [Phase 2](../plans/2026-09-11-pr-1914-references-and-context.md).
+
 Primary files: `Infrastructure/JsonSchemaSerialization.cs`, `JsonReferenceResolver.cs`, `Visitors/JsonReferenceVisitorBase.cs`, `Visitors/AsyncJsonReferenceVisitorBase.cs`, and `JsonPathUtilities.cs` under `src/NJsonSchema/`. Add regression fixtures in core reference/serialization tests; use actual NSwag callback types at the integration gate.
 
 | ID | Required behavior / regression test |
@@ -71,6 +73,8 @@ Primary files: `Infrastructure/JsonSchemaSerialization.cs`, `JsonReferenceResolv
 Gate: all six cases covered; review virtual members and NSwag overrides before accepting a traversal/context API change. Prefer an explicit per-operation context carried through awaits. If compatibility requires another mechanism, prove async isolation, nested scope restoration, and cleanup with tests.
 
 ### Phase 3: serialization and generated contracts
+
+Detailed execution plan: [Phase 3](../plans/2026-09-11-pr-1914-serialization-contracts.md).
 
 Primary files: `JsonXmlObject.cs`, `Infrastructure/SchemaSerializationConverter.cs`, `Infrastructure/JsonSchemaSerialization.cs`, `JsonSchema.Serialization.cs`, and `Generation/JsonSchemaGenerator.cs`; corresponding serialization and code-generation tests.
 
@@ -89,6 +93,8 @@ Gate: compare parsed schema outputs and generated declarations with the pre-migr
 
 ### Phase 4: diagnostics and sample generation
 
+Detailed execution plan: [Phase 4](../plans/2026-09-11-pr-1914-diagnostics-and-samples.md).
+
 Primary files: `Validation/JsonSchemaValidator.cs`, `SampleJsonSchemaGenerator.cs`, `Generation/SampleJsonDataGenerator.cs`; corresponding validation/generation tests.
 
 | ID | Required behavior / regression test |
@@ -101,6 +107,8 @@ Primary files: `Validation/JsonSchemaValidator.cs`, `SampleJsonSchemaGenerator.c
 | V10 P3 | Root null has source coordinates, and CR-only input has correct line numbers. Cover LF, CRLF, CR, and escaped property names. |
 
 ### Phase 5: migration documentation and downstream release gate
+
+Detailed execution plan: [Phase 5](../plans/2026-09-11-pr-1914-documentation-and-final-gate.md).
 
 | ID | Required behavior / regression test |
 | --- | --- |
