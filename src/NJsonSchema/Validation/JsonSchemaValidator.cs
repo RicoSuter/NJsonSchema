@@ -581,7 +581,7 @@ namespace NJsonSchema.Validation
                 return;
             }
 
-            if (schema.Enumeration.Count > 0 && schema.Enumeration.All(v => v?.ToString() != token?.ToString()))
+            if (schema.Enumeration.Count > 0 && schema.Enumeration.All(value => !JsonValueComparer.Instance.Equals(JsonValueComparer.ToNode(value), token)))
             {
                 errors.Add(new ValidationError(ValidationErrorKind.NotInEnumeration, propertyName, propertyPath, token, schema));
             }
@@ -876,7 +876,7 @@ namespace NJsonSchema.Validation
                     errors.Add(new ValidationError(ValidationErrorKind.TooManyItems, propertyName, propertyPath, token, schema));
                 }
 
-                if (schema.UniqueItems && array.Count != array.Select(a => NormalizeJsonValue(a)).Distinct().Count())
+                if (schema.UniqueItems && array.Count != array.Distinct(JsonValueComparer.Instance).Count())
                 {
                     errors.Add(new ValidationError(ValidationErrorKind.ItemsNotUnique, propertyName, propertyPath, token, schema));
                 }
@@ -1043,25 +1043,6 @@ namespace NJsonSchema.Validation
             }
 
             throw new InvalidOperationException("Cannot get double value from token.");
-        }
-
-        private static string NormalizeJsonValue(JsonNode? node)
-        {
-            if (node == null)
-            {
-                return "null";
-            }
-
-            // Normalize numbers so that 1.0, 1.00 and 1 compare as equal
-            if (node is JsonValue value && value.GetValueKind() == JsonValueKind.Number)
-            {
-                if (value.TryGetValue<double>(out var doubleValue))
-                {
-                    return "n:" + doubleValue.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
-                }
-            }
-
-            return node.ToJsonString();
         }
     }
 }

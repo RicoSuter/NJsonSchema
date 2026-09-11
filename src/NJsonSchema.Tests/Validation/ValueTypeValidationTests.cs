@@ -318,7 +318,9 @@ namespace NJsonSchema.Tests.Validation
             var errors = schema.Validate(token);
 
             // Assert
-            Assert.Single(errors); // wrong type
+            Assert.Equal(2, errors.Count);
+            Assert.Contains(errors, error => error.Kind == ValidationErrorKind.StringExpected);
+            Assert.Contains(errors, error => error.Kind == ValidationErrorKind.NotInEnumeration);
         }
     }
 }
