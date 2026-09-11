@@ -25,6 +25,8 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
+- Avoid unnecessary decimal/double conversion when numeric validation has no arithmetic constraints, so exact integer and number checks accept extreme JSON exponents on .NET Framework as well as modern .NET.
+
 - Normalize embedded schemas throughout typed document graphs, including pattern properties, tuple items, dictionary keys, and nested extensions, while preserving literal defaults, examples, and enum values. Traverse and resolve generic-only reference dictionaries by key, support non-schema reference replacements, retain collection indices across nulls, and distinguish shared or equal-valued objects by reference identity.
 
 - Preserve serialization options, dialect, and read/write state throughout asynchronous reference resolution and restore the caller context after nested operations, failures, and cancellation. Embedded schemas retain configured converters, including OpenAPI nullable conversion; independent concurrent loads keep their own operation context.

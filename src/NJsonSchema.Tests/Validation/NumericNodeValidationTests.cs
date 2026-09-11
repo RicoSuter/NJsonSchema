@@ -62,6 +62,46 @@ public class NumericNodeValidationTests
         }
     }
 
+    [Theory]
+    [InlineData("1e1000")]
+    [InlineData("1e999999999999999999999999999999999999")]
+    [InlineData("1e-999999999999999999999999999999999999")]
+    public void Number_WithoutArithmeticConstraints_AcceptsExtremeExponents(string json)
+    {
+        // Arrange
+        var schemas = new[]
+        {
+            new JsonSchema(),
+            new JsonSchema { Type = JsonObjectType.Number },
+            new JsonSchema { Type = JsonObjectType.Number | JsonObjectType.Null }
+        };
+
+        // Act / Assert
+        foreach (var schema in schemas)
+        {
+            Assert.Empty(schema.Validate(json));
+        }
+    }
+
+    [Theory]
+    [InlineData("minimum", ValidationErrorKind.NumberTooSmall)]
+    [InlineData("maximum", ValidationErrorKind.NumberTooBig)]
+    [InlineData("exclusiveMinimum", ValidationErrorKind.NumberTooSmall)]
+    [InlineData("exclusiveMaximum", ValidationErrorKind.NumberTooBig)]
+    [InlineData("multipleOf", ValidationErrorKind.NumberNotMultipleOf)]
+    public async Task Number_WithSingleArithmeticConstraint_EnforcesConstraint(string keyword, ValidationErrorKind expected)
+    {
+        // Arrange
+        var schema = await JsonSchema.FromJsonAsync("{\"" + keyword + "\":2}");
+        var json = keyword == "minimum" ? "1" : keyword == "maximum" || keyword == "multipleOf" ? "3" : "2";
+
+        // Act
+        var errors = schema.Validate(json);
+
+        // Assert
+        Assert.Contains(errors, error => error.Kind == expected);
+    }
+
     [Fact]
     public void GeneratedNumericNode_EnforcesMinimum()
     {

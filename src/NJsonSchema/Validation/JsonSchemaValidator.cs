@@ -640,6 +640,14 @@ namespace NJsonSchema.Validation
                 errors.Add(new ValidationError(ValidationErrorKind.NumberExpected, propertyName, propertyPath, token, schema));
             }
 
+            // Type recognition is exact; conversion is only needed to evaluate arithmetic constraints.
+            if (!schema.Minimum.HasValue && !schema.Maximum.HasValue &&
+                !schema.ExclusiveMinimum.HasValue && !schema.ExclusiveMaximum.HasValue &&
+                !schema.MultipleOf.HasValue)
+            {
+                return;
+            }
+
             if (isNumber || isInteger)
             {
                 try
