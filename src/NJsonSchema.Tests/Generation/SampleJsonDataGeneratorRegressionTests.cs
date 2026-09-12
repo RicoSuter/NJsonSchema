@@ -7,6 +7,24 @@ namespace NJsonSchema.Tests.Generation;
 public class SampleJsonDataGeneratorRegressionTests
 {
     [Fact]
+    public async Task Generate_NullArrayItem_PreservesAndValidatesNull()
+    {
+        // Arrange
+        var schema = await JsonSchema.FromJsonAsync("""
+            { "type": "array", "minItems": 1, "items": { "type": "null" } }
+            """);
+        var generator = new SampleJsonDataGenerator();
+
+        // Act
+        var sample = generator.Generate(schema);
+        var serializedSample = sample!.ToJsonString();
+
+        // Assert
+        Assert.Equal("[null]", serializedSample);
+        Assert.Empty(schema.Validate(serializedSample));
+    }
+
+    [Fact]
     public void Generate_StringProperty_ReturnsString()
     {
         // Arrange

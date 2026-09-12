@@ -25,6 +25,8 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
+- Align sample schema generation from streams with lenient string input, including BOM-aware decoding and stream disposal. Keep date inference culture-independent and preserve explicit null items in generated sample arrays.
+
 - Preserve validation source coordinates for colliding or escaped property names, null values, and nested errors without changing public diagnostic paths. Count CRLF and bare CR correctly, retain character positions for multibyte text, skip source lookup for valid documents, and scan error locations in linear time.
 
 - Restore case-insensitive schema member input (including readonly declarations) without folding dictionary or vendor-extension keys. Restore free-form Newtonsoft `JObject`/`JToken` generation, preserving explicit type mappers and array handling.

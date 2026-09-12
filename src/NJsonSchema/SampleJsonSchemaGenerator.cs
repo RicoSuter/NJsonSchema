@@ -10,12 +10,16 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using NJsonSchema.Validation.FormatValidators;
 
 namespace NJsonSchema
 {
     /// <summary>Generates a JSON Schema from sample JSON data.</summary>
     public class SampleJsonSchemaGenerator
     {
+        private static readonly DateFormatValidator DateFormatValidator = new();
+        private static readonly DateTimeFormatValidator DateTimeFormatValidator = new();
+
         private readonly SampleJsonSchemaGeneratorSettings _settings;
 
         /// <summary>
@@ -70,11 +74,8 @@ namespace NJsonSchema
         /// <returns>The JSON Schema.</returns>
         public JsonSchema Generate(Stream stream)
         {
-            var node = JsonNode.Parse(stream);
-
-            var schema = new JsonSchema();
-            Generate(node, schema, schema, "Anonymous");
-            return schema;
+            using var reader = new StreamReader(stream, detectEncodingFromByteOrderMarks: true);
+            return Generate(reader.ReadToEnd());
         }
 
         private void Generate(JsonNode? node, JsonSchema schema, JsonSchema rootSchema, string typeNameHint)
@@ -132,12 +133,15 @@ namespace NJsonSchema
                         schema.Type = JsonObjectType.String;
                         var stringValue = element.GetString()!;
 
-                        // Try to detect date/datetime formats
-                        if (DateTime.TryParse(stringValue, out var dateTime))
+                        // Date must be checked first because the date-time validator also accepts date-only values.
+                        if (DateFormatValidator.IsValid(stringValue, JsonValueKind.String))
                         {
-                            schema.Format = dateTime == dateTime.Date
-                                ? JsonFormatStrings.Date
-                                : JsonFormatStrings.DateTime;
+                            schema.Format = JsonFormatStrings.Date;
+                        }
+                        else if (Regex.IsMatch(stringValue, "^[0-2][0-9]{3}-[0-9]{2}-[0-9]{2}[T ]") &&
+                                 DateTimeFormatValidator.IsValid(stringValue, JsonValueKind.String))
+                        {
+                            schema.Format = JsonFormatStrings.DateTime;
                         }
                         else if (Guid.TryParse(stringValue, out _))
                         {
@@ -169,16 +173,6 @@ namespace NJsonSchema
                 if (schema.Type == JsonObjectType.String)
                 {
                     var str = element.GetString()!;
-
-                    if (Regex.IsMatch(str, "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$"))
-                    {
-                        schema.Format = JsonFormatStrings.Date;
-                    }
-
-                    if (Regex.IsMatch(str, "^[0-2][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
-                    {
-                        schema.Format = JsonFormatStrings.DateTime;
-                    }
 
                     if (Regex.IsMatch(str, "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9])?$"))
                     {

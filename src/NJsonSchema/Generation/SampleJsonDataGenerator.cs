@@ -171,6 +171,10 @@ namespace NJsonSchema.Generation
                     {
                         return JsonValue.Create(false);
                     }
+                    else if (schema.Type == JsonObjectType.Null)
+                    {
+                        return CreateJsonNullValue();
+                    }
                 }
 
                 return null;
