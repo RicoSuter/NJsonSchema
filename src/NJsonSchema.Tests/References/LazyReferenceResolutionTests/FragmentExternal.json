@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "definitions": {
+    "Foo": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "bar": { "$ref": "#/definitions/Bar" }
+      }
+    },
+    "Bar": {
+      "type": "object",
+      "properties": {
+        "value": { "type": "integer" }
+      }
+    }
+  }
+}

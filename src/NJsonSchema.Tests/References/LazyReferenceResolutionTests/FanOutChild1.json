@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "data": { "type": "string" },
+    "root": { "$ref": "FanOutRoot.json" },
+    "sibling": { "$ref": "FanOutChild2.json" }
+  }
+}

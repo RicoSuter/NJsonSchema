@@ -26,6 +26,7 @@ namespace NJsonSchema
 
         private readonly JsonSchemaAppender _schemaAppender;
         private readonly Dictionary<string, IJsonReference> _resolvedObjects = [];
+        private readonly HashSet<string> _inProgressDocuments = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>Initializes a new instance of the <see cref="JsonReferenceResolver"/> class.</summary>
         /// <param name="schemaAppender">The schema appender.</param>
@@ -52,7 +53,7 @@ namespace NJsonSchema
         /// <param name="schema">The referenced schema.</param>
         public void AddDocumentReference(string documentPath, IJsonReference schema)
         {
-            _resolvedObjects[documentPath.Contains("://") ? documentPath : Path.GetFullPath(documentPath)] = schema;
+            _resolvedObjects[NormalizeDocumentPath(documentPath)] = schema;
         }
 
         /// <summary>Gets the object from the given JSON path.</summary>
@@ -196,11 +197,41 @@ namespace NJsonSchema
 
                 fullPath = DynamicApis.HandleSubdirectoryRelativeReferences(fullPath, jsonPath);
 
-                if (!_resolvedObjects.TryGetValue(fullPath, out IJsonReference? value))
+                var normalizedPath = NormalizeDocumentPath(fullPath);
+                if (!_resolvedObjects.TryGetValue(normalizedPath, out IJsonReference? value))
                 {
-                    value = await ResolveFileReferenceAsync(fullPath, cancellationToken).ConfigureAwait(false);
-                    value.DocumentPath = arr[0];
-                    _resolvedObjects[fullPath] = value;
+                    if (_inProgressDocuments.Add(normalizedPath))
+                    {
+                        try
+                        {
+                            value = await ResolveFileReferenceAsync(fullPath, cancellationToken).ConfigureAwait(false);
+                            value.DocumentPath = arr[0];
+                            _resolvedObjects[normalizedPath] = value;
+                        }
+                        finally
+                        {
+                            _inProgressDocuments.Remove(normalizedPath);
+                        }
+                    }
+                    else
+                    {
+                        // Document is currently being resolved up the call stack.
+                        // It was pre-registered via AddDocumentReference before resolution started,
+                        // so we can return the partially-resolved schema to break the cycle.
+                        if (_resolvedObjects.TryGetValue(normalizedPath, out value))
+                        {
+                            // Found via normalized key (added between our check and now)
+                        }
+                        else if (_resolvedObjects.TryGetValue(fullPath, out value))
+                        {
+                            // Fallback: try original (un-normalized) key
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                "Circular reference detected for '" + fullPath + "' but no pre-registered schema was found.");
+                        }
+                    }
                 }
 
                 var referencedFile = value;
@@ -225,17 +256,45 @@ namespace NJsonSchema
             try
             {
                 var arr = fullJsonPath.Split('#');
-                if (!_resolvedObjects.TryGetValue(arr[0], out IJsonReference? value))
+                var normalizedUrl = NormalizeDocumentPath(arr[0]);
+                if (!_resolvedObjects.TryGetValue(normalizedUrl, out IJsonReference? value))
                 {
-                    var schema = await ResolveUrlReferenceAsync(arr[0], cancellationToken).ConfigureAwait(false);
-                    schema.DocumentPath = arr[0];
-                    if (schema is JsonSchema && append)
+                    if (_inProgressDocuments.Add(normalizedUrl))
                     {
-                        _schemaAppender.AppendSchema((JsonSchema)schema, null);
-                    }
+                        try
+                        {
+                            var schema = await ResolveUrlReferenceAsync(arr[0], cancellationToken).ConfigureAwait(false);
+                            schema.DocumentPath = arr[0];
+                            if (schema is JsonSchema && append)
+                            {
+                                _schemaAppender.AppendSchema((JsonSchema)schema, null);
+                            }
 
-                    value = schema;
-                    _resolvedObjects[arr[0]] = value;
+                            value = schema;
+                            _resolvedObjects[normalizedUrl] = value;
+                        }
+                        finally
+                        {
+                            _inProgressDocuments.Remove(normalizedUrl);
+                        }
+                    }
+                    else
+                    {
+                        // Document is currently being resolved up the call stack.
+                        if (_resolvedObjects.TryGetValue(normalizedUrl, out value))
+                        {
+                            // Found via normalized key
+                        }
+                        else if (_resolvedObjects.TryGetValue(arr[0], out value))
+                        {
+                            // Fallback: try original key
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                "Circular reference detected for '" + arr[0] + "' but no pre-registered schema was found.");
+                        }
+                    }
                 }
 
                 var result = value;
@@ -342,6 +401,21 @@ namespace NJsonSchema
             }
 
             return null;
+        }
+
+        private static string NormalizeDocumentPath(string path)
+        {
+            if (path.Contains("://"))
+            {
+                if (Uri.TryCreate(path, UriKind.Absolute, out var uri))
+                {
+                    return uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
+                }
+
+                return path;
+            }
+
+            return Path.GetFullPath(path);
         }
     }
 }

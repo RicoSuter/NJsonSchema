@@ -1,0 +1,7 @@
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "sub": { "$ref": "TransitiveSubExternal.json" }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "count": { "type": "integer" },
+    "root": { "$ref": "FanOutRoot.json" },
+    "sibling": { "$ref": "FanOutChild3.json" }
+  }
+}

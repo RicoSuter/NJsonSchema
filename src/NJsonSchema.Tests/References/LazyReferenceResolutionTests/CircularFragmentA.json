@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "definitions": {
+    "Bar": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      }
+    }
+  },
+  "properties": {
+    "foo": { "$ref": "CircularFragmentB.json#/definitions/Foo" }
+  }
+}
