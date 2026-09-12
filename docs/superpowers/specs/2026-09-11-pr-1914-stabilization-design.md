@@ -65,7 +65,7 @@ Additional regression discovered and repaired during Phase 1:
 
 Detailed execution plan: [Phase 2](../plans/2026-09-11-pr-1914-references-and-context.md).
 
-Primary files: `Infrastructure/JsonSchemaSerialization.cs`, `JsonReferenceResolver.cs`, `Visitors/JsonReferenceVisitorBase.cs`, `Visitors/AsyncJsonReferenceVisitorBase.cs`, and `JsonPathUtilities.cs` under `src/NJsonSchema/`. Add regression fixtures in core reference/serialization tests; use actual NSwag callback types at the integration gate.
+Primary files: `Infrastructure/JsonSchemaSerialization.cs`, `JsonReferenceResolver.cs`, `Visitors/JsonReferenceVisitorBase.cs`, `Visitors/AsyncJsonReferenceVisitorBase.cs`, and `JsonPathUtilities.cs` under `src/NJsonSchema/`. Add regression fixtures in core reference/serialization tests; exercise actual NSwag callback types in the deferred NSwag #5355 downstream gate.
 
 | ID | Required behavior / regression test |
 | --- | --- |
@@ -122,16 +122,18 @@ Detailed execution plan: [Phase 5](../plans/2026-09-11-pr-1914-documentation-and
 | A1 | Preserve the public static `JsonSchema.ToolchainVersion` getter; STJ migration does not require changing a property to a field. Verify the member contract before documenting final API differences. |
 | D1 P2 | Correct `docs/changelog_v12.md`: construct the actual settings type, remove nonexistent `SerializerSettings` usage, describe discriminator mappings with their actual types, and correct date/numeric/runtime-value claims. Compile API migration examples against the intended packages. |
 
+A1 and D1 implementation/documentation are complete at Phase 5 Task 1: getter RED/green and baseline binary binding, repaired compiled migration examples, and focused generated consumers passed. See the Phase 5 plan for the still-open controller gates.
+
 Refresh the PR description using `.github/pull_request_template.md`, with explicit sections for source/binary API breaks, serialized JSON/schema contracts, validation/runtime behavior, generated client contracts, and NSwag actions. Distinguish intentional breaks from fixed regressions and unresolved decisions. Do not mark a finding fixed until its test and implementation land.
 
-Reproduce NSwag integration in an isolated checkout using its STJ companion branch and this NJsonSchema build. Verify branch heads and project-reference wiring before running its full build/tests. A clean build of NSwag's older Newtonsoft-based branch is not the migration compatibility gate. Exercise callback references, discriminator mapping, parameter schema overrides, and client generation. Record both exact commit hashes and test results; maintain the companion PR separately.
+As the user-sequenced follow-up in NSwag #5355, reproduce NSwag integration in an isolated checkout using its STJ companion branch and this NJsonSchema build. Verify branch heads and project-reference wiring before running its full build/tests. A clean build of NSwag's older Newtonsoft-based branch is not the migration compatibility gate. Exercise callback references, discriminator mapping, parameter schema overrides, and client generation. Record both exact commit hashes and test results; maintain the companion PR separately.
 
 ## Checkpoints and completion
 
 1. Review this compatibility policy and the Phase 1 plan, then implement Phase 1 as focused commits.
 2. At each phase boundary, report resolved IDs, test results, remaining compatibility decisions, and any new public API changes. Write the next executable phase plan using the repaired code as its baseline.
 3. Run focused regressions during each task, then the affected project's supported test targets. Run the complete NJsonSchema build/test/package gate before final review; Windows CI must cover framework-only targets.
-4. Repeat the full PR review after repairs, including API comparison, semantic schema/generated-output comparison, numeric/diagnostic performance probes, and actual NSwag integration. New findings join the same checklist.
-5. Require successful Windows and Ubuntu CI for the exact final pushed head, and an updated PR description/changelog that agrees with the code. Only then decide whether to merge into `v12` or publish previews for wider migration testing.
+4. Repeat the full PR review after repairs, including API comparison, semantic schema/generated-output comparison, numeric/diagnostic performance probes, and record actual NSwag integration as deferred to NSwag #5355. New findings join the same checklist.
+5. Require successful Windows and Ubuntu CI for the exact final pushed head, and an updated PR description/changelog that agrees with the code. This completes the NJsonSchema verification report only; do not merge or release here, and keep downstream readiness pending the separate NSwag #5355 gate.
 
 Non-goals: unrelated master fixes, new dialect support, #1917, a public path-format redesign, wholesale serializer replacement, and the final `v12` release/merge to master.

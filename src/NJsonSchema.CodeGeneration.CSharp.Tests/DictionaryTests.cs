@@ -21,7 +21,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             // Assert
             Assert.True(schema.Properties["values"].IsReadOnly);
             Assert.Contains("IDictionary<string, string> Values", output);
-            CSharpCompiler.AssertCompile(output);
+            var assembly = CSharpCompiler.AssertCompile(output, returnAssembly: true);
+            var property = assembly.GetType("MyNamespace.Container")!.GetProperty("Values")!;
+            Assert.True(property.GetMethod!.IsPublic);
+            Assert.True(property.SetMethod!.IsPublic);
         }
 
         public enum PropertyName

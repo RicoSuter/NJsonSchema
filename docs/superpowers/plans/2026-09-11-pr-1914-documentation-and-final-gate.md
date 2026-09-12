@@ -22,18 +22,18 @@
 
 Files: `src/NJsonSchema/JsonSchema.cs`, an appropriate core API contract test file, `docs/changelog_v12.md`, the stabilization design and phase checklists; add concise migration examples to an appropriate existing test file only if they provide an enduring public-contract regression. Otherwise compile temporary example projects outside the tracked tree.
 
-- [ ] Restore `JsonSchema.ToolchainVersion` as a public static get-only property (A1), retaining cached initialization and the STJ version text. Baseline master `18ba2ccf` exposes a getter; the migration changed it to a field unnecessarily. Add a failing public API regression that verifies the getter/property contract, then restore it and run covering tests. If feasible, compile a baseline consumer using the getter and run it with the repaired assembly to verify the restored member binding. Do not list this repaired change as an intentional break.
-- [ ] Inventory public removals/signature changes, constructors, virtual members, annotations, runtime types, exception contracts, and package/TFM changes between the pre-migration base and the repaired head. Verify claims against source or built assemblies; report source compatibility separately from binary compatibility.
-- [ ] Correct the Newtonsoft adapter description: it provides reflection/generation support, not automatic restoration of direct Newtonsoft serialization of all STJ-annotated core types.
-- [ ] Replace the invalid settings example with actual v11/v12 supported settings/generator APIs. Verify the old snippet against the baseline and the new snippet against the repaired source. Do not instantiate abstract settings or use a nonexistent `SerializerSettings` member.
-- [ ] Correct `OpenApiDiscriminator.Mapping` examples to the actual dictionary value type and setter behavior. Compile the replacement example.
-- [ ] Correct JSON-value runtime-type and date claims using the repaired materializer; explain exact-number fallback and distinguish literal date strings from sample-schema date inference.
-- [ ] Explain exact enum/uniqueItems equality and whole-valued integer recognition. Remove double-normalization claims.
-- [ ] Fix `ValidationError.Token` guidance: internal `JsonPropertyToken` cannot appear in consumer pattern matching. Use supported public access and display behavior; do not claim nonexistent public properties.
-- [ ] Update leniency, source-location, stream ownership, and generated-contract notes to match repaired behavior. Audit `readOnly`/enum-description and other semantic snapshot differences against the baseline rather than listing all reordering as a breaking change.
-- [ ] Compile runnable API examples in a temporary consumer project using the real built/project-referenced assemblies. Record target framework, commands, and results in the task report. Run code-generation consumer tests when examples touch generated output.
-- [ ] Mark each finding resolved only after its actual implementation/test gate; keep NSwag integration visibly pending. Update plan checkboxes truthfully, retain any unresolved findings and new compatibility choices.
-- [ ] Commit `Document the stabilized System.Text.Json migration contracts`.
+- [x] Restore `JsonSchema.ToolchainVersion` as a public static get-only property (A1), retaining cached initialization and the STJ version text. Baseline master `18ba2ccf` exposes a getter; the migration changed it to a field unnecessarily. Add a failing public API regression that verifies the getter/property contract, then restore it and run covering tests. If feasible, compile a baseline consumer using the getter and run it with the repaired assembly to verify the restored member binding. Do not list this repaired change as an intentional break.
+- [x] Inventory public removals/signature changes, constructors, virtual members, annotations, runtime types, exception contracts, and package/TFM changes between the pre-migration base and the repaired head. Verify claims against source or built assemblies; report source compatibility separately from binary compatibility.
+- [x] Correct the Newtonsoft adapter description: it provides reflection/generation support, not automatic restoration of direct Newtonsoft serialization of all STJ-annotated core types.
+- [x] Replace the invalid settings example with actual v11/v12 supported settings/generator APIs. Verify the old snippet against the baseline and the new snippet against the repaired source. Do not instantiate abstract settings or use a nonexistent `SerializerSettings` member.
+- [x] Correct `OpenApiDiscriminator.Mapping` examples to the actual dictionary value type and setter behavior. Compile the replacement example.
+- [x] Correct JSON-value runtime-type and date claims using the repaired materializer; explain exact-number fallback and distinguish literal date strings from sample-schema date inference.
+- [x] Explain exact enum/uniqueItems equality and whole-valued integer recognition. Remove double-normalization claims.
+- [x] Fix `ValidationError.Token` guidance: internal `JsonPropertyToken` cannot appear in consumer pattern matching. Use supported public access and display behavior; do not claim nonexistent public properties.
+- [x] Update leniency, source-location, stream ownership, and generated-contract notes to match repaired behavior. Audit `readOnly`/enum-description and other semantic snapshot differences against the baseline rather than listing all reordering as a breaking change.
+- [x] Compile runnable API examples in a temporary consumer project using the real built/project-referenced assemblies. Record target framework, commands, and results in the task report. Run code-generation consumer tests when examples touch generated output.
+- [x] Mark each finding resolved only after its actual implementation/test gate; keep NSwag integration visibly pending. Update plan checkboxes truthfully, retain any unresolved findings and new compatibility choices.
+- [x] Commit `Document the stabilized System.Text.Json migration contracts`.
 
 ## Final controller gate
 

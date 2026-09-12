@@ -83,7 +83,7 @@ namespace NJsonSchema
         }
 
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
-        public static readonly string ToolchainVersion = typeof(JsonSchema).Assembly.GetName().Version +
+        public static string ToolchainVersion { get; } = typeof(JsonSchema).Assembly.GetName().Version +
             " (System.Text.Json v" + typeof(JsonSerializer).Assembly.GetName().Version + ")";
 
         /// <summary>Loads a JSON Schema from a given file path (only available in .NET 4.x).</summary>

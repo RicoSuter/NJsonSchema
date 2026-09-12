@@ -11,6 +11,26 @@ namespace NJsonSchema.Tests.Serialization;
 public class SerializationContractRegressionTests
 {
     [Fact]
+    public void ToolchainVersion_preserves_public_static_get_only_property_contract()
+    {
+        // Arrange
+        var schemaType = typeof(JsonSchema);
+
+        // Act
+        var property = schemaType.GetProperty(nameof(JsonSchema.ToolchainVersion));
+
+        // Assert
+        Assert.NotNull(property);
+        Assert.Equal(typeof(string), property.PropertyType);
+        Assert.True(property.GetMethod!.IsPublic);
+        Assert.True(property.GetMethod.IsStatic);
+        Assert.Null(property.SetMethod);
+        Assert.Null(schemaType.GetField(nameof(JsonSchema.ToolchainVersion)));
+        Assert.Same(JsonSchema.ToolchainVersion, property.GetValue(null));
+        Assert.Contains("System.Text.Json v", JsonSchema.ToolchainVersion);
+    }
+
+    [Fact]
     public void Derived_schema_json_ignore_still_owns_its_input_contract()
     {
         // Arrange

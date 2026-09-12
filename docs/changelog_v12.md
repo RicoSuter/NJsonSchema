@@ -25,6 +25,8 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
+- Preserve the cached public static `JsonSchema.ToolchainVersion` getter so existing getter calls and reflection keep working.
+
 - Align sample schema generation from streams with lenient string input, including BOM-aware decoding and stream disposal. Parse ISO dates with the invariant Gregorian calendar so date validation and sample inference remain culture-independent, and preserve explicit null items in generated sample arrays.
 
 - Preserve validation source coordinates for colliding or escaped property names, null values, and nested errors without changing public diagnostic paths. Count CRLF and bare CR correctly, retain character positions for multibyte text, skip source lookup for valid documents, and scan error locations in linear time.
@@ -63,149 +65,125 @@ Intended as a running "how do I upgrade" companion. Each section is added as bre
 
 ### System.Text.Json replaces Newtonsoft.Json in the core
 
-The `NJsonSchema` core package no longer depends on `Newtonsoft.Json`. All serialization, deserialization, and validation go through `System.Text.Json` (STJ). If you rely on Newtonsoft.Json attributes (`[JsonProperty]`), contract resolvers, or `JToken`-based APIs, install the **`NJsonSchema.NewtonsoftJson`** package — it restores the legacy behavior by replacing the reflection/serialization services.
+The core `NJsonSchema` package uses System.Text.Json (STJ) for schema serialization and validation. Rebuild consumers for v12: this is a source migration with binary-incompatible signatures, not an assembly drop-in replacement. Use `JsonSchema.ToJson` / `FromJsonAsync` and the schema serialization APIs to retain dialect and reference handling.
 
-Numeric values in object-valued schema data retain `int`/`long` and lossless roundtripping `double` values where possible. Numbers whose original spelling cannot roundtrip through those mappings are retained as independent `JsonElement` values, including high-precision decimals and some exponent spellings. Consumers inspecting runtime types should support `JsonElement` rather than assuming every nonintegral number is a `double`.
+`NJsonSchema.NewtonsoftJson` supplies Newtonsoft-aware reflection and schema generation, including `[JsonProperty]` and contract resolvers. Its settings and generator already existed in v11. Installing it does **not** restore direct `JsonConvert` serialization of STJ-annotated core schema models or the removed `JToken` validation overloads.
 
-#### Breaking API changes at a glance
+#### Public API and binary changes
 
-| Area | v11 (Newtonsoft) | v12 (STJ) |
+| Area | v11 | v12 / migration |
 |---|---|---|
-| Indented output | `schema.ToJson(Formatting.Indented)` | `schema.ToJson(writeIndented: true)` |
-| Sample JSON output | `JToken ToSampleJson()` | `JsonNode? ToSampleJson()` |
-| Validate a parsed document | `schema.Validate(JToken)` | `schema.Validate(JsonNode?)` |
-| `ValidationError.Token` | `JToken?` | `object?` (can be `JsonNode`, `JsonPropertyToken`, or null) |
-| `IFormatValidator.IsValid` parameter | `JTokenType` | `JsonValueKind` |
-| Malformed-JSON exception | `Newtonsoft.Json.JsonReaderException` | `System.Text.Json.JsonException` |
-| Property rename / ignore | `PropertyRenameAndIgnoreSerializerContractResolver` | `SchemaSerializationConverter` |
-| Contract resolver parameter | `IContractResolver` on public APIs (`FromJsonAsync`, `JsonPathUtilities.GetJsonPath`, `JsonReferenceResolver.ResolveReferenceAsync`, `JsonReferenceVisitorBase` constructors, etc.) | Removed — replaced by `SchemaSerializationConverter?` where applicable |
-| Visitor base constructors | `: base(IContractResolver)` | parameterless |
-| Schema generator (Newtonsoft-aware) | `JsonSchemaGenerator` / `JsonSchemaGeneratorSettings` (with `SerializerSettings`) | `NewtonsoftJsonSchemaGenerator` / `NewtonsoftJsonSchemaGeneratorSettings` in the `NJsonSchema.NewtonsoftJson` package |
-| `OpenApiDiscriminator.Mapping` | `{ get; }` | `{ get; set; }` — STJ needs a setter to deserialize |
-| `ChildSchemaValidationError` / `MultiTypeValidationError` constructors | `JToken?` parameter | `JsonNode?` parameter |
+| Indented output | `ToJson(Formatting.Indented)` | `ToJson(writeIndented: true)`; parameterless overload retained |
+| Samples | `JToken ToSampleJson()` / `SampleJsonDataGenerator.Generate` | `JsonNode?` return type |
+| Parsed validation | `Validate(JToken, ...)` | `Validate(JsonNode?, ...)`; string overloads retained |
+| Validator subclasses | protected virtual `Validate(JToken, ...)` | Override with `JsonNode?` |
+| Diagnostics | `ValidationError` constructor token and `Token` getter use `JToken?` | `object?`; constructor calls/getters require recompilation even when source converts to object |
+| Child diagnostics | `ChildSchemaValidationError` / `MultiTypeValidationError` constructors take `JToken?` | `JsonNode?` |
+| Formats | `IFormatValidator.IsValid(string, JTokenType)` and built-in implementations | `JsonValueKind`; Integer/Float become Number, Boolean becomes True/False; do not cast enum values |
+| Resolver customization | `PropertyRenameAndIgnoreSerializerContractResolver` and its protected `CreateProperty` override | Removed; `SchemaSerializationConverter` is an STJ converter factory, not an inheritance-compatible replacement |
+| Serializer factory/context | `CreateJsonSerializerContractResolver`, `CurrentSerializerSettings` | `CreateSchemaSerializationConverter`, `CurrentSerializerOptions` |
+| Serialization helpers | `JsonSchemaSerialization.ToJson` resolver/Formatting parameters; string/stream `FromJson` and `FromJsonAsync` resolver parameters | `SchemaSerializationConverter?` and bool output formatting; async string overloads consolidate with optional cancellation |
+| Reference APIs | Resolver arguments on `ResolveReferenceAsync`, `ResolveReferenceWithoutAppendAsync`, virtual `ResolveDocumentReference` | Removed; update overrides and callers |
+| Paths/visitors | Resolver overloads on `JsonPathUtilities`, `JsonSchemaReferenceUtilities`; protected resolver constructors on both reference visitor bases | Removed or replaced by resolver-free overloads; parameterless visitor constructors remain |
+| Discriminator | `IDictionary<string, JsonSchema> Mapping { get; }` | Existing getter retained; public setter added |
 
-#### Common migrations
+`JsonSchema.ToolchainVersion` retains its public static get-only property and cached value, now reporting STJ. Schema constructors and virtual `ActualSchema`, `ActualTypeSchema`, `Description`, `Parent`, and `IsNullable` contracts retain their signatures. Signature preservation alone does not establish downstream behavioral compatibility.
 
-**Indented `ToJson`:**
+Core model and settings annotations/converters now use STJ; applications inspecting Newtonsoft metadata or supplying Newtonsoft converters must migrate those customizations. The `NJsonSchema.Annotations` attribute package itself is unchanged. `SchemaSerializationConverter` exposes `IgnoreProperty`, `RenameProperty`, `AddConverter`, and `IsPropertyIgnored`; its optional `ignoreEmptyCollections` constructor argument defaults to true. Supply STJ converters rather than Newtonsoft converters.
 
-```csharp
-// Before (v11)
-var json = schema.ToJson(Formatting.Indented);
+#### Supported settings and validation examples
 
-// After (v12)
-var json = schema.ToJson(writeIndented: true);
-```
-
-**`Validate(JToken)`:**
+These Newtonsoft generation APIs work in **both v11 and v12**, with a reference to `NJsonSchema.NewtonsoftJson`:
 
 ```csharp
-// Before (v11)
-var token = JToken.Parse(json);
-var errors = schema.Validate(token);
+using Newtonsoft.Json;
+using NJsonSchema;
+using NJsonSchema.NewtonsoftJson.Generation;
 
-// After (v12) — pass the raw string or a System.Text.Json.Nodes.JsonNode
-var errors = schema.Validate(json);
-// or
-var node = JsonNode.Parse(json);
-var errors = schema.Validate(node);
-```
-
-**Removing `IContractResolver` parameters:**
-
-```csharp
-// Before (v11)
-var schema = await JsonSchemaSerialization.FromJsonAsync<JsonSchema>(
-    json, schemaType, documentPath, referenceResolverFactory, contractResolver);
-
-// After (v12) — pass a SchemaSerializationConverter, or null for defaults
-var converter = JsonSchema.CreateSchemaSerializationConverter(schemaType);
-var schema = await JsonSchemaSerialization.FromJsonAsync<JsonSchema>(
-    json, schemaType, documentPath, referenceResolverFactory, converter);
-```
-
-**Keeping Newtonsoft.Json generator behavior (`[JsonProperty]`, custom contract resolvers):**
-
-```csharp
-// Before (v11) — core package could consume Newtonsoft settings directly
-var settings = new JsonSchemaGeneratorSettings {
-    SerializerSettings = new JsonSerializerSettings { /* ... */ }
-};
-var schema = JsonSchema.FromType<MyType>(settings);
-
-// After (v12) — install NJsonSchema.NewtonsoftJson and use the Newtonsoft-aware generator
-var settings = new NewtonsoftJsonSchemaGeneratorSettings {
-    SerializerSettings = new JsonSerializerSettings { /* ... */ }
-};
-var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>(settings);
-```
-
-#### Namespace quick reference
-
-| Newtonsoft | System.Text.Json |
-|---|---|
-| `Newtonsoft.Json` | `System.Text.Json` |
-| `Newtonsoft.Json.Linq` | `System.Text.Json.Nodes` |
-| `Newtonsoft.Json.Serialization` | `System.Text.Json.Serialization` |
-| `JToken` | `JsonNode` |
-| `JObject` | `JsonObject` |
-| `JArray` | `JsonArray` |
-| `JValue` | `JsonValue` |
-| `JTokenType` | `JsonValueKind` |
-| `Formatting.Indented` | `true` (the `writeIndented` bool) |
-| `Formatting.None` | `false` |
-| `IContractResolver` | `SchemaSerializationConverter` |
-
-#### Behavioral notes
-
-- **Lenient JSON recovery.** Newtonsoft tolerated single-quoted strings, unquoted property names, non-breaking spaces, and stringified booleans. `FromJson` retries with `FixLenientJson` on the first `JsonException`, so the usual real-world dirty inputs still parse. `FromJson(Stream)` buffers to string before delegating, so this fallback applies to both overloads.
-- **Extension-data types.** Extension-data values deserialize as `JsonElement` and are converted lazily: JSON integers prefer `int`, falling back to `long`, then `double` (no `decimal`). ISO-8601 date strings are auto-parsed to `DateTime` via `DateTime.TryParse` with `RoundtripKind`.
-- **`uniqueItems` comparison.** STJ preserves the textual form (`1` and `1.0` are different nodes). NJsonSchema normalizes numeric values to `double` (round-trip format) before comparing, keeping v11 semantics.
-- **Validation-error token format.** Newtonsoft's `JProperty.ToString()` emitted `"name": value`. Property-level errors now carry a `JsonPropertyToken` whose `ToString()` preserves that format, so error messages remain stable.
-- **Line information.** `Utf8JsonReader` reports byte offsets; the public `ValidationError.LinePosition` is still a character count, converted via `Encoding.UTF8.GetCharCount` from the line start.
-
-### `ValidationError.Token` type change
-
-`ValidationError.Token` is now `object?` (v11: `JToken?`). It can hold a `JsonNode`, a `JsonPropertyToken` (for property-level errors like `NoAdditionalPropertiesAllowed`), or `null`. Use `Token?.ToString()` for display; for typed access, pattern-match:
-
-```csharp
-if (error.Token is JsonNode node)
+var settings = new NewtonsoftJsonSchemaGeneratorSettings
 {
-    // inspect node.GetPath(), node.GetValueKind(), etc.
-}
-else if (error.Token is JsonPropertyToken property)
+    SerializerSettings = new JsonSerializerSettings()
+};
+var schema = NewtonsoftJsonSchemaGenerator.FromType<Person>(settings);
+
+public class Person
 {
-    // property.Name and property.Value
+    [JsonProperty("display_name")]
+    public string Name { get; set; } = "";
 }
 ```
 
-### `OpenApiDiscriminator.Mapping` now has a setter
-
-`Mapping` changed from `{ get; }` to `{ get; set; }` because STJ needs a setter on properties it deserializes. Callers that read the collection are unaffected. Callers that previously wrote into it via `.Add()` still work; direct assignment (`discriminator.Mapping = new Dictionary<string, string>()`) is now also possible.
-
-### `IFormatValidator.IsValid` parameter change
-
-The `tokenType` parameter was retyped from Newtonsoft's `JTokenType` to STJ's `JsonValueKind`:
+`JsonSchemaGeneratorSettings` is abstract and requires a reflection service; do not instantiate it or assume it has `SerializerSettings`. For STJ-aware generation, both versions support:
 
 ```csharp
-// Before (v11)
-public bool IsValid(string value, JTokenType tokenType) { /* ... */ }
-
-// After (v12)
-public bool IsValid(string value, JsonValueKind tokenType) { /* ... */ }
+var settings = new NJsonSchema.Generation.SystemTextJsonSchemaGeneratorSettings
+{
+    SerializerOptions = new System.Text.Json.JsonSerializerOptions
+    {
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+    }
+};
+var schema = NJsonSchema.JsonSchema.FromType<MyType>(settings);
 ```
 
-The values map directly:
+For v12 validation and output:
 
-| `JTokenType` | `JsonValueKind` |
-|---|---|
-| `String` | `String` |
-| `Integer` / `Float` | `Number` |
-| `Boolean` | `True` or `False` |
-| `Null` | `Null` |
-| `Object` | `Object` |
-| `Array` | `Array` |
+```csharp
+var compact = schema.ToJson(writeIndented: false);
+var indented = schema.ToJson(writeIndented: true);
+var errors = schema.Validate(System.Text.Json.Nodes.JsonNode.Parse(json));
+// schema.Validate(json) remains supported and additionally supplies source locations.
+```
 
-Note that STJ splits boolean into two distinct kinds; format validators that branched on "boolean" should check both `True` and `False` (or use `!= JsonValueKind.Undefined && != JsonValueKind.Null` patterns where applicable).
+#### Discriminator mapping
+
+Mapping values are schemas, not strings. Existing `.Add()` calls work. Assignment retains the supplied dictionary instance (no copy or normalization); keep it non-null. Serialize a complete graph to obtain reference paths:
+
+```csharp
+var dog = new JsonSchema { Type = JsonObjectType.Object };
+var root = new JsonSchema { Type = JsonObjectType.Object };
+root.Definitions["Dog"] = dog;
+root.DiscriminatorObject = new OpenApiDiscriminator
+{
+    PropertyName = "kind",
+    Mapping = new Dictionary<string, JsonSchema>
+    {
+        ["dog"] = new JsonSchema { Reference = dog }
+    }
+};
+var json = root.ToJson(); // mapping wire value is "#/definitions/Dog"
+```
+
+#### Runtime, validation, and wire contracts
+
+- **Literal values:** ordinary objects materialize as `Dictionary<string, object?>`, arrays as `object?[]`, booleans as `bool`, null as null, and strings as strings, including ISO date strings. Numbers prefer `int`, then `long`, then a finite `double` only if its serialized spelling matches the input; otherwise they retain an independent `JsonElement`. There is no automatic decimal mapping. Support `JsonElement` when inspecting defaults, examples, enums, and extension values. Integer materialization does not promise lexical preservation. Schema-valued extensions follow separate schema inference; literal defaults/examples/enums remain literal even when they contain `type` or `properties`.
+- **Exact equality and integers:** enum and uniqueItems comparisons use exact mathematical number equality, ignore object member order, and preserve array order and JSON type distinctions. `1`, `1.0`, and `1e0` compare equal; distinct large integers do not collapse through double rounding. Whole-valued exponent/decimal forms count as integers, while precise nonzero fractions do not. Arithmetic minimum/maximum/multipleOf checks still use constrained decimal/double arithmetic; this is not arbitrary-precision constraint validation. Extreme constrained exponents can still throw on .NET Framework. Unconstrained exact type checks avoid that conversion.
+- **Dates:** literal dates remain strings. Sample-schema inference accepts supported ISO forms invariantly; culture-specific strings such as `10/12/2024` remain ordinary strings. Date validation uses the invariant Gregorian calendar, also repairing a preexisting non-Gregorian leap-date bug.
+- **Input tolerance:** comments and trailing commas are supported. The syntax-aware lenient fallback handles supported single-quoted strings, unquoted keys, and non-breaking whitespace outside literals without rewriting literal contents. Quoted booleans are coerced only by typed contracts; custom converter precedence is preserved. This is not a promise to accept every malformed Newtonsoft input. Malformed JSON now generally raises `System.Text.Json.JsonException`; callback, reference, converter, and I/O failures retain their own contracts. Exception messages/positions can differ.
+- **Streams:** schema and sample-schema stream entry points buffer through a BOM-aware reader and dispose the supplied stream, including failure paths. String and stream inputs share leniency. Account for ownership when reusing a caller stream.
+- **Diagnostics:** `Validate(string)` supplies one-based line/UTF-16 character positions, including CRLF, bare CR, multibyte text, root null, and special property names. Caller-supplied nodes have no original source text and do not gain source coordinates. Public paths retain their existing display format and can be ambiguous for special keys; internal location identity disambiguates them. Property error display retains `"name": value` formatting.
+- **Context behavior:** `JsonSchemaSerialization.IsWriting` keeps its getter signature but now reports true while writing and false while reading. The v11 baseline reported false in ToJson and true in FromJson. Custom callbacks relying on that inversion must change. Options, dialect, and state flow across awaits and nested operations restore their caller state after success, failure, or cancellation.
+- **Preserved schema semantics:** dialect-specific `readOnly` (Swagger/OpenAPI) and `readonly` (JSON Schema) output, case-insensitive typed input, XML metadata, converter precedence, derived members, and enum-description aliases are restored contracts, not intentional data loss. Mixed/object vendor enum-description data retains its original alias and values. Property ordering alone is not a semantic break.
+
+#### Public diagnostic access
+
+`ValidationError.Token` is `object?`. Library errors may hold a `JsonNode`, null, or an internal property wrapper; constructor callers can supply other objects. `JsonPropertyToken` is internal and has no supported public Name/Value accessor. Use public error metadata and display output, inspecting caller-owned input when a property value is needed:
+
+```csharp
+Console.WriteLine($"{error.Property}: {error.Path}: {error.Token}");
+if (error.Token is System.Text.Json.Nodes.JsonNode node)
+{
+    Console.WriteLine(node.ToJsonString());
+}
+```
+
+#### Generated code, packages, and downstream migration
+
+Generated C# still defaults to Newtonsoft.Json serialization; the core migration does not silently switch generated clients to STJ. Exact integral enum constants/defaults and custom enum naming are preserved, including large Int64 values; TypeScript still uses JavaScript Number and cannot represent every integer beyond 2^53 exactly. Restored readonly dictionary declarations retain each generator's existing accessor/initialization policy. Enum-description and readonly snapshot differences were audited semantically against v11 rather than accepted solely as reordered text.
+
+Production target frameworks remain `netstandard2.0;net462;net8.0`; Annotations remains `netstandard2.0;net462`. Core removes its direct Newtonsoft.Json dependency, while the adapter retains it. STJ is a package dependency for older targets and comes from the framework on net8.0. Final package artifact/dependency auditing remains part of the release gate.
+
+NSwag source migration and its full downstream build/tests are deliberately deferred to companion [NSwag #5355](https://github.com/RicoSuter/NSwag/pull/5355). That follow-up must cover callback references, discriminator mappings, parameter schema overrides, and generated clients against the exact NJsonSchema build. NJsonSchema-only verification does not establish downstream merge or release readiness.
 
 ### `SchemaType` enum expansion
 
