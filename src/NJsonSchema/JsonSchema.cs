@@ -980,8 +980,7 @@ namespace NJsonSchema
         public ICollection<ValidationError> Validate(JsonNode? token, JsonSchemaValidatorSettings? settings = null)
         {
             var validator = new JsonSchemaValidator(settings);
-            var json = token?.ToJsonString() ?? "null";
-            return validator.Validate(json, ActualSchema);
+            return validator.Validate(token, ActualSchema);
         }
 
         /// <summary>Validates the given JSON data against this schema.</summary>
@@ -1003,8 +1002,7 @@ namespace NJsonSchema
         public ICollection<ValidationError> Validate(JsonNode? token, SchemaType schemaType, JsonSchemaValidatorSettings? settings = null)
         {
             var validator = new JsonSchemaValidator(settings);
-            var json = token?.ToJsonString() ?? "null";
-            return validator.Validate(json, ActualSchema, schemaType);
+            return validator.Validate(token, ActualSchema, schemaType);
         }
 
         private static JsonObjectType ConvertStringToJsonObjectType(string? value)

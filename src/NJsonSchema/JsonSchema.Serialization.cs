@@ -298,9 +298,18 @@ namespace NJsonSchema
                     {
                         AllowAdditionalItems = false;
                     }
-                    else
+                    else if (element.ValueKind == JsonValueKind.String &&
+                        (element.GetString() == "true" || element.GetString() == "false"))
+                    {
+                        AllowAdditionalItems = element.GetString() == "true";
+                    }
+                    else if (element.ValueKind == JsonValueKind.Object)
                     {
                         AdditionalItemsSchema = FromJsonWithCurrentSettings(element);
+                    }
+                    else
+                    {
+                        throw new JsonException("Expected a boolean or schema object for additionalItems.");
                     }
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))
@@ -373,9 +382,18 @@ namespace NJsonSchema
                     {
                         AllowAdditionalProperties = true; // empty object = allow in Swagger2
                     }
-                    else
+                    else if (element.ValueKind == JsonValueKind.String &&
+                        (element.GetString() == "true" || element.GetString() == "false"))
+                    {
+                        AllowAdditionalProperties = element.GetString() == "true";
+                    }
+                    else if (element.ValueKind == JsonValueKind.Object)
                     {
                         AdditionalPropertiesSchema = FromJsonWithCurrentSettings(element);
+                    }
+                    else
+                    {
+                        throw new JsonException("Expected a boolean or schema object for additionalProperties.");
                     }
                 }
                 else if (value != null && (value.Equals("true") || value.Equals("false")))

@@ -41,7 +41,7 @@ A resolver-modifier rewrite is not a prerequisite. If a repair cannot be made wi
 
 ## Findings and acceptance criteria
 
-The IDs below preserve the review's identifiers. The original review has 26 findings; implementation added V11, G3, and A1 below. The original six P1 findings are: S1, S2, S3, V1, V2, R1. The reproductions are summarized here so execution does not depend on temporary probe directories or a local review artifact.
+The IDs below preserve the review's identifiers. The original review has 26 findings; implementation added V11, G3, A1, and the final whole-PR findings F1–F6 below. The original six P1 findings are: S1, S2, S3, V1, V2, R1. The reproductions are summarized here so execution does not depend on temporary probe directories or a local review artifact.
 
 ### Phase 1: literal values and validation semantics
 
@@ -60,6 +60,19 @@ Additional regression discovered and repaired during Phase 1:
 | ID | Required behavior / regression test |
 | --- | --- |
 | V11 | Direct CLR-backed and customized `JsonValue` instances validate and compare according to their serialized JSON value, including non-string CLR values serialized as strings, custom objects/arrays/nulls, booleans, numbers, enums, and primitive type-info converters. Preserve caller-owned nodes. |
+
+### Final whole-PR review: F1–F6
+
+The final review at `13dcbd0a` identified six additional P2 compatibility defects. These are repaired and verified by the public `FinalMigrationRegressionTests` fixture (33 cases) and the full core net8/net9 suites. The controller still owns the subsequent scoped re-review, exact-head full build/package/CI gates, and overall disposition; NSwag integration remains deferred to NSwag #5355.
+
+| ID | Completed behavior / regression coverage |
+| --- | --- |
+| F1 | Direct and factory property converters delegate with the original options and property scope; bounded recursion guard, nested same-type values, sibling isolation, and nullable factory controls pass. |
+| F2 | Explicit `JsonIgnore(Never)` and resolver `ShouldSerialize` contracts supersede operation null/default omission. Plain nulls, `HandleNull` true/false, factories, and all three default-ignore policies match STJ controls. |
+| F3 | Ignored core metadata names survive as root/nested extension data, including inherited generic reference metadata. References into these entries resolve and retain paths; explicit user/derived ignores (including differently typed hidden members) and registered ignores remain authoritative. |
+| F4 | Both public node-validation overloads forward directly with settings/dialect. Primitive/object/array/null and nested error tokens retain caller identity where adaptation is unnecessary and never acquire synthetic source coordinates. |
+| F5 | Quoted boolean unions control additional-properties/items validation in all three dialects; literal strings survive. Invalid non-null recognized scalars throw instead of silently disappearing. |
+| F6 | Customized string-backed nodes use serialized text for length/pattern/format, enum, and uniqueness semantics. Parsed-value fast path and unchanged ordinary-string identity remain; only individual CLR-backed values are serialized, without whole-document reparsing or mutation. |
 
 ### Phase 2: serializer context and reference graph
 

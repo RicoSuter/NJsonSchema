@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Reflection;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -467,8 +469,13 @@ namespace NJsonSchema.Infrastructure
                         continue;
                     }
 
-                    // Skip null values
-                    if (propValue == null)
+                    // An explicit ShouldSerialize contract supersedes the operation default,
+                    // including JsonIgnore(Never) and custom resolver predicates.
+                    if (property.ShouldSerialize == null &&
+                        ((propValue == null && options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingNull) ||
+                         (options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingDefault &&
+                          (propValue == null || (property.PropertyType.IsValueType &&
+                           propValue.Equals(Activator.CreateInstance(property.PropertyType)))))))
                     {
                         continue;
                     }
@@ -521,7 +528,7 @@ namespace NJsonSchema.Infrastructure
                     // Use runtime type for object-typed properties so values like int/string
                     // serialize correctly (STJ would serialize declared type 'object' as {}).
                     var serializeType = property.PropertyType == typeof(object)
-                        ? propValue.GetType()
+                        ? propValue?.GetType() ?? property.PropertyType
                         : property.PropertyType;
                     JsonSerializer.Serialize(writer, propValue, serializeType, options);
                 }
@@ -547,16 +554,53 @@ namespace NJsonSchema.Infrastructure
                 writer.WriteEndObject();
             }
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1869:Cache and reuse JsonSerializerOptions instances",
-                Justification = "Property converters require isolated options to preserve precedence without affecting siblings.")]
-            private static void WriteConvertedProperty(Utf8JsonWriter writer, object value,
+            private static readonly ConcurrentDictionary<Type, Action<Utf8JsonWriter, object?, JsonConverter, JsonSerializerOptions>>
+                PropertyConverterWriters = new();
+
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2263", Justification = "The generic CreateDelegate overload is unavailable on netstandard2.0 and net462.")]
+            private static void WriteConvertedProperty(Utf8JsonWriter writer, object? value,
                 JsonPropertyInfo property, JsonSerializerOptions options)
             {
-                // Isolate property converters (including factories) from sibling properties.
-                // STJ resolves the converter against the declared property type.
-                var propertyOptions = new JsonSerializerOptions(options);
-                propertyOptions.Converters.Insert(0, property.CustomConverter!);
-                JsonSerializer.Serialize(writer, value, property.PropertyType, propertyOptions);
+                var converter = property.CustomConverter!;
+                if (converter is JsonConverterFactory factory)
+                {
+                    converter = factory.CreateConverter(property.PropertyType, options)
+                        ?? throw new InvalidOperationException("The property converter factory returned null.");
+                }
+
+                // Dispatch directly with the active options. Adding this converter to options
+                // would change its scope and intercept its own normal-serializer delegation.
+                var write = PropertyConverterWriters.GetOrAdd(converter.GetType(), static converterType =>
+                {
+                    var baseType = converterType;
+                    while (baseType != null && (!baseType.IsGenericType || baseType.GetGenericTypeDefinition() != typeof(JsonConverter<>)))
+                    {
+                        baseType = baseType.BaseType;
+                    }
+
+                    var valueType = baseType?.GetGenericArguments()[0]
+                        ?? throw new InvalidOperationException("Expected a typed property converter.");
+                    return (Action<Utf8JsonWriter, object?, JsonConverter, JsonSerializerOptions>)typeof(PropertyFilterConverter<T>)
+                        .GetMethod(nameof(WritePropertyValue), BindingFlags.NonPublic | BindingFlags.Static)!
+                        .MakeGenericMethod(valueType)
+                        .CreateDelegate(typeof(Action<Utf8JsonWriter, object?, JsonConverter, JsonSerializerOptions>));
+                });
+                write(writer, value, converter, options);
+            }
+
+            private static void WritePropertyValue<TValue>(Utf8JsonWriter writer, object? value,
+                JsonConverter converter, JsonSerializerOptions options)
+            {
+                var typedConverter = (JsonConverter<TValue>)converter;
+                // Nullable properties may use an underlying value-type converter. STJ's
+                // nullable adapter writes null itself, regardless of that converter's HandleNull.
+                if (value == null && (!typedConverter.HandleNull || default(TValue) is not null))
+                {
+                    writer.WriteNullValue();
+                    return;
+                }
+
+                typedConverter.Write(writer, (TValue)value!, options);
             }
 
             private static void RemoveNullCollectionProperties(JsonObject obj, Type targetType)

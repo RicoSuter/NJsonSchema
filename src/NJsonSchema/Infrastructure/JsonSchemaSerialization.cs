@@ -32,7 +32,7 @@ namespace NJsonSchema.Infrastructure
                     return;
                 }
 
-                // The core Name and Parent bookkeeping members are not wire keywords.
+                // Ignored core bookkeeping members are not wire keywords.
                 // Preserve their legacy extension-data spellings without removing ignored
                 // members declared by user-defined schema types.
                 if (typeof(JsonSchema).IsAssignableFrom(typeInfo.Type))
@@ -40,9 +40,12 @@ namespace NJsonSchema.Infrastructure
                     for (var i = typeInfo.Properties.Count - 1; i >= 0; i--)
                     {
                         if (typeInfo.Properties[i].AttributeProvider is PropertyInfo member &&
-                            (member.DeclaringType == typeof(JsonSchema) || member.DeclaringType == typeof(JsonSchemaProperty)) &&
-                            (member.Name == nameof(JsonSchemaProperty.Name) || member.Name == nameof(JsonSchema.Parent)) &&
-                            member.GetCustomAttribute<JsonIgnoreAttribute>()?.Condition == JsonIgnoreCondition.Always)
+                            (member.DeclaringType == typeof(JsonSchema) || member.DeclaringType == typeof(JsonSchemaProperty) ||
+                             member.DeclaringType == typeof(JsonReferenceBase<JsonSchema>)) &&
+                            member.GetCustomAttribute<JsonIgnoreAttribute>()?.Condition == JsonIgnoreCondition.Always &&
+                            !typeInfo.Type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                .Any(candidate => candidate.Name == member.Name && candidate.DeclaringType != member.DeclaringType &&
+                                    member.DeclaringType!.IsAssignableFrom(candidate.DeclaringType)))
                         {
                             typeInfo.Properties.RemoveAt(i);
                         }

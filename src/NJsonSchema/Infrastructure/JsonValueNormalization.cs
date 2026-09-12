@@ -19,8 +19,22 @@ internal static class JsonValueNormalization
                 return null;
             }
 
-            if (kind == JsonValueKind.Object || kind == JsonValueKind.Array ||
-                (kind == JsonValueKind.String && !value.TryGetValue<string>(out _)))
+            // Parsed values already expose their wire representation. CLR-backed strings
+            // can carry a custom converter even when TryGetValue<string> succeeds.
+            if (kind == JsonValueKind.String && !value.TryGetValue<JsonElement>(out _))
+            {
+                var serialized = JsonNode.Parse(value.ToJsonString());
+                if (value.TryGetValue<string>(out var text) &&
+                    serialized is JsonValue serializedValue && serializedValue.TryGetValue<string>(out var serializedText) &&
+                    text == serializedText)
+                {
+                    return node;
+                }
+
+                return serialized;
+            }
+
+            if (kind == JsonValueKind.Object || kind == JsonValueKind.Array)
             {
                 return JsonNode.Parse(value.ToJsonString());
             }
