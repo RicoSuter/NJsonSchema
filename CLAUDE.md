@@ -33,6 +33,12 @@ Reviewers: explicitly ask "has this been cross-checked against NSwag?" for any P
 
 Reference resolution (`ActualSchema` vs `ActualTypeSchema`, `$ref` semantics, sibling keyword handling) is one common area where NJsonSchema/NSwag interactions matter — see `docs/references.md` for the details, the resolution algorithm, and known cross-keyword limitations.
 
+## Specification authority and migration records
+
+The applicable JSON Schema specification takes precedence over `master` behavior. For Swagger/OpenAPI inputs, use that version's specification and JSON Schema subset. Preserve correct existing behavior, but do not reproduce a baseline bug merely to match master. Check the declared/selected dialect before calling a difference a specification correction; a newer draft's rules do not automatically apply to older targets. Record unsupported or ambiguous dialect handling as an open limitation.
+
+Every observable difference from master must be recorded in `docs/changelog_v12.md`, including specification corrections, API/binary changes, serialized schema and generated-code contracts, runtime values, exceptions, diagnostics, and performance. Include the baseline revision, before/after behavior, affected targets, rationale (with a specification reference when normative), consumer action, and regression/comparison evidence. Separate intentional changes from accidental regressions and behavior restored to master. An unverified comparison remains unverified; passing tests do not establish exhaustive behavior preservation. Update the inventory whenever a new difference is found, before declaring the migration ready.
+
 ## Project docs
 
 | File | Read when |

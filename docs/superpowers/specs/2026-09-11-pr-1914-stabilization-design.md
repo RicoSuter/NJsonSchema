@@ -10,18 +10,20 @@ At the planning checkpoint, the PR head is `d0ae5c5b774a436eef9a96238b4b9a3e0dad
 
 The existing March migration plans describe the original implementation. This document and its linked phase plans supersede those plans for remaining stabilization work. They do not supersede the broader [v12 roadmap](../../plan_v12.md).
 
-## Proposed compatibility policy
+## Compatibility policy
 
+- Specification behavior wins over master behavior (user clarification, 2026-09-12). Apply the relevant JSON Schema dialect or Swagger/OpenAPI version, rather than assuming modern draft semantics apply everywhere. Preserve correct baseline contracts; document and test corrections to baseline bugs.
+- Record every observable difference from master in the [v12 migration guide](../../changelog_v12.md), with before/after behavior, baseline revision, affected targets, rationale/specification source, consumer action, and evidence. Separate specification corrections, intentional API/runtime changes, restored behavior, accidental regressions, and unverified comparisons. Green CI is not an exhaustive compatibility claim.
 - Accept the major-version API and binary breaks required to replace Newtonsoft types and customization APIs with STJ equivalents. Inventory each actual signature change and provide a working migration example; this is not blanket approval for additional public API redesign.
 - Preserve literal JSON values in defaults, examples, enumeration values, and extension payloads. An object resembling a schema is still data when it occurs in a data-valued keyword.
-- Preserve supported schema and OpenAPI wire contracts, including XML metadata, property converters, ignored fields, derived schema members, keyword names, and references. Ordering and insignificant number spelling may change; semantic values may not.
+- Preserve supported schema and OpenAPI wire contracts, including XML metadata, property converters, ignored fields, derived schema members, keyword names, and references. Ordering and insignificant number spelling may change; semantic changes require a documented specification correction or explicit migration contract.
 - Preserve correct validation and generated C#/TypeScript contracts. Existing snapshots are evidence to investigate, not authority to accept lost behavior.
 - Exercise all three current `SchemaType` values with appropriate inputs. Do not expand `SchemaType`, implement new JSON Schema drafts, or absorb #1917 property discovery into this repair.
 - Preserve existing Newtonsoft adapter support. Direct Newtonsoft serialization of STJ-annotated core objects is a separate compatibility limitation that must be documented accurately.
 
 Proposed decisions to review before the affected later phase: preserve supported lenient schema inputs through targeted parsing, including quoted exclusive bounds; preserve stream/string sample-input parity and the previous stream ownership behavior; infer dates only for supported ISO forms. If a stricter policy is preferred, replace that specific compatibility repair with explicit rejection tests and a documented breaking change. Do not silently drop values or change unrelated strings.
 
-Whole-valued JSON numbers such as `1.0` and `1e0` should validate as integers. Nonintegral values must remain nonintegral even when a double would round or underflow. This intentional numeric policy must be documented alongside the fixes.
+Whole-valued JSON numbers such as `1.0` and `1e0` should validate as integers. Nonintegral values must remain nonintegral even when a double would round or underflow. This implemented numeric policy matches modern JSON Schema. Draft 4 defines integers lexically (without a fraction or exponent part); the shared implementation does not currently distinguish that rule. Record this as an open dialect compatibility issue, not universal specification conformance, alongside the observed change from master.
 
 ## Implementation approach
 
@@ -150,3 +152,9 @@ As the user-sequenced follow-up in NSwag #5355, reproduce NSwag integration in a
 5. Require successful Windows and Ubuntu CI for the exact final pushed head, and an updated PR description/changelog that agrees with the code. This completes the NJsonSchema verification report only; do not merge or release here, and keep downstream readiness pending the separate NSwag #5355 gate.
 
 Non-goals: unrelated master fixes, new dialect support, #1917, a public path-format redesign, wholesale serializer replacement, and the final `v12` release/merge to master.
+
+## Follow-up master comparison (2026-09-12)
+
+The subsequent comparison against master `18ba2ccfd20d795033d00b5e01585a94e2b78486`, using functional migration source `74e71db7324143a4a193cf9d020c42915f2fb356` (identical production sources at documentation head `1ff8c6a4`), found substantial load/save latency and allocation regressions. Earlier diagnostic speedups compared two migration revisions, not master. See the [migration guide assessment](../../changelog_v12.md#performance-and-outstanding-readiness) and PR verification section for measurements and limitations.
+
+The prior correctness/API/package/CI gates remain historical evidence. Readiness additionally requires resolving and remeasuring the load/save regressions, resolving or explicitly scoping the draft-4 integer distinction under the specification-first policy, and completing the separately sequenced NSwag #5355 integration. No performance fix or new dialect implementation is claimed by this documentation update.

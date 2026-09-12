@@ -74,6 +74,25 @@ The core `NJsonSchema` package uses System.Text.Json (STJ) for schema serializat
 
 `NJsonSchema.NewtonsoftJson` supplies Newtonsoft-aware reflection and schema generation, including `[JsonProperty]` and contract resolvers. Its settings and generator already existed in v11. Installing it does **not** restore direct `JsonConvert` serialization of STJ-annotated core schema models or the removed `JToken` validation overloads.
 
+#### Compatibility policy and changes from master
+
+**The applicable JSON Schema specification wins over master behavior.** For Swagger/OpenAPI, use that version's specification and schema subset. Correct baseline behavior remains a compatibility requirement; baseline bugs are not contracts to reproduce. A specification correction can still break a consumer and must be documented. This migration is not behavior-identical to master, and green CI does not establish full dialect conformance.
+
+Every observable difference must have a migration record: baseline revision, before/after behavior, affected targets, rationale (including the applicable specification where relevant), consumer action, and comparison/regression evidence. This includes API/binary, wire/generated contracts, runtime, diagnostic, exception, and performance changes. Restoring behavior broken during the migration is not itself a new difference from master. Unverified or unresolved differences must remain marked as such.
+
+The current inventory combines the API table and contract sections below with these semantic comparisons. The measured baseline is master `18ba2ccfd20d795033d00b5e01585a94e2b78486`; migration functional source is `74e71db7324143a4a193cf9d020c42915f2fb356` (unchanged production sources at documentation head `1ff8c6a4`). This records known differences; it is not proof that no undiscovered difference remains.
+
+| Area / evidence | Master behavior | Migration behavior and consumer action |
+|---|---|---|
+| `uniqueItems`, shared JSON value equality; common-API probe plus value-validation regressions | `[1, "1"]` produces a uniqueness error | Accepts the array: a number and a string are different JSON values. Equality uses mathematical numbers and unordered object members; array order remains significant. Update expectations that relied on text-based comparison. This follows [draft 4 §3.6](https://json-schema.org/draft-04/draft-zyp-json-schema-04#section-3.6) and [2020-12 §4.2.2](https://json-schema.org/draft/2020-12/json-schema-core#section-4.2.2). |
+| Integer validation; common-API `type: integer` probe | `1.0` produces one type error | Accepts `1.0` and other exact whole-valued decimal/exponent forms. This matches [2020-12 validation §6.1.1](https://json-schema.org/draft/2020-12/json-schema-validation#section-6.1.1). **Open dialect issue:** [draft 4 §3.5](https://json-schema.org/draft-04/draft-zyp-json-schema-04#section-3.5) excludes fraction/exponent spellings. The shared validator currently applies the modern rule without distinguishing that older target; do not claim this is correct for every supported dialect. |
+| `JsonSchemaSerialization.IsWriting`; baseline/current context probes | False during `ToJson`, true during `FromJson` | True during writes, false during reads. Change callbacks that relied on the inverted flag; this is a library contract correction, not a JSON Schema rule. |
+| Invalid recognized `additionalProperties` / `additionalItems` scalars; F5 regressions | Invalid non-null scalars could silently leave the constraint absent | Rejects them during deserialization. Repair invalid schema input or handle the exception. This is explicit parser behavior for invalid schema-or-boolean input, not a claim that every dialect supports both keywords. Supported quoted booleans remain a compatibility extension. |
+| Gregorian ISO date handling; culture regressions | A non-Gregorian current calendar could change leap-date validation | Uses the invariant Gregorian calendar. Date results no longer depend on that calendar. The en-US sample `"10/12/2024"` infers no date format in both measured versions; it is a preserved control, not a new breaking change. |
+| Numeric enum defaults and custom names; baseline generated-contract audit | Mixed numeric representations could fail to select the declared default member consistently | Uses JSON equality and declaration naming inputs consistently. Review generated defaults and custom enum-name generators; the CLR representation changes described below still require migration. |
+| Public signatures, CLR values, serializer metadata and errors; packed API audit and compiled migration examples | Newtonsoft types and serializer contracts | STJ types/contracts and different runtime value/exception representations. Rebuild and apply the API/runtime guidance below; these are migration costs, not specification requirements. |
+| Performance; same-host master comparison | Baseline load/save and validation costs | Substantial load/save regression remains open; see the measured assessment below. Specification correctness does not excuse this regression. |
+
 #### Public API and binary changes
 
 | Area | v11 | v12 / migration |
@@ -170,6 +189,14 @@ var json = root.ToJson(); // mapping wire value is "#/definitions/Dog"
 - **Context behavior:** `JsonSchemaSerialization.IsWriting` keeps its getter signature but now reports true while writing and false while reading. The v11 baseline reported false in ToJson and true in FromJson. Custom callbacks relying on that inversion must change. Options, dialect, and state flow across awaits and nested operations restore their caller state after success, failure, or cancellation.
 - **Preserved schema semantics:** dialect-specific `readOnly` (Swagger/OpenAPI) and `readonly` (JSON Schema) output, case-insensitive typed input, XML metadata, converter precedence, derived members, and enum-description aliases are restored contracts, not intentional data loss. Mixed/object vendor enum-description data retains its original alias and values. Property ordering alone is not a semantic break.
 
+#### Performance and outstanding readiness
+
+A 2026-09-12 comparison used the exact revisions above, identical harnesses, .NET 8.0.11 Arm64 and serial master → migration → migration → master processes. With tiered compilation disabled consistently, 20k/40k/80k array validation cases were 1.2–1.4× slower and allocated 22–33% more; load/save of 197 B, 3610 B and 59618 B schema fixtures was 187–262× slower and allocated 84–126× more. Allocation means cumulative allocated bytes per operation, not retained or peak memory.
+
+A separate default-tiering spot check of the 3610 B repository fixture measured load at 0.748 ms → 28.074 ms (37.5×) and save at 0.678 ms → 16.812 ms (24.8×). Load allocation was approximately 239 KB → 25.7 MB; save was 154 KB → 15.1 MB. JIT policy materially affects the timing multiplier; the controlled ~200× result is not universal. These focused measurements are not a full application benchmark, but both configurations expose a major regression. Earlier diagnostic speedups within the migration did not compare against master.
+
+**Open before readiness:** profile and fix load/save latency/allocation, repeat the master comparison, resolve or explicitly scope the draft-4 integer distinction above, and complete the deferred NSwag integration. No performance fix is claimed here. Measurement details and current gate status are tracked in [PR #1914](https://github.com/RicoSuter/NJsonSchema/pull/1914).
+
 #### Public diagnostic access
 
 `ValidationError.Token` is `object?`. Library errors may hold a `JsonNode`, null, or an internal property wrapper; constructor callers can supply other objects. `JsonPropertyToken` is internal and has no supported public Name/Value accessor. Use public error metadata and display output, inspecting caller-owned input when a property value is needed:
@@ -206,4 +233,5 @@ When merging a v12 PR that includes a user-visible change:
 
 1. Add an entry under `Unreleased → Breaking changes` / `New features` / `Fixes`.
 2. If it breaks v11 consumers, also add a section under **Migration guide** with a before/after example.
-3. Keep entries concise; link to the merged PR for full detail.
+3. Record every observable difference from master, including specification corrections: baseline, before/after, affected targets, rationale/specification, consumer action, and evidence. Mark unresolved and unverified comparisons explicitly.
+4. Keep entries concise; link to the merged PR for full detail.
