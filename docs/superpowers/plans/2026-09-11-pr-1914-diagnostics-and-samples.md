@@ -69,7 +69,7 @@ git -c core.whitespace=cr-at-eol diff --check
 ```
 
 - [x] Review each finding against its regression and benchmark evidence.
-- [ ] Include benchmark outcomes and remaining limitations in the final PR description; do not report performance from unrelated old probes as current results.
+- [x] Include benchmark outcomes and remaining limitations in the final PR description; do not report performance from unrelated old probes as current results.
 - [x] Require Windows framework execution in final CI. Proceed to documentation/API comparison and whole-PR review; the NSwag companion gate remains explicitly pending.
 
 Execution checkpoint: completed and independently reviewed through `1d31c332`. Core net8: 889 passed/7 skipped; net9: 892 passed/7 skipped. All production core TFMs build cleanly. Source-location benchmark uses the same .NET 8.0.11/Arm64 harness for baseline `d0ae5c5b` and repair `5fe8afa9`: 80k pretty arrays improved from 1255/1262 ms (valid/invalid-last) to 26.7/29.6 ms. Smaller measurements are noisy; comparison includes intervening repairs. Windows net472 and final package/review/CI gates remain pending, with NSwag explicitly deferred.

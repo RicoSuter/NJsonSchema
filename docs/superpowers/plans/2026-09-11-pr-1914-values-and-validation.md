@@ -175,14 +175,16 @@ dotnet build src/NJsonSchema/NJsonSchema.csproj -c Release
 git -c core.whitespace=cr-at-eol diff --check
 ```
 
-- [ ] Review the five finding IDs against their original reproductions and the new tests. Check exact-number behavior, object-order/hash consistency, node ownership, disposed element lifetimes, and all callers of changed helpers.
-- [ ] Run the existing C# and TypeScript code-generation suites because defaults and enum values feed generators. Use `npm ci` in `src/NJsonSchema.CodeGeneration.TypeScript.Tests` if dependencies are missing, then run:
+- [x] Review the five finding IDs against their original reproductions and the new tests. Check exact-number behavior, object-order/hash consistency, node ownership, disposed element lifetimes, and all callers of changed helpers.
+- [x] Run the existing C# and TypeScript code-generation suites because defaults and enum values feed generators. Use `npm ci` in `src/NJsonSchema.CodeGeneration.TypeScript.Tests` if dependencies are missing, then run:
 
 ```bash
 dotnet test src/NJsonSchema.CodeGeneration.CSharp.Tests/NJsonSchema.CodeGeneration.CSharp.Tests.csproj -c Release
 dotnet test src/NJsonSchema.CodeGeneration.TypeScript.Tests/NJsonSchema.CodeGeneration.TypeScript.Tests.csproj -c Release
 ```
 
-- [ ] Cross-check affected APIs/value consumption in the NSwag companion sources and record the inspected head. The full downstream test gate remains mandatory in Phase 5; do not label NSwag migration compatibility complete here.
-- [ ] Verify Windows framework tests in CI on the exact pushed repair head. Do not infer those results from macOS test runs or a cross-compilation.
-- [ ] Report the completed IDs, actual test totals, any new findings/contract decisions, and the remaining phases. Prepare the Phase 2 execution plan against the resulting code before beginning reference/context repairs.
+- [x] Cross-check affected APIs/value consumption in the NSwag companion sources and record the inspected head. The full downstream test gate is deferred to the later NSwag #5355 companion work by the approved stabilization design; do not label NSwag migration compatibility complete here.
+- [x] Verify Windows framework tests in CI on the exact pushed repair head. Do not infer those results from macOS test runs or a cross-compilation.
+- [x] Report the completed IDs, actual test totals, any new findings/contract decisions, and the remaining phases. Prepare the Phase 2 execution plan against the resulting code before beginning reference/context repairs.
+
+Phase boundary record: all Phase 1 implementation and review gates completed before the later phases. Windows/Ubuntu repair checkpoints passed (including `c1172f70`, `e178fd39`, and `13dcbd0a`). The actual NSwag STJ sources were inspected at `edd1a7c6d7883240d212788a9f0f64ed0a2da554`; its full integration gate remains deferred. Final NJsonSchema evidence is recorded in the Phase 5 plan and PR #1914 verification section.

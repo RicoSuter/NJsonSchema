@@ -63,7 +63,7 @@ Additional regression discovered and repaired during Phase 1:
 
 ### Final whole-PR review: F1–F6
 
-The final review at `13dcbd0a` identified six additional P2 compatibility defects. These are repaired and verified by the public `FinalMigrationRegressionTests` fixture (34 cases) and the full core net8/net9 suites. The controller still owns the subsequent scoped re-review, exact-head full build/package/CI gates, and overall disposition; NSwag integration remains deferred to NSwag #5355.
+The final review at `13dcbd0a` identified six additional P2 compatibility defects. These are repaired and verified by the public `FinalMigrationRegressionTests` fixture (34 cases) and the full core net8/net9 suites. The scoped re-review is complete, including the subsequent N1 struct-default correction. Full Release build/tests/packages and the actual packed-assembly API audit pass at `74e71db7`; exact-head CI publication status is recorded in the Phase 5 plan and PR verification section. NSwag integration remains deferred to NSwag #5355.
 
 | ID | Completed behavior / regression coverage |
 | --- | --- |
@@ -135,7 +135,7 @@ Detailed execution plan: [Phase 5](../plans/2026-09-11-pr-1914-documentation-and
 | A1 | Preserve the public static `JsonSchema.ToolchainVersion` getter; STJ migration does not require changing a property to a field. Verify the member contract before documenting final API differences. |
 | D1 P2 | Correct `docs/changelog_v12.md`: construct the actual settings type, remove nonexistent `SerializerSettings` usage, describe discriminator mappings with their actual types, and correct date/numeric/runtime-value claims. Compile API migration examples against the intended packages. |
 
-A1 and D1 implementation/documentation are complete at Phase 5 Task 1: getter RED/green and baseline binary binding, repaired compiled migration examples, and focused generated consumers passed. See the Phase 5 plan for the still-open controller gates.
+A1 and D1 implementation/documentation are complete at Phase 5 Task 1: getter RED/green and baseline binary binding, repaired compiled migration examples, and focused generated consumers passed. See the Phase 5 plan for the final controller evidence and the deliberately deferred NSwag gate.
 
 Refresh the PR description using `.github/pull_request_template.md`, with explicit sections for source/binary API breaks, serialized JSON/schema contracts, validation/runtime behavior, generated client contracts, and NSwag actions. Distinguish intentional breaks from fixed regressions and unresolved decisions. Do not mark a finding fixed until its test and implementation land.
 
