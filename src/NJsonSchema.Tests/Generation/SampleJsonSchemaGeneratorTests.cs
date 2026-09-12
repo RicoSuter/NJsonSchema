@@ -216,7 +216,7 @@ namespace NJsonSchema.Tests.Generation
             // Arrange
             var originalCulture = CultureInfo.CurrentCulture;
             var generator = new SampleJsonSchemaGenerator();
-            var cultures = new[] { "en-US", "de-DE" };
+            var cultures = new[] { "en-US", "de-DE", "th-TH" };
 
             try
             {
@@ -225,15 +225,16 @@ namespace NJsonSchema.Tests.Generation
                     CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(cultureName);
 
                     // Act
-                    var schema = generator.Generate("{ local: '10/12/2024', year: '2024', date: '2024-10-12', midnight: '2024-10-12T00:00:00', offset: '2024-10-12T00:00:00+02:00' }");
+                    var schema = generator.Generate("{ local: '10/12/2024', year: '2024', date: '2024-02-29', invalidDate: '2023-02-29', midnight: '2024-10-12T00:00:00', offset: '2024-10-12T00:00:00+02:00' }");
 
                     // Assert
                     Assert.Null(schema.Properties["local"].Format);
                     Assert.Null(schema.Properties["year"].Format);
                     Assert.Equal(JsonFormatStrings.Date, schema.Properties["date"].Format);
+                    Assert.Null(schema.Properties["invalidDate"].Format);
                     Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["midnight"].Format);
                     Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["offset"].Format);
-                    Assert.Empty(schema.Validate("{ \"local\": \"10/12/2024\", \"year\": \"2024\", \"date\": \"2024-10-12\", \"midnight\": \"2024-10-12T00:00:00\", \"offset\": \"2024-10-12T00:00:00+02:00\" }"));
+                    Assert.Empty(schema.Validate("{ \"local\": \"10/12/2024\", \"year\": \"2024\", \"date\": \"2024-02-29\", \"invalidDate\": \"2023-02-29\", \"midnight\": \"2024-10-12T00:00:00\", \"offset\": \"2024-10-12T00:00:00+02:00\" }"));
                 }
             }
             finally

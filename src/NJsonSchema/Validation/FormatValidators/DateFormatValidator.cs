@@ -20,7 +20,7 @@ namespace NJsonSchema.Validation.FormatValidators
         /// <returns>True if value is correct for given format, False - if not.</returns>
         public bool IsValid(string value, JsonValueKind tokenType)
         {
-            return DateTime.TryParseExact(value, "yyyy-MM-dd", null, DateTimeStyles.None, out DateTime dateTimeResult)
+            return DateTime.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTimeResult)
                 && dateTimeResult.Date == dateTimeResult;
         }
 

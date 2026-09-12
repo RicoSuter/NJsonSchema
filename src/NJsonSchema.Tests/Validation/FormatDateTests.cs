@@ -1,5 +1,8 @@
+using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
+using NJsonSchema.Validation.FormatValidators;
 
 namespace NJsonSchema.Tests.Validation
 {
@@ -54,6 +57,33 @@ namespace NJsonSchema.Tests.Validation
 
             // Assert
             Assert.Empty(errors);
+        }
+
+        [Fact]
+        public void Date_format_validation_uses_the_Gregorian_calendar_in_all_cultures()
+        {
+            // Arrange
+            var originalCulture = CultureInfo.CurrentCulture;
+            var validator = new DateFormatValidator();
+
+            try
+            {
+                CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("th-TH");
+
+                // Act
+                var validLeapDate = validator.IsValid("2024-02-29", JsonValueKind.String);
+                var invalidLeapDate = validator.IsValid("2023-02-29", JsonValueKind.String);
+                var yearOnly = validator.IsValid("2024", JsonValueKind.String);
+
+                // Assert
+                Assert.True(validLeapDate);
+                Assert.False(invalidLeapDate);
+                Assert.False(yearOnly);
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+            }
         }
     }
 }
