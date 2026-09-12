@@ -63,12 +63,12 @@ Additional regression discovered and repaired during Phase 1:
 
 ### Final whole-PR review: F1–F6
 
-The final review at `13dcbd0a` identified six additional P2 compatibility defects. These are repaired and verified by the public `FinalMigrationRegressionTests` fixture (33 cases) and the full core net8/net9 suites. The controller still owns the subsequent scoped re-review, exact-head full build/package/CI gates, and overall disposition; NSwag integration remains deferred to NSwag #5355.
+The final review at `13dcbd0a` identified six additional P2 compatibility defects. These are repaired and verified by the public `FinalMigrationRegressionTests` fixture (34 cases) and the full core net8/net9 suites. The controller still owns the subsequent scoped re-review, exact-head full build/package/CI gates, and overall disposition; NSwag integration remains deferred to NSwag #5355.
 
 | ID | Completed behavior / regression coverage |
 | --- | --- |
 | F1 | Direct and factory property converters delegate with the original options and property scope; bounded recursion guard, nested same-type values, sibling isolation, and nullable factory controls pass. |
-| F2 | Explicit `JsonIgnore(Never)` and resolver `ShouldSerialize` contracts supersede operation null/default omission. Plain nulls, `HandleNull` true/false, factories, and all three default-ignore policies match STJ controls. |
+| F2 | Explicit `JsonIgnore(Never)` and resolver `ShouldSerialize` contracts supersede operation null/default omission. Plain nulls, `HandleNull` true/false, factories, and all three default-ignore policies match STJ controls. Explicit parameterless struct constructors are not invoked to compute default values. |
 | F3 | Ignored core metadata names survive as root/nested extension data, including inherited generic reference metadata. References into these entries resolve and retain paths; explicit user/derived ignores (including differently typed hidden members) and registered ignores remain authoritative. |
 | F4 | Both public node-validation overloads forward directly with settings/dialect. Primitive/object/array/null and nested error tokens retain caller identity where adaptation is unnecessary and never acquire synthetic source coordinates. |
 | F5 | Quoted boolean unions control additional-properties/items validation in all three dialects; literal strings survive. Invalid non-null recognized scalars throw instead of silently disappearing. |

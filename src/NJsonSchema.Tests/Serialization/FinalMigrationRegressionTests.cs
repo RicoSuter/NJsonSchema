@@ -281,6 +281,45 @@ public class FinalMigrationRegressionTests
         public bool IsValid(string value, JsonValueKind tokenType) => value == "expanded";
     }
 
+    [Fact]
+    public void F2_Default_struct_filter_does_not_invoke_parameterless_constructor()
+    {
+        // Arrange
+        var holder = new ConstructorStructHolder();
+        var constructorCalls = ConstructorStruct.ConstructorCalls;
+        var options = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault };
+        var expected = JsonSerializer.Serialize(holder, options);
+        var filteredOptions = new JsonSerializerOptions(options);
+        var converter = new SchemaSerializationConverter();
+        converter.IgnoreProperty(typeof(ConstructorStructHolder));
+        filteredOptions.Converters.Add(converter);
+
+        // Act
+        var actual = JsonSerializer.Serialize(holder, filteredOptions);
+
+        // Assert
+        Assert.True(JsonNode.DeepEquals(JsonNode.Parse(expected), JsonNode.Parse(actual)), actual);
+        Assert.Equal("{\"Initialized\":{\"Value\":42}}", actual);
+        Assert.Equal(constructorCalls, ConstructorStruct.ConstructorCalls);
+    }
+
+    public class ConstructorStructHolder
+    {
+        public ConstructorStruct Default { get; set; }
+        public ConstructorStruct Initialized { get; set; } = new();
+    }
+
+    public struct ConstructorStruct
+    {
+        public static int ConstructorCalls { get; private set; }
+        public int Value { get; set; }
+        public ConstructorStruct()
+        {
+            ConstructorCalls++;
+            Value = 42;
+        }
+    }
+
     public class UserSchema : JsonSchema
     {
         [JsonIgnore]

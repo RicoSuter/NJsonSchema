@@ -25,7 +25,7 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
-- Keep property converters scoped to their property when they delegate to the normal serializer, including converter factories and nullable properties. Respect explicit null/default serialization contracts and `HandleNull` without changing the operation's default omission policy.
+- Keep property converters scoped to their property when they delegate to the normal serializer, including converter factories and nullable properties. Respect explicit null/default serialization contracts and `HandleNull` without changing the operation's default omission policy. Default-value filtering uses zero-initialized struct values without invoking explicit parameterless constructors.
 - Preserve unknown keywords that collide with ignored core schema metadata (including inherited reference bookkeeping), while retaining explicit derived/user ignores and registered property ignores.
 - Forward both `JsonSchema.Validate(JsonNode)` overloads directly so ordinary error tokens retain caller identity and no source coordinates are invented. Customized string nodes use their serialized text for constraints, enum equality, and uniqueness, including converters that change a backing string.
 - Restore quoted `"true"`/`"false"` handling for `additionalProperties` and `additionalItems` across schema dialects. Invalid non-null scalar values for these schema-or-boolean keywords now throw instead of silently leaving the constraint absent; literal defaults, examples, and extension strings remain unchanged.

@@ -475,7 +475,8 @@ namespace NJsonSchema.Infrastructure
                         ((propValue == null && options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingNull) ||
                          (options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingDefault &&
                           (propValue == null || (property.PropertyType.IsValueType &&
-                           propValue.Equals(Activator.CreateInstance(property.PropertyType)))))))
+                           propValue.Equals(DefaultPropertyValues.GetOrAdd(property.PropertyType, static type =>
+                               Array.CreateInstance(type, 1).GetValue(0))))))))
                     {
                         continue;
                     }
@@ -553,6 +554,10 @@ namespace NJsonSchema.Infrastructure
 
                 writer.WriteEndObject();
             }
+
+            // Array elements are initialized to default(T), without invoking an explicit
+            // parameterless struct constructor as Activator.CreateInstance would.
+            private static readonly ConcurrentDictionary<Type, object?> DefaultPropertyValues = new();
 
             private static readonly ConcurrentDictionary<Type, Action<Utf8JsonWriter, object?, JsonConverter, JsonSerializerOptions>>
                 PropertyConverterWriters = new();
