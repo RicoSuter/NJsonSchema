@@ -54,9 +54,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     var value = _schema.Enumeration.ElementAt(i);
                     if (value != null)
                     {
+                        var literal = _schema.Type.IsInteger() ? ValueGeneratorBase.GetIntegerEnumLiteral(value) : value.ToString()!;
                         var name = _schema.EnumerationNames.Count > i
                             ? _schema.EnumerationNames[i]
-                            : _schema.Type.IsInteger() ? "_" + value : value.ToString()!;
+                            : _schema.Type.IsInteger() ? "_" + (_settings.EnumNameGenerator.GetType() == typeof(DefaultEnumNameGenerator) ? literal : value.ToString()) : value.ToString()!;
 
                         var description = _schema.EnumerationDescriptions.Count > i
                             ? _schema.EnumerationDescriptions[i]
@@ -66,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         {
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                             OriginalName = name,
-                            Value = _schema.Type.IsInteger() ? value.ToString()! : "\"" + value + "\"",
+                            Value = _schema.Type.IsInteger() ? literal : "\"" + value + "\"",
                             Description = description,
                         });
                     }

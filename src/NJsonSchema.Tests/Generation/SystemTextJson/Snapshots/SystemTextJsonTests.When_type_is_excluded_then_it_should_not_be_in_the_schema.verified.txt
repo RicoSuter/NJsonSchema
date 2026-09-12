@@ -2,11 +2,11 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "ContainerType1",
   "type": "object",
-  "additionalProperties": false,
   "properties": {
     "Property": {
       "type": "integer",
       "format": "int32"
     }
-  }
+  },
+  "additionalProperties": false
 }

@@ -850,8 +850,12 @@ namespace NJsonSchema.Generation
                 return true;
             }
 
+            var originalType = contextualType.OriginalType;
+            var isNewtonsoftToken = originalType.IsAssignableToTypeName("Newtonsoft.Json.Linq.JToken", TypeNameStyle.FullName);
+            var isNewtonsoftArray = originalType.IsAssignableToTypeName("Newtonsoft.Json.Linq.JArray", TypeNameStyle.FullName);
             if (!contextualType.OriginalType.IsAssignableToTypeName(nameof(JsonArray), TypeNameStyle.Name) &&
-                (contextualType.OriginalType.IsAssignableToTypeName(nameof(JsonNode), TypeNameStyle.Name) ||
+                ((isNewtonsoftToken && !isNewtonsoftArray) ||
+                 contextualType.OriginalType.IsAssignableToTypeName(nameof(JsonNode), TypeNameStyle.Name) ||
                  contextualType.OriginalType == typeof(object)))
             {
                 if (Settings.SchemaType == SchemaType.Swagger2)

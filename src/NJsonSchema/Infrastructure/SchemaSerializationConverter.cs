@@ -253,10 +253,10 @@ namespace NJsonSchema.Infrastructure
                     var renames = factory.GetMergedRenames(targetType);
                     foreach (var key in obj.Select(property => property.Key).ToArray())
                     {
-                        var originalName = renames?.FirstOrDefault(rename =>
-                            string.Equals(rename.Value, key, comparison)).Key ?? key;
-                        var effectiveName = renames?.FirstOrDefault(rename =>
-                            string.Equals(rename.Key, originalName, comparison)).Value ?? originalName;
+                        var originalName = renames?.FirstOrDefault(rename => rename.Value == key).Key ??
+                            renames?.FirstOrDefault(rename => string.Equals(rename.Value, key, comparison)).Key ?? key;
+                        var effectiveName = renames?.FirstOrDefault(rename => rename.Key == originalName).Value ??
+                            renames?.FirstOrDefault(rename => string.Equals(rename.Key, originalName, comparison)).Value ?? originalName;
                         var ignored = false;
                         for (var type = targetType; type != null; type = type.BaseType)
                         {
@@ -279,13 +279,15 @@ namespace NJsonSchema.Infrastructure
                     // the CLR property expects the original form.
                     if (renames != null)
                     {
-                        foreach (var kvp in renames)
+                        foreach (var key in obj.Select(property => property.Key).ToArray())
                         {
-                            if (obj.ContainsKey(kvp.Value) && !obj.ContainsKey(kvp.Key))
+                            var originalName = renames.FirstOrDefault(rename => rename.Value == key).Key ??
+                                renames.FirstOrDefault(rename => string.Equals(rename.Value, key, comparison)).Key;
+                            if (originalName != null && FindPropertyKey(obj, originalName, comparison) == null)
                             {
-                                var value = obj[kvp.Value];
-                                obj.Remove(kvp.Value);
-                                obj[kvp.Key] = value?.DeepClone();
+                                var value = obj[key];
+                                obj.Remove(key);
+                                obj[originalName] = value?.DeepClone();
                             }
                         }
                     }
@@ -299,7 +301,8 @@ namespace NJsonSchema.Infrastructure
                             continue;
                         }
 
-                        if (!obj.TryGetPropertyValue(propertyInfo.Name, out var child) || child == null)
+                        var propertyKey = FindPropertyKey(obj, propertyInfo.Name, comparison);
+                        if (propertyKey == null || obj[propertyKey] is not { } child)
                         {
                             continue;
                         }
@@ -314,6 +317,14 @@ namespace NJsonSchema.Infrastructure
                         ApplyTypedReverseRenames(item, targetType, factory, strippedOptions, visited);
                     }
                 }
+            }
+
+            private static string? FindPropertyKey(JsonObject obj, string name, StringComparison comparison)
+            {
+                // Preserve exact matches and original-name collision precedence.
+                return obj.ContainsKey(name) ? name : comparison == StringComparison.OrdinalIgnoreCase
+                    ? obj.Select(property => property.Key).FirstOrDefault(key => string.Equals(key, name, comparison))
+                    : null;
             }
 
             private static void RecurseInto(JsonNode? child, Type propertyType,

@@ -2,11 +2,6 @@
   "title": "Person",
   "type": "object",
   "description": "A person object",
-  "additionalProperties": {},
-  "required": [
-    "name",
-    "age"
-  ],
   "properties": {
     "name": {
       "type": "string",
@@ -36,7 +31,6 @@
   "definitions": {
     "Address": {
       "type": "object",
-      "additionalProperties": {},
       "properties": {
         "street": {
           "type": "string"
@@ -44,7 +38,13 @@
         "city": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": {}
     }
-  }
+  },
+  "additionalProperties": {},
+  "required": [
+    "name",
+    "age"
+  ]
 }

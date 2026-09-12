@@ -3037,50 +3037,46 @@
         "title": "Amount with Breakdown",
         "type": "object",
         "description": "The breakdown details for the amount. Includes the gross, tax, fee, and shipping amounts.",
-        "required": [
-          "gross_amount"
-        ],
         "properties": {
           "gross_amount": {
+            "readonly": true,
             "description": "The amount for this transaction.",
-            "$ref": "#/components/schemas/money",
-            "readOnly": true
+            "$ref": "#/components/schemas/money"
           },
           "total_item_amount": {
+            "readonly": true,
             "description": "The item total for the transaction.",
-            "$ref": "#/components/schemas/money",
-            "readOnly": true
+            "$ref": "#/components/schemas/money"
           },
           "fee_amount": {
+            "readonly": true,
             "description": "The fee details for the transaction.",
-            "$ref": "#/components/schemas/money",
-            "readOnly": true
+            "$ref": "#/components/schemas/money"
           },
           "shipping_amount": {
+            "readonly": true,
             "description": "The shipping amount for the transaction.",
-            "$ref": "#/components/schemas/money",
-            "readOnly": true
+            "$ref": "#/components/schemas/money"
           },
           "tax_amount": {
+            "readonly": true,
             "description": "The tax amount for the transaction.",
-            "$ref": "#/components/schemas/money",
-            "readOnly": true
+            "$ref": "#/components/schemas/money"
           },
           "net_amount": {
+            "readonly": true,
             "description": "The net amount that the payee receives for this transaction in their PayPal account. The net amount is computed as <code>gross_amount</code> minus the <code>paypal_fee</code>.",
-            "$ref": "#/components/schemas/money",
-            "readOnly": true
+            "$ref": "#/components/schemas/money"
           }
-        }
+        },
+        "required": [
+          "gross_amount"
+        ]
       },
       "application_context": {
         "title": "Application Context",
         "type": "object",
         "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
-        "required": [
-          "return_url",
-          "cancel_url"
-        ],
         "properties": {
           "brand_name": {
             "type": "string",
@@ -3168,7 +3164,11 @@
             "maxLength": 4000,
             "minLength": 10
           }
-        }
+        },
+        "required": [
+          "return_url",
+          "cancel_url"
+        ]
       },
       "authentication_response": {
         "title": "Authentication Response",
@@ -3187,11 +3187,6 @@
         "title": "Billing Cycle",
         "type": "object",
         "description": "The billing cycle details.",
-        "required": [
-          "frequency",
-          "tenure_type",
-          "sequence"
-        ],
         "properties": {
           "pricing_scheme": {
             "description": "The active pricing scheme for this billing cycle. A free trial billing cycle does not require a pricing scheme.",
@@ -3235,7 +3230,12 @@
             "maximum": 999,
             "minimum": 0
           }
-        }
+        },
+        "required": [
+          "frequency",
+          "tenure_type",
+          "sequence"
+        ]
       },
       "billing_cycle_list": {
         "type": "array",
@@ -3250,9 +3250,6 @@
         "title": "Billing Cycle Override",
         "type": "object",
         "description": "The billing cycle details to override at subscription level. The subscription billing cycle definition has to adhere to the plan billing cycle definition.",
-        "required": [
-          "sequence"
-        ],
         "properties": {
           "pricing_scheme": {
             "description": "The active pricing scheme for this billing cycle. A free trial billing cycle does not require a pricing scheme.",
@@ -3270,7 +3267,10 @@
             "maximum": 999,
             "minimum": 0
           }
-        }
+        },
+        "required": [
+          "sequence"
+        ]
       },
       "billing_cycle_override_list": {
         "type": "array",
@@ -3489,11 +3489,11 @@
           },
           "last_digits": {
             "type": "string",
+            "readonly": true,
             "description": "The last digits of the payment card.",
             "maxLength": 4,
             "minLength": 2,
-            "pattern": "[0-9]{2,}",
-            "readOnly": true
+            "pattern": "[0-9]{2,}"
           }
         }
       },
@@ -3510,14 +3510,14 @@
           },
           "last_digits": {
             "type": "string",
+            "readonly": true,
             "description": "The last digits of the payment card.",
-            "pattern": "[0-9]{2,}",
-            "readOnly": true
+            "pattern": "[0-9]{2,}"
           },
           "brand": {
+            "readonly": true,
             "description": "The card brand or network. Typically used in the response.",
-            "$ref": "#/components/schemas/card_brand",
-            "readOnly": true
+            "$ref": "#/components/schemas/card_brand"
           },
           "available_networks": {
             "$ref": "#/components/schemas/card_brand_list"
@@ -3562,9 +3562,6 @@
                 "title": "Portable Postal Address (Medium-Grained)",
                 "type": "object",
                 "description": "The portable international postal address. Maps to [AddressValidationMetadata](https://github.com/googlei18n/libaddressinput/wiki/AddressValidationMetadata) and HTML 5.1 [Autofilling form controls: the autocomplete attribute](https://www.w3.org/TR/html51/sec-forms.html#autofilling-form-controls-the-autocomplete-attribute).",
-                "required": [
-                  "country_code"
-                ],
                 "properties": {
                   "address_line_1": {
                     "type": "string",
@@ -3594,7 +3591,10 @@
                   "country_code": {
                     "$ref": "#/components/schemas/country_code"
                   }
-                }
+                },
+                "required": [
+                  "country_code"
+                ]
               },
               "expiry": {
                 "description": "The card expiration year and month, in [Internet date format](https://tools.ietf.org/html/rfc3339#section-5.6).",
@@ -3736,14 +3736,10 @@
         "title": "Billing Cycle Execution Details",
         "type": "object",
         "description": "The regular and trial execution details for a billing cycle.",
-        "required": [
-          "tenure_type",
-          "sequence",
-          "cycles_completed"
-        ],
         "properties": {
           "tenure_type": {
             "type": "string",
+            "readonly": true,
             "description": "The type of the billing cycle.",
             "maxLength": 24,
             "minLength": 1,
@@ -3761,8 +3757,7 @@
             "enum": [
               "REGULAR",
               "TRIAL"
-            ],
-            "readOnly": true
+            ]
           },
           "sequence": {
             "type": "integer",
@@ -3772,33 +3767,38 @@
           },
           "cycles_completed": {
             "type": "integer",
+            "readonly": true,
             "description": "The number of billing cycles that have completed.",
             "maximum": 9999,
-            "minimum": 0,
-            "readOnly": true
+            "minimum": 0
           },
           "cycles_remaining": {
             "type": "integer",
+            "readonly": true,
             "description": "For a finite billing cycle, cycles_remaining is the number of remaining cycles. For an infinite billing cycle, cycles_remaining is set as 0.",
             "maximum": 9999,
-            "minimum": 0,
-            "readOnly": true
+            "minimum": 0
           },
           "current_pricing_scheme_version": {
             "type": "integer",
+            "readonly": true,
             "description": "The active pricing scheme version for the billing cycle.",
             "maximum": 99,
-            "minimum": 1,
-            "readOnly": true
+            "minimum": 1
           },
           "total_cycles": {
             "type": "integer",
+            "readonly": true,
             "description": "The number of times this billing cycle gets executed. Trial billing cycles can only be executed a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>). Regular billing cycles can be executed infinite times (value of <code>0</code> for <code>total_cycles</code>) or a finite number of times (value between <code>1</code> and <code>999</code> for <code>total_cycles</code>).",
             "maximum": 999,
-            "minimum": 0,
-            "readOnly": true
+            "minimum": 0
           }
-        }
+        },
+        "required": [
+          "tenure_type",
+          "sequence",
+          "cycles_completed"
+        ]
       },
       "cycle_execution_list": {
         "type": "array",
@@ -4255,9 +4255,6 @@
         "title": "Error Details",
         "type": "object",
         "description": "The error details. Required for client-side `4XX` errors.",
-        "required": [
-          "issue"
-        ],
         "properties": {
           "field": {
             "type": "string",
@@ -4278,16 +4275,15 @@
             "type": "string",
             "description": "The human-readable description for an issue. The description can change over the lifetime of an API, so clients must not depend on this value."
           }
-        }
+        },
+        "required": [
+          "issue"
+        ]
       },
       "error_link_description": {
         "title": "Link Description",
         "type": "object",
         "description": "The request-related [HATEOAS link](/api/rest/responses/#hateoas-links) information.",
-        "required": [
-          "href",
-          "rel"
-        ],
         "properties": {
           "href": {
             "type": "string",
@@ -4317,7 +4313,11 @@
               "PATCH"
             ]
           }
-        }
+        },
+        "required": [
+          "href",
+          "rel"
+        ]
       },
       "error_location": {
         "type": "string",
@@ -4333,23 +4333,20 @@
         "title": "Failed Payment Details",
         "type": "object",
         "description": "The details for the failed payment of the subscription.",
-        "required": [
-          "amount",
-          "time"
-        ],
         "properties": {
           "amount": {
+            "readonly": true,
             "description": "The failed payment amount.",
-            "$ref": "#/components/schemas/money",
-            "readOnly": true
+            "$ref": "#/components/schemas/money"
           },
           "time": {
+            "readonly": true,
             "description": "The date and time when the failed payment was made, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           },
           "reason_code": {
             "type": "string",
+            "readonly": true,
             "description": "The reason code for the payment failure.",
             "maxLength": 120,
             "minLength": 1,
@@ -4397,23 +4394,23 @@
               "SENDING_LIMIT_EXCEEDED",
               "TRANSACTION_RECEIVING_LIMIT_EXCEEDED",
               "CURRENCY_MISMATCH"
-            ],
-            "readOnly": true
+            ]
           },
           "next_payment_retry_time": {
+            "readonly": true,
             "description": "The time when the retry attempt for the failed payment occurs, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           }
-        }
+        },
+        "required": [
+          "amount",
+          "time"
+        ]
       },
       "frequency": {
         "title": "Billing Cycle Frequency",
         "type": "object",
         "description": "The frequency of the billing cycle.",
-        "required": [
-          "interval_unit"
-        ],
         "properties": {
           "interval_unit": {
             "type": "string",
@@ -4453,7 +4450,10 @@
             "maximum": 365,
             "minimum": 1
           }
-        }
+        },
+        "required": [
+          "interval_unit"
+        ]
       },
       "language": {
         "type": "string",
@@ -4467,25 +4467,25 @@
         "title": "Last Payment Details",
         "type": "object",
         "description": "The details for the last payment.",
-        "required": [
-          "amount",
-          "time"
-        ],
         "allOf": [
           {
             "properties": {
               "amount": {
+                "readonly": true,
                 "description": "The last payment amount.",
-                "$ref": "#/components/schemas/money",
-                "readOnly": true
+                "$ref": "#/components/schemas/money"
               },
               "time": {
+                "readonly": true,
                 "description": "The date and time when the last payment was made, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-                "$ref": "#/components/schemas/date_time",
-                "readOnly": true
+                "$ref": "#/components/schemas/date_time"
               }
             }
           }
+        ],
+        "required": [
+          "amount",
+          "time"
         ]
       },
       "liability_shift": {
@@ -4518,10 +4518,6 @@
         "title": "Link Description",
         "type": "object",
         "description": "The request-related [HATEOAS link](/api/rest/responses/#hateoas-links) information.",
-        "required": [
-          "href",
-          "rel"
-        ],
         "properties": {
           "href": {
             "type": "string",
@@ -4545,7 +4541,11 @@
               "PATCH"
             ]
           }
-        }
+        },
+        "required": [
+          "href",
+          "rel"
+        ]
       },
       "link_description_list": {
         "type": "array",
@@ -4569,10 +4569,6 @@
         "title": "Money",
         "type": "object",
         "description": "The currency and amount for a financial transaction, such as a balance or payment due.",
-        "required": [
-          "currency_code",
-          "value"
-        ],
         "properties": {
           "currency_code": {
             "$ref": "#/components/schemas/currency_code"
@@ -4583,7 +4579,11 @@
             "maxLength": 32,
             "pattern": "^((-?[0-9]+)|(-?([0-9]+)?[.][0-9]+))$"
           }
-        }
+        },
+        "required": [
+          "currency_code",
+          "value"
+        ]
       },
       "name": {
         "title": "Name",
@@ -4677,9 +4677,6 @@
         "title": "Patch",
         "type": "object",
         "description": "The JSON patch object to apply partial updates to resources.",
-        "required": [
-          "op"
-        ],
         "properties": {
           "op": {
             "type": "string",
@@ -4731,7 +4728,10 @@
             "type": "string",
             "description": "The <a href=\"https://tools.ietf.org/html/rfc6901\">JSON Pointer</a> to the target document location from which to move the value. Required for the <code>move</code> operation."
           }
-        }
+        },
+        "required": [
+          "op"
+        ]
       },
       "patch_request": {
         "title": "Patch Request",
@@ -4774,9 +4774,9 @@
             "$ref": "#/components/schemas/email"
           },
           "payer_id": {
+            "readonly": true,
             "description": "The PayPal-assigned ID for the payer.",
-            "$ref": "#/components/schemas/account_id",
-            "readOnly": true
+            "$ref": "#/components/schemas/account_id"
           }
         }
       },
@@ -4914,9 +4914,6 @@
                 "title": "Portable Postal Address (Medium-Grained)",
                 "type": "object",
                 "description": "The portable international postal address. Maps to [AddressValidationMetadata](https://github.com/googlei18n/libaddressinput/wiki/AddressValidationMetadata) and HTML 5.1 [Autofilling form controls: the autocomplete attribute](https://www.w3.org/TR/html51/sec-forms.html#autofilling-form-controls-the-autocomplete-attribute).",
-                "required": [
-                  "country_code"
-                ],
                 "properties": {
                   "address_line_1": {
                     "type": "string",
@@ -4946,7 +4943,10 @@
                   "country_code": {
                     "$ref": "#/components/schemas/country_code"
                   }
-                }
+                },
+                "required": [
+                  "country_code"
+                ]
               },
               "attributes": {
                 "description": "Additional attributes associated with the use of this card.",
@@ -4988,9 +4988,6 @@
         "title": "Phone With Type",
         "type": "object",
         "description": "The phone information.",
-        "required": [
-          "phone_number"
-        ],
         "properties": {
           "phone_type": {
             "$ref": "#/components/schemas/phone_type"
@@ -4999,9 +4996,6 @@
             "title": "Phone",
             "type": "object",
             "description": "The phone number, in its canonical international [E.164 numbering plan format](https://www.itu.int/rec/T-REC-E.164/en).",
-            "required": [
-              "national_number"
-            ],
             "properties": {
               "national_number": {
                 "type": "string",
@@ -5010,9 +5004,15 @@
                 "minLength": 1,
                 "pattern": "^[0-9]{1,14}?$"
               }
-            }
+            },
+            "required": [
+              "national_number"
+            ]
           }
-        }
+        },
+        "required": [
+          "phone_number"
+        ]
       },
       "plan": {
         "title": "Plan",
@@ -5021,11 +5021,11 @@
         "properties": {
           "id": {
             "type": "string",
+            "readonly": true,
             "description": "The unique PayPal-generated ID for the plan.",
             "maxLength": 26,
             "minLength": 26,
-            "pattern": "^P-[A-Z0-9]*$",
-            "readOnly": true
+            "pattern": "^P-[A-Z0-9]*$"
           },
           "product_id": {
             "type": "string",
@@ -5089,14 +5089,14 @@
             "default": false
           },
           "create_time": {
+            "readonly": true,
             "description": "The date and time when the plan was created, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           },
           "update_time": {
+            "readonly": true,
             "description": "The date and time when the plan was last updated, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           },
           "links": {
             "$ref": "#/components/schemas/link_description_list"
@@ -5156,12 +5156,6 @@
         "title": "Create Plan Request",
         "type": "object",
         "description": "The create plan request details.",
-        "required": [
-          "name",
-          "billing_cycles",
-          "payment_preferences",
-          "product_id"
-        ],
         "properties": {
           "product_id": {
             "type": "string",
@@ -5225,7 +5219,13 @@
             "description": "Indicates whether you can subscribe to this plan by providing a quantity for the goods or service.",
             "default": false
           }
-        }
+        },
+        "required": [
+          "name",
+          "billing_cycles",
+          "payment_preferences",
+          "product_id"
+        ]
       },
       "plans.activate-422": {
         "properties": {
@@ -5838,10 +5838,10 @@
         "properties": {
           "version": {
             "type": "integer",
+            "readonly": true,
             "description": "The version of the pricing scheme.",
             "maximum": 999,
-            "minimum": 0,
-            "readOnly": true
+            "minimum": 0
           },
           "fixed_price": {
             "description": "The fixed amount to charge for the subscription. The changes to fixed amount are applicable to both existing and future subscriptions. For existing subscriptions, payments within 10 days of price change are not affected.",
@@ -5872,14 +5872,14 @@
             "$ref": "#/components/schemas/pricing_tier_list"
           },
           "create_time": {
+            "readonly": true,
             "description": "The date and time when this pricing scheme was created, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           },
           "update_time": {
+            "readonly": true,
             "description": "The date and time when this pricing scheme was last updated, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           }
         }
       },
@@ -5887,10 +5887,6 @@
         "title": "Pricing Tier",
         "type": "object",
         "description": "The pricing tier details.",
-        "required": [
-          "starting_quantity",
-          "amount"
-        ],
         "properties": {
           "starting_quantity": {
             "type": "string",
@@ -5910,7 +5906,11 @@
             "description": "The pricing amount for the tier.",
             "$ref": "#/components/schemas/money"
           }
-        }
+        },
+        "required": [
+          "starting_quantity",
+          "amount"
+        ]
       },
       "pricing_tier_list": {
         "type": "array",
@@ -5993,9 +5993,6 @@
             "title": "Portable Postal Address (Medium-Grained)",
             "type": "object",
             "description": "The portable international postal address. Maps to [AddressValidationMetadata](https://github.com/googlei18n/libaddressinput/wiki/AddressValidationMetadata) and HTML 5.1 [Autofilling form controls: the autocomplete attribute](https://www.w3.org/TR/html51/sec-forms.html#autofilling-form-controls-the-autocomplete-attribute).",
-            "required": [
-              "country_code"
-            ],
             "properties": {
               "address_line_1": {
                 "type": "string",
@@ -6025,7 +6022,10 @@
               "country_code": {
                 "$ref": "#/components/schemas/country_code"
               }
-            }
+            },
+            "required": [
+              "country_code"
+            ]
           }
         }
       },
@@ -6033,11 +6033,6 @@
         "title": "Shipping Option",
         "type": "object",
         "description": "The options that the payee or merchant offers to the payer to ship or pick up their items.",
-        "required": [
-          "id",
-          "label",
-          "selected"
-        ],
         "properties": {
           "id": {
             "type": "string",
@@ -6061,7 +6056,12 @@
             "type": "boolean",
             "description": "If the API request sets `selected = true`, it represents the shipping option that the payee or merchant expects to be pre-selected for the payer when they first view the `shipping.options` in the PayPal Checkout experience. As part of the response if a `shipping.option` contains `selected=true`, it represents the shipping option that the payer selected during the course of checkout with PayPal. Only one `shipping.option` can be set to `selected=true`."
           }
-        }
+        },
+        "required": [
+          "id",
+          "label",
+          "selected"
+        ]
       },
       "shipping_option_list": {
         "type": "array",
@@ -6233,10 +6233,10 @@
             "properties": {
               "id": {
                 "type": "string",
+                "readonly": true,
                 "description": "The PayPal-generated ID for the subscription.",
                 "maxLength": 50,
-                "minLength": 3,
-                "readOnly": true
+                "minLength": 3
               },
               "plan_id": {
                 "type": "string",
@@ -6261,16 +6261,16 @@
                 "$ref": "#/components/schemas/subscriber"
               },
               "billing_info": {
-                "$ref": "#/components/schemas/subscription_billing_info",
-                "readOnly": true
+                "readonly": true,
+                "$ref": "#/components/schemas/subscription_billing_info"
               },
               "create_time": {
-                "$ref": "#/components/schemas/date_time",
-                "readOnly": true
+                "readonly": true,
+                "$ref": "#/components/schemas/date_time"
               },
               "update_time": {
-                "$ref": "#/components/schemas/date_time",
-                "readOnly": true
+                "readonly": true,
+                "$ref": "#/components/schemas/date_time"
               },
               "custom_id": {
                 "type": "string",
@@ -6281,8 +6281,8 @@
               },
               "plan_overridden": {
                 "type": "boolean",
-                "description": "Indicates whether the subscription has overridden any plan attributes.",
-                "readOnly": true
+                "readonly": true,
+                "description": "Indicates whether the subscription has overridden any plan attributes."
               },
               "plan": {
                 "title": "Plan",
@@ -6356,10 +6356,6 @@
         "title": "Subscription Billing Information",
         "type": "object",
         "description": "The billing details for the subscription. If the subscription was or is active, these fields are populated.",
-        "required": [
-          "outstanding_balance",
-          "failed_payments_count"
-        ],
         "properties": {
           "outstanding_balance": {
             "description": "The total pending bill amount, to be paid by the subscriber.",
@@ -6369,41 +6365,42 @@
             "$ref": "#/components/schemas/cycle_execution_list"
           },
           "last_payment": {
+            "readonly": true,
             "description": "The details for the last payment of the subscription.",
-            "$ref": "#/components/schemas/last_payment_details",
-            "readOnly": true
+            "$ref": "#/components/schemas/last_payment_details"
           },
           "next_billing_time": {
+            "readonly": true,
             "description": "The next date and time for billing this subscription, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           },
           "final_payment_time": {
+            "readonly": true,
             "description": "The date and time when the final billing cycle occurs, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           },
           "failed_payments_count": {
             "type": "integer",
+            "readonly": true,
             "description": "The number of consecutive payment failures. Resets to `0` after a successful payment. If this reaches the `payment_failure_threshold` value, the subscription updates to the `SUSPENDED` state.",
             "maximum": 999,
-            "minimum": 0,
-            "readOnly": true
+            "minimum": 0
           },
           "last_failed_payment": {
+            "readonly": true,
             "description": "The details for the last failed payment of the subscription.",
-            "$ref": "#/components/schemas/failed_payment_details",
-            "readOnly": true
+            "$ref": "#/components/schemas/failed_payment_details"
           }
-        }
+        },
+        "required": [
+          "outstanding_balance",
+          "failed_payments_count"
+        ]
       },
       "subscription_cancel_request": {
         "title": "Cancel Subscription Request",
         "type": "object",
         "description": "The cancel subscription request details.",
-        "required": [
-          "reason"
-        ],
         "properties": {
           "reason": {
             "type": "string",
@@ -6412,17 +6409,15 @@
             "minLength": 1,
             "pattern": "^.*$"
           }
-        }
+        },
+        "required": [
+          "reason"
+        ]
       },
       "subscription_capture_request": {
         "title": "Charge Amount from Subscriber",
         "type": "object",
         "description": "The charge amount from the subscriber.",
-        "required": [
-          "note",
-          "capture_type",
-          "amount"
-        ],
         "properties": {
           "note": {
             "type": "string",
@@ -6451,15 +6446,17 @@
             "description": "The amount of the outstanding balance. This value cannot be greater than the current outstanding balance amount.",
             "$ref": "#/components/schemas/money"
           }
-        }
+        },
+        "required": [
+          "note",
+          "capture_type",
+          "amount"
+        ]
       },
       "subscription_request_post": {
         "title": "Create Subscription Request",
         "type": "object",
         "description": "The create subscription request details.",
-        "required": [
-          "plan_id"
-        ],
         "properties": {
           "plan_id": {
             "type": "string",
@@ -6511,7 +6508,10 @@
             "description": "Merchant's inventory identifier details for the WPS hosted button.",
             "$ref": "#/components/schemas/merchant_inventory"
           }
-        }
+        },
+        "required": [
+          "plan_id"
+        ]
       },
       "subscription_revise_request": {
         "title": "Subscription Modify Plan Request",
@@ -6544,10 +6544,6 @@
             "title": "Application Context",
             "type": "object",
             "description": "The application context, which customizes the payer experience during the subscription approval process with PayPal.",
-            "required": [
-              "return_url",
-              "cancel_url"
-            ],
             "properties": {
               "brand_name": {
                 "type": "string",
@@ -6612,7 +6608,11 @@
                 "maxLength": 4000,
                 "minLength": 10
               }
-            }
+            },
+            "required": [
+              "return_url",
+              "cancel_url"
+            ]
           },
           "plan": {
             "description": "An inline plan object to customise the subscription. You can override plan level default attributes by providing customised values for the subscription in this object. Any existing overrides will not be carried forward during subscription revise.",
@@ -6653,8 +6653,8 @@
           },
           "plan_overridden": {
             "type": "boolean",
-            "description": "Indicates whether the subscription has overridden any plan attributes.",
-            "readOnly": true
+            "readonly": true,
+            "description": "Indicates whether the subscription has overridden any plan attributes."
           },
           "links": {
             "$ref": "#/components/schemas/subscription_revise_response_definitions-link_description_list"
@@ -6723,8 +6723,8 @@
             "pattern": "^.*$"
           },
           "status_update_time": {
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "readonly": true,
+            "$ref": "#/components/schemas/date_time"
           }
         }
       },
@@ -6732,9 +6732,6 @@
         "title": "Suspend Subscription",
         "type": "object",
         "description": "The suspend subscription request details.",
-        "required": [
-          "reason"
-        ],
         "properties": {
           "reason": {
             "type": "string",
@@ -6743,7 +6740,10 @@
             "minLength": 1,
             "pattern": "^.*$"
           }
-        }
+        },
+        "required": [
+          "reason"
+        ]
       },
       "subscriptions.activate-400": {
         "properties": {
@@ -8523,9 +8523,6 @@
         "title": "Taxes",
         "type": "object",
         "description": "The tax details.",
-        "required": [
-          "percentage"
-        ],
         "properties": {
           "percentage": {
             "description": "The tax percentage on the billing amount.",
@@ -8536,7 +8533,10 @@
             "description": "Indicates whether the tax was already included in the billing amount.",
             "default": true
           }
-        }
+        },
+        "required": [
+          "percentage"
+        ]
       },
       "taxes_override": {
         "title": "Taxes Override",
@@ -8572,15 +8572,11 @@
         "title": "Transaction Details",
         "type": "object",
         "description": "The transaction details.",
-        "required": [
-          "id",
-          "amount_with_breakdown",
-          "time"
-        ],
         "properties": {
           "status": {
             "title": "Capture Status",
             "type": "string",
+            "readonly": true,
             "description": "The status of the captured payment.",
             "x-enumDescriptions": [
               {
@@ -8615,35 +8611,39 @@
               "PENDING",
               "REFUNDED",
               "FAILED"
-            ],
-            "readOnly": true
+            ]
           },
           "id": {
             "type": "string",
+            "readonly": true,
             "description": "The PayPal-generated transaction ID.",
             "maxLength": 50,
-            "minLength": 3,
-            "readOnly": true
+            "minLength": 3
           },
           "amount_with_breakdown": {
             "$ref": "#/components/schemas/amount_with_breakdown"
           },
           "payer_name": {
+            "readonly": true,
             "description": "The name of the customer.",
-            "$ref": "#/components/schemas/name",
-            "readOnly": true
+            "$ref": "#/components/schemas/name"
           },
           "payer_email": {
+            "readonly": true,
             "description": "The email ID of the customer.",
-            "$ref": "#/components/schemas/email_address",
-            "readOnly": true
+            "$ref": "#/components/schemas/email_address"
           },
           "time": {
+            "readonly": true,
             "description": "The date and time when the transaction was processed, in [Internet date and time format](https://tools.ietf.org/html/rfc3339#section-5.6).",
-            "$ref": "#/components/schemas/date_time",
-            "readOnly": true
+            "$ref": "#/components/schemas/date_time"
           }
-        }
+        },
+        "required": [
+          "id",
+          "amount_with_breakdown",
+          "time"
+        ]
       },
       "transaction_list": {
         "type": "array",
@@ -8682,10 +8682,6 @@
         "title": "Update Pricing Scheme",
         "type": "object",
         "description": "The update pricing scheme request details.",
-        "required": [
-          "billing_cycle_sequence",
-          "pricing_scheme"
-        ],
         "properties": {
           "billing_cycle_sequence": {
             "type": "integer",
@@ -8696,7 +8692,11 @@
           "pricing_scheme": {
             "$ref": "#/components/schemas/pricing_scheme"
           }
-        }
+        },
+        "required": [
+          "billing_cycle_sequence",
+          "pricing_scheme"
+        ]
       },
       "update_pricing_scheme_request_list": {
         "type": "array",
@@ -8711,14 +8711,14 @@
         "title": "Update Pricing Scheme Request",
         "type": "object",
         "description": "The update pricing scheme request details.",
-        "required": [
-          "pricing_schemes"
-        ],
         "properties": {
           "pricing_schemes": {
             "$ref": "#/components/schemas/update_pricing_scheme_request_list"
           }
-        }
+        },
+        "required": [
+          "pricing_schemes"
+        ]
       },
       "vault_instruction_base": {
         "title": "Vault Instruction Base",

@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
+using System.Text.Json.Nodes;
+using NJsonSchema.Infrastructure;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.CodeGeneration
@@ -96,12 +98,28 @@ namespace NJsonSchema.CodeGeneration
         {
             var typeName = typeResolver.Resolve(actualSchema, false, typeNameHint);
 
-            var index = actualSchema.Enumeration.IndexOf(schema.Default);
+            var defaultNode = JsonValueComparer.ToNode(schema.Default);
+            var index = -1;
+            var enumValue = schema.Default;
+            var candidateIndex = 0;
+            foreach (var candidate in actualSchema.Enumeration)
+            {
+                if (JsonValueComparer.Instance.Equals(JsonValueComparer.ToNode(candidate), defaultNode))
+                {
+                    index = candidateIndex;
+                    enumValue = candidate;
+                    break;
+                }
+                candidateIndex++;
+            }
             var enumName = index >= 0 && actualSchema.EnumerationNames?.Count > index
                 ? actualSchema.EnumerationNames[index]
-                : schema.Default?.ToString();
+                : actualSchema.Type.IsInteger() && enumValue != null
+                    ? "_" + (_settings.EnumNameGenerator.GetType() == typeof(DefaultEnumNameGenerator)
+                        ? GetIntegerEnumLiteral(enumValue) : enumValue.ToString())
+                    : enumValue?.ToString();
 
-            return typeName.Trim('?') + "." + _settings.EnumNameGenerator.Generate(index, enumName, schema.Default, actualSchema);
+            return typeName.Trim('?') + "." + _settings.EnumNameGenerator.Generate(index, enumName, enumValue, actualSchema);
         }
 
         /// <summary>Gets the default value as string literal.</summary>
@@ -121,6 +139,20 @@ namespace NJsonSchema.CodeGeneration
         protected string ConvertNumberToString(object value)
 #pragma warning restore CA1822
         {
+            return ConvertToNumberToStringCore(value);
+        }
+
+        internal static string GetIntegerEnumLiteral(object value)
+        {
+            // Bound expansion to the largest supported native integer spelling. Never round
+            // retained JSON numbers through floating point when generating enum constants.
+            if (JsonValueComparer.ToNode(value) is JsonValue node &&
+                JsonNumber.TryCreate(node, out var number) &&
+                number!.TryGetIntegerLiteral(20, out var literal))
+            {
+                return literal!;
+            }
+
             return ConvertToNumberToStringCore(value);
         }
 

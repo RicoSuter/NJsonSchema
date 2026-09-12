@@ -27,32 +27,21 @@ public class LenientJsonTests
         Assert.DoesNotContain(' ', result);
     }
 
-    [Fact]
-    public void Converts_stringified_true_to_bool_true()
+    [Theory]
+    [InlineData("true", true)]
+    [InlineData("false", false)]
+    public async Task Quoted_booleans_are_preserved_by_syntax_recovery_and_read_by_typed_schema(string literal, bool expected)
     {
         // Arrange
-        var input = "{ \"readOnly\": \"true\" }";
+        var input = "{ \"readOnly\": \"" + literal + "\" }";
 
         // Act
         var result = Fix(input);
+        var schema = await JsonSchema.FromJsonAsync("{\"properties\":{\"value\":" + input + "}}");
 
         // Assert
-        Assert.Contains(": true", result);
-        Assert.DoesNotContain("\"true\"", result);
-    }
-
-    [Fact]
-    public void Converts_stringified_false_to_bool_false()
-    {
-        // Arrange
-        var input = "{ \"readOnly\": \"false\" }";
-
-        // Act
-        var result = Fix(input);
-
-        // Assert
-        Assert.Contains(": false", result);
-        Assert.DoesNotContain("\"false\"", result);
+        Assert.Equal(input, result);
+        Assert.Equal(expected, schema.Properties["value"].IsReadOnly);
     }
 
     [Fact]
@@ -154,7 +143,7 @@ public class LenientJsonTests
 
         // Assert
         Assert.Equal("bar", root.GetProperty("foo").GetString());
-        Assert.True(root.GetProperty("readOnly").GetBoolean());
+        Assert.Equal("true", root.GetProperty("readOnly").GetString());
         Assert.Equal("qux", root.GetProperty("baz").GetString());
     }
 }

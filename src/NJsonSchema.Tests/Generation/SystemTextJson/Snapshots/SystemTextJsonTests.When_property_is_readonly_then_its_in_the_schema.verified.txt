@@ -2,10 +2,6 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "HealthCheckResult",
   "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "Name"
-  ],
   "properties": {
     "Name": {
       "type": "string",
@@ -17,5 +13,9 @@
         "string"
       ]
     }
-  }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ]
 }

@@ -32,6 +32,23 @@ namespace NJsonSchema.Infrastructure
                     return;
                 }
 
+                // The core Name and Parent bookkeeping members are not wire keywords.
+                // Preserve their legacy extension-data spellings without removing ignored
+                // members declared by user-defined schema types.
+                if (typeof(JsonSchema).IsAssignableFrom(typeInfo.Type))
+                {
+                    for (var i = typeInfo.Properties.Count - 1; i >= 0; i--)
+                    {
+                        if (typeInfo.Properties[i].AttributeProvider is PropertyInfo member &&
+                            (member.DeclaringType == typeof(JsonSchema) || member.DeclaringType == typeof(JsonSchemaProperty)) &&
+                            (member.Name == nameof(JsonSchemaProperty.Name) || member.Name == nameof(JsonSchema.Parent)) &&
+                            member.GetCustomAttribute<JsonIgnoreAttribute>()?.Condition == JsonIgnoreCondition.Always)
+                        {
+                            typeInfo.Properties.RemoveAt(i);
+                        }
+                    }
+                }
+
                 foreach (var property in typeInfo.Properties)
                 {
                     if (property.ObjectCreationHandling != null || property.Set != null)
@@ -228,6 +245,7 @@ namespace NJsonSchema.Infrastructure
             var options = new JsonSerializerOptions
             {
                 WriteIndented = writeIndented,
+                PropertyNameCaseInsensitive = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 MaxDepth = 128,
                 AllowTrailingCommas = true,

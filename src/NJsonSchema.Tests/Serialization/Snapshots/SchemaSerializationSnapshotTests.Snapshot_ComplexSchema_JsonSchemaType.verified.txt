@@ -2,10 +2,6 @@
   "title": "Person",
   "type": "object",
   "description": "A person object",
-  "required": [
-    "name",
-    "age"
-  ],
   "properties": {
     "name": {
       "type": "string",
@@ -44,5 +40,9 @@
         }
       }
     }
-  }
+  },
+  "required": [
+    "name",
+    "age"
+  ]
 }

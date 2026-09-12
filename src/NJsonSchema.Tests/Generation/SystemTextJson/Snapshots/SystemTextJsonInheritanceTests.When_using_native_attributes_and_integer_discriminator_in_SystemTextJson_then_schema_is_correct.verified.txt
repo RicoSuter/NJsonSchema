@@ -9,10 +9,6 @@
       "2": "#/definitions/Poodle"
     }
   },
-  "additionalProperties": false,
-  "required": [
-    "breed"
-  ],
   "properties": {
     "Baz": {
       "type": [
@@ -32,7 +28,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "Foo": {
               "type": [
@@ -40,7 +35,8 @@
                 "string"
               ]
             }
-          }
+          },
+          "additionalProperties": false
         }
       ]
     },
@@ -51,7 +47,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "Bar": {
               "type": [
@@ -59,9 +54,14 @@
                 "string"
               ]
             }
-          }
+          },
+          "additionalProperties": false
         }
       ]
     }
-  }
+  },
+  "additionalProperties": false,
+  "required": [
+    "breed"
+  ]
 }

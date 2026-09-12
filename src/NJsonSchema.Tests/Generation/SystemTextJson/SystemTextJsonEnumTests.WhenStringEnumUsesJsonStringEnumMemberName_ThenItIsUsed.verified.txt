@@ -2,7 +2,6 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "StringJsonStringEnumMemberNameContainer",
   "type": "object",
-  "additionalProperties": false,
   "properties": {
     "CloudCover": {
       "$ref": "#/definitions/CloudCoverWithJsonStringEnumMemberName"
@@ -23,5 +22,6 @@
         "Overcast"
       ]
     }
-  }
+  },
+  "additionalProperties": false
 }

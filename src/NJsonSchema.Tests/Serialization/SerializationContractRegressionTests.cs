@@ -10,6 +10,118 @@ namespace NJsonSchema.Tests.Serialization;
 
 public class SerializationContractRegressionTests
 {
+    [Fact]
+    public void Derived_schema_json_ignore_still_owns_its_input_contract()
+    {
+        // Arrange
+        const string json = """{"Secret":{"incompatible":true}}""";
+
+        // Act
+        var schema = JsonSchemaSerialization.FromJson<IgnoredDerivedSchema>(json, JsonSchema.CreateSchemaSerializationConverter(SchemaType.JsonSchema))!;
+
+        // Assert
+        Assert.Equal("kept", schema.Secret);
+        Assert.True(schema.ExtensionData == null || !schema.ExtensionData.ContainsKey("Secret"));
+        Assert.Null(JsonNode.Parse(schema.ToJson())!["Secret"]);
+    }
+
+    public class IgnoredDerivedSchema : JsonSchema
+    {
+        [JsonIgnore]
+        public string Secret { get; set; } = "kept";
+    }
+
+    [Fact]
+    public async Task Unknown_schema_keys_do_not_bind_to_ignored_clr_metadata()
+    {
+        // Arrange
+        const string json = """{"properties":{"bar":{"name":{"type":"string"},"parent":{"type":"integer"}}}}""";
+
+        // Act
+        var schema = await JsonSchema.FromJsonAsync(json);
+        var output = JsonNode.Parse(schema.ToJson())!;
+
+        // Assert
+        Assert.Equal("bar", schema.Properties["bar"].Name);
+        Assert.Same(schema, schema.Properties["bar"].Parent);
+        Assert.Equal("string", output["properties"]!["bar"]!["name"]!["type"]!.GetValue<string>());
+        Assert.Equal("integer", output["properties"]!["bar"]!["parent"]!["type"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public void Exact_reverse_aliases_win_before_case_insensitive_aliases()
+    {
+        // Arrange
+        var converter = new SchemaSerializationConverter();
+        converter.RenameProperty(typeof(AliasHolder), "First", "Alias");
+        converter.RenameProperty(typeof(AliasHolder), "Second", "alias");
+
+        // Act
+        var result = JsonSchemaSerialization.FromJson<AliasHolder>("""{"alias":2}""", converter)!;
+
+        // Assert
+        Assert.Equal(0, result.First);
+        Assert.Equal(2, result.Second);
+    }
+
+    public class AliasHolder
+    {
+        public int First { get; set; }
+        public int Second { get; set; }
+    }
+
+    [Theory]
+    [InlineData(true, 9)]
+    [InlineData(false, 7)]
+    public void Reverse_renames_follow_the_active_case_policy(bool insensitive, int expected)
+    {
+        // Arrange
+        var converter = new SchemaSerializationConverter();
+        converter.RenameProperty(typeof(IgnoredHolder), "secret", "wire_secret");
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = insensitive };
+        options.Converters.Add(converter);
+
+        // Act
+        var result = JsonSerializer.Deserialize<IgnoredHolder>("""{"WIRE_SECRET":9}""", options)!;
+        var collision = JsonSerializer.Deserialize<IgnoredHolder>("""{"secret":3,"wire_secret":9}""", options)!;
+
+        // Assert
+        Assert.Equal(expected, result.Secret);
+        Assert.Equal(3, collision.Secret);
+        Assert.Equal(9, ((JsonElement)collision.ExtensionData!["wire_secret"]).GetInt32());
+    }
+
+    [Theory]
+    [InlineData(SchemaType.JsonSchema)]
+    [InlineData(SchemaType.Swagger2)]
+    [InlineData(SchemaType.OpenApi3)]
+    public void Schema_member_matching_preserves_dictionary_and_vendor_key_case(SchemaType dialect)
+    {
+        foreach (var spelling in new[] { "readOnly", "readonly", "READONLY" })
+        {
+            // Arrange
+            var json = $$$$"""{"TYPE":"object","PROPERTIES":{"values":{"type":"object","{{{{spelling}}}}":true,"ADDITIONALPROPERTIES":{"type":"string"}},"Foo":{"type":"string","{{{{spelling}}}}":true},"foo":{"type":"string"}},"x-payload":{"Foo":1,"foo":2,"READONLY":"true"}}""";
+
+            // Act
+            var schema = JsonSchemaSerialization.FromJson<JsonSchema>(json, JsonSchema.CreateSchemaSerializationConverter(dialect))!;
+
+            // Assert
+            Assert.True(schema.Properties["values"].IsReadOnly);
+            Assert.Equal(JsonObjectType.String, schema.Properties["values"].AdditionalPropertiesSchema!.Type);
+            Assert.True(schema.Properties["Foo"].IsReadOnly);
+            Assert.False(schema.Properties["foo"].IsReadOnly);
+            var wire = JsonNode.Parse(JsonSchemaSerialization.ToJson(schema, dialect, JsonSchema.CreateSchemaSerializationConverter(dialect), false))!;
+            var outputName = dialect == SchemaType.JsonSchema ? "readonly" : "readOnly";
+            Assert.True(wire["properties"]!["values"]![outputName]!.GetValue<bool>());
+            Assert.Null(wire["properties"]!["values"]!["x-readOnly"]);
+            Assert.True(schema.Properties["values"].ExtensionData == null || !schema.Properties["values"].ExtensionData!.ContainsKey(spelling));
+            var payload = JsonSerializer.SerializeToNode(schema.ExtensionData!["x-payload"])!;
+            Assert.Equal(1, payload["Foo"]!.GetValue<int>());
+            Assert.Equal(2, payload["foo"]!.GetValue<int>());
+            Assert.Equal("true", payload["READONLY"]!.GetValue<string>());
+        }
+    }
+
     [Theory]
     [InlineData(SchemaType.JsonSchema)]
     [InlineData(SchemaType.Swagger2)]

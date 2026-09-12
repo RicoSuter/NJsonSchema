@@ -25,6 +25,10 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
+- Restore case-insensitive schema member input (including readonly declarations) without folding dictionary or vendor-extension keys. Restore free-form Newtonsoft `JObject`/`JToken` generation, preserving explicit type mappers and array handling.
+
+- Generate integral enum constants and default member names from exact JSON numeric values, including decimal and exponent spellings and metadata flags. Match enum defaults by JSON equality and reuse declaration inputs for custom enum-name generators. This also repairs preexisting mixed-numeric default lookup mismatches; large C# integer values remain exact, while TypeScript retains JavaScript Number semantics.
+
 - Preserve supported single-quoted and unquoted-key schema inputs without changing literal strings, escaped text, or non-breaking spaces within values. Coerce quoted booleans only through typed serialization contracts, preserve custom converter precedence, and parse quoted exclusive bounds invariantly instead of silently discarding them.
 
 - Restore XML metadata deserialization, property converter precedence (including discriminator mappings), ignored-input filtering, and derived schema members in base-typed containers. Filtered serialization preserves runtime metadata customizations and explicit converter contracts.
