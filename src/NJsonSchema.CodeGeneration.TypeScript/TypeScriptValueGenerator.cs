@@ -14,9 +14,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private readonly List<string> _supportedFormatStrings =
         [
             JsonFormatStrings.Uri,
-            JsonFormatStrings.Guid,
+            JsonFormatStrings.Uuid,
 #pragma warning disable CS0618 // Type or member is obsolete
-            JsonFormatStrings.Uuid
+            JsonFormatStrings.Guid
 #pragma warning restore CS0618 // Type or member is obsolete
         ];
 
