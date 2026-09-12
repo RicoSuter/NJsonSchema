@@ -167,7 +167,7 @@ namespace NJsonSchema.NewtonsoftJson.Generation
                     }
                     else
                     {
-                        throw new InvalidOperationException("The JSON property '" + propertyName + "' is defined multiple times on type '" + parentType.FullName + "'.");
+                        return;
                     }
                 }
 

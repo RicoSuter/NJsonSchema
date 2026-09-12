@@ -129,7 +129,7 @@ namespace NJsonSchema.CodeGeneration.Tests.Samples
             var value = data["SimpleDate"].Value<string>(); // not original format
 
             // Act
-            var errors = schema.Validate(data);
+            var errors = schema.Validate(data.ToString());
 
             // Assert
             Assert.Empty(errors);

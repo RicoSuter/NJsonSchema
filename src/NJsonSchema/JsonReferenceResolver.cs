@@ -8,20 +8,32 @@
 
 using System.Collections;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Namotion.Reflection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
+using System.Text.Json.Nodes;
 
 namespace NJsonSchema
 {
     /// <summary>Resolves JSON Pointer references.</summary>
     public class JsonReferenceResolver
     {
-        private static readonly List<ContextualAccessorInfo> JsonSchemaContextualAccessors = typeof(JsonSchema).GetContextualAccessors()
-            .Where(p => !p.IsAttributeDefined<JsonIgnoreAttribute>(inherit: true))
+        private static readonly List<ContextualAccessorInfo> JsonSchemaContextualAccessors = typeof(JsonSchema)
+            .GetContextualAccessors()
+            .Where(p =>
+            {
+                if (p.MemberInfo is PropertyInfo propertyInfo && propertyInfo.GetMethod?.IsStatic == true)
+                {
+                    return false;
+                }
+
+                var jsonIgnoreAttribute = p.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>();
+                return jsonIgnoreAttribute == null || jsonIgnoreAttribute.Condition != JsonIgnoreCondition.Always;
+            })
             .ToList();
 
         private readonly JsonSchemaAppender _schemaAppender;
@@ -59,30 +71,28 @@ namespace NJsonSchema
         /// <param name="rootObject">The root object.</param>
         /// <param name="jsonPath">The JSON path.</param>
         /// <param name="targetType">The target type to resolve.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
         public async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType,
-                IContractResolver contractResolver, CancellationToken cancellationToken = default)
+                CancellationToken cancellationToken = default)
         {
-            return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, true, cancellationToken).ConfigureAwait(false);
+            return await ResolveReferenceAsync(rootObject, jsonPath, targetType, true, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Gets the object from the given JSON path.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="jsonPath">The JSON path.</param>
         /// <param name="targetType">The target type to resolve.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The JSON Schema or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
         /// <exception cref="NotSupportedException">Could not resolve the JSON path.</exception>
         public async Task<IJsonReference> ResolveReferenceWithoutAppendAsync(object rootObject, string jsonPath, Type targetType,
-                IContractResolver contractResolver, CancellationToken cancellationToken = default)
+                CancellationToken cancellationToken = default)
         {
-            return await ResolveReferenceAsync(rootObject, jsonPath, targetType, contractResolver, false, cancellationToken).ConfigureAwait(false);
+            return await ResolveReferenceAsync(rootObject, jsonPath, targetType, false, cancellationToken).ConfigureAwait(false);
         }
 
         private static string UnescapeReferenceSegment(string segment)
@@ -95,10 +105,9 @@ namespace NJsonSchema
         /// <param name="rootObject">The root object.</param>
         /// <param name="jsonPath">The JSON path to resolve.</param>
         /// <param name="targetType">The target type to resolve.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The resolved JSON Schema.</returns>
         /// <exception cref="InvalidOperationException">Could not resolve the JSON path.</exception>
-        public virtual IJsonReference ResolveDocumentReference(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver)
+        public virtual IJsonReference ResolveDocumentReference(object rootObject, string jsonPath, Type targetType)
         {
             var allSegments = jsonPath.Split('/').Skip(1).ToList();
             for (var i = 0; i < allSegments.Count; i++)
@@ -106,7 +115,7 @@ namespace NJsonSchema
                 allSegments[i] = UnescapeReferenceSegment(allSegments[i]);
             }
 
-            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, contractResolver, [])
+            var schema = ResolveDocumentReference(rootObject, allSegments, targetType, new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance))
                          ?? throw new InvalidOperationException($"Could not resolve the path '{jsonPath}'.");
 
             return schema;
@@ -131,7 +140,7 @@ namespace NJsonSchema
             return await JsonSchema.FromUrlAsync(url, schema => this, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType, IContractResolver contractResolver, bool append, CancellationToken cancellationToken = default)
+        private async Task<IJsonReference> ResolveReferenceAsync(object rootObject, string jsonPath, Type targetType, bool append, CancellationToken cancellationToken = default)
         {
             if (jsonPath == "#")
             {
@@ -144,11 +153,11 @@ namespace NJsonSchema
             }
             else if (jsonPath.StartsWith("#/", StringComparison.Ordinal))
             {
-                return ResolveDocumentReference(rootObject, jsonPath, targetType, contractResolver);
+                return ResolveDocumentReference(rootObject, jsonPath, targetType);
             }
             else if (jsonPath.StartsWith("http://", StringComparison.Ordinal) || jsonPath.StartsWith("https://", StringComparison.Ordinal))
             {
-                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath, targetType, contractResolver, append, cancellationToken).ConfigureAwait(false);
+                return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(jsonPath, jsonPath, targetType, append, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -160,15 +169,12 @@ namespace NJsonSchema
                     if (documentPath.StartsWith("http://", StringComparison.Ordinal) || documentPath.StartsWith("https://", StringComparison.Ordinal))
                     {
                         var url = new Uri(new Uri(documentPath), jsonPath).ToString();
-                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath, targetType, contractResolver, append, cancellationToken).ConfigureAwait(false);
+                        return await ResolveUrlReferenceWithAlreadyResolvedCheckAsync(url, jsonPath, targetType, append, cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
-                        // Split the file path and fragment before concatenating with
-                        // document path. If document path have '#' in it, doing this
-                        // later would not work.
                         var filePath = ResolveFilePath(documentPath, jsonPath);
-                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, targetType, contractResolver, jsonPath, append, cancellationToken).ConfigureAwait(false);
+                        return await ResolveFileReferenceWithAlreadyResolvedCheckAsync(filePath, targetType, jsonPath, append, cancellationToken).ConfigureAwait(false);
                     }
                 }
                 else
@@ -187,7 +193,7 @@ namespace NJsonSchema
             return Path.Combine(Path.GetDirectoryName(documentPath)!, arr[0]);
         }
 
-        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string filePath, Type targetType, IContractResolver contractResolver, string jsonPath, bool append, CancellationToken cancellationToken)
+        private async Task<IJsonReference> ResolveFileReferenceWithAlreadyResolvedCheckAsync(string filePath, Type targetType, string jsonPath, bool append, CancellationToken cancellationToken)
         {
             try
             {
@@ -204,7 +210,7 @@ namespace NJsonSchema
                 }
 
                 var referencedFile = value;
-                var resolvedSchema = arr.Length == 1 ? referencedFile : await ResolveReferenceAsync(referencedFile, arr[1], targetType, contractResolver, cancellationToken).ConfigureAwait(false);
+                var resolvedSchema = arr.Length == 1 ? referencedFile : await ResolveReferenceAsync(referencedFile, arr[1], targetType, cancellationToken).ConfigureAwait(false);
                 if (resolvedSchema is JsonSchema && append &&
                     (_schemaAppender.RootObject as JsonSchema)?.Definitions.Values.Contains(referencedFile) != true)
                 {
@@ -220,7 +226,7 @@ namespace NJsonSchema
             }
         }
 
-        private async Task<IJsonReference> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, Type targetType, IContractResolver contractResolver, bool append, CancellationToken cancellationToken)
+        private async Task<IJsonReference> ResolveUrlReferenceWithAlreadyResolvedCheckAsync(string fullJsonPath, string jsonPath, Type targetType, bool append, CancellationToken cancellationToken)
         {
             try
             {
@@ -239,7 +245,7 @@ namespace NJsonSchema
                 }
 
                 var result = value;
-                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, "#" + arr[1], targetType, contractResolver, cancellationToken).ConfigureAwait(false);
+                return arr.Length == 1 ? result : await ResolveReferenceAsync(result, "#" + arr[1], targetType, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -247,7 +253,7 @@ namespace NJsonSchema
             }
         }
 
-        private IJsonReference? ResolveDocumentReference(object obj, List<string> segments, Type targetType, IContractResolver contractResolver, HashSet<object> checkedObjects)
+        private IJsonReference? ResolveDocumentReference(object obj, List<string> segments, Type targetType, HashSet<object> checkedObjects)
         {
             if (obj == null || obj is string || checkedObjects.Contains(obj))
             {
@@ -256,10 +262,10 @@ namespace NJsonSchema
 
             if (obj is IJsonReference reference && reference.Reference != null)
             {
-                var result = ResolveDocumentReferenceWithoutDereferencing(reference.Reference, segments, targetType, contractResolver, checkedObjects);
+                var result = ResolveDocumentReferenceWithoutDereferencing(reference.Reference, segments, targetType, checkedObjects);
                 if (result == null)
                 {
-                    return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, contractResolver, checkedObjects);
+                    return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, checkedObjects);
                 }
                 else
                 {
@@ -267,18 +273,139 @@ namespace NJsonSchema
                 }
             }
 
-            return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, contractResolver, checkedObjects);
+            return ResolveDocumentReferenceWithoutDereferencing(obj, segments, targetType, checkedObjects);
         }
 
-        private IJsonReference? ResolveDocumentReferenceWithoutDereferencing(object obj, List<string> segments, Type targetType, IContractResolver contractResolver, HashSet<object> checkedObjects)
+        private static void PreserveMaterializedReferences(object? value, string path,
+            Dictionary<string, IJsonReference> children, bool restore, Action<object?>? replace,
+            HashSet<object> ancestors)
+        {
+            if (value == null || value is string || value is JsonNode || value.GetType().IsValueType)
+            {
+                return;
+            }
+
+            if (value is IJsonReference reference)
+            {
+                if (!restore)
+                {
+                    children[path] = reference;
+                    return;
+                }
+                if (children.TryGetValue(path, out var child))
+                {
+                    replace?.Invoke(child);
+                    return;
+                }
+            }
+
+            if (!ancestors.Add(value))
+            {
+                return;
+            }
+
+            try
+            {
+                // JSON Pointer escaping is internal here; protected visitor path syntax is unchanged.
+                void VisitChild(object? child, string key, Action<object?>? setter) =>
+                    PreserveMaterializedReferences(child, path + "/" + key.Replace("~", "~0").Replace("/", "~1"),
+                        children, restore, setter, ancestors);
+
+                if (JsonObjectGraphUtilities.TryGetDictionaryEntries(value, out var entries))
+                {
+                    foreach (var entry in entries) VisitChild(entry.Value, entry.Key, entry.ReplaceOrRemove);
+                    return;
+                }
+
+                if (value is IEnumerable enumerable)
+                {
+                    var index = 0;
+                    foreach (var item in enumerable.Cast<object?>().ToArray())
+                    {
+                        var currentIndex = index++;
+                        VisitChild(item, currentIndex.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            value is IList list ? replacement => list[currentIndex] = replacement : null);
+                    }
+                    return;
+                }
+
+                if (value is IJsonExtensionObject extension && extension.ExtensionData != null)
+                {
+                    foreach (var pair in extension.ExtensionData.ToArray())
+                    {
+                        VisitChild(pair.Value, pair.Key, replacement => extension.ExtensionData[pair.Key] = replacement);
+                    }
+                }
+
+                foreach (var member in value.GetType().GetContextualAccessors())
+                {
+                    if (member.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>() is { Condition: JsonIgnoreCondition.Always } ||
+                        member.MemberInfo.GetCustomAttribute<JsonExtensionDataAttribute>() != null)
+                    {
+                        continue;
+                    }
+                    if (member.MemberInfo is PropertyInfo property &&
+                        (property.GetMethod == null || property.GetMethod.IsStatic ||
+                         property.GetIndexParameters().Length != 0 ||
+                         (!property.GetMethod.IsPublic && property.GetCustomAttribute<JsonIncludeAttribute>() == null)))
+                    {
+                        continue;
+                    }
+                    if (member.MemberInfo is FieldInfo field &&
+                        (field.IsStatic || field.GetCustomAttribute<JsonIncludeAttribute>() == null))
+                    {
+                        continue;
+                    }
+
+                    var originalName = member.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? member.GetName();
+                    if (JsonObjectGraphUtilities.TryGetSerializedPropertyName(value.GetType(), originalName, out var name))
+                    {
+                        VisitChild(member.GetValue(value), name, replacement => member.SetValue(value, replacement));
+                    }
+                }
+            }
+            finally
+            {
+                ancestors.Remove(value);
+            }
+        }
+
+        private IJsonReference? ResolveChildReference(object child, List<string> segments, Type targetType,
+            HashSet<object> checkedObjects, Action<object?>? replace)
+        {
+            var resolved = ResolveDocumentReference(child, segments, targetType, checkedObjects);
+            if (segments.Count == 0 && child is not IJsonReference && resolved != null)
+            {
+                // A dictionary materialized as a reference target must stay reachable at its source path.
+                replace?.Invoke(resolved);
+            }
+
+            return resolved;
+        }
+
+        private IJsonReference? ResolveDocumentReferenceWithoutDereferencing(object obj, List<string> segments, Type targetType, HashSet<object> checkedObjects)
         {
             if (segments.Count == 0)
             {
-                if (obj is IDictionary)
+                if (obj is not IJsonReference && JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out _))
                 {
-                    var settings = new JsonSerializerSettings { ContractResolver = contractResolver };
-                    var json = JsonConvert.SerializeObject(obj, settings);
-                    return JsonConvert.DeserializeObject(json, targetType, settings) as IJsonReference;
+                    var options = JsonSchemaSerialization.CurrentSerializerOptions
+                        ?? throw new InvalidOperationException(
+                            "JsonSchemaSerialization.CurrentSerializerOptions must be set before resolving references. "
+                            + "Use JsonSchema.FromJsonAsync / JsonSchemaSerialization.FromJsonAsync to deserialize.");
+                    // Rehydration must not clone already-materialized children: their resolved references
+                    // and shared identity are not represented by the temporary JSON payload.
+                    var children = new Dictionary<string, IJsonReference>();
+                    PreserveMaterializedReferences(obj, "#", children, false, null, new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance));
+                    var json = JsonSerializer.Serialize(obj, obj.GetType(), options);
+                    var result = JsonSerializer.Deserialize(json, targetType, options) as IJsonReference;
+                    if (result != null)
+                    {
+                        JsonSchemaSerialization.PostProcessExtensionData(result);
+                        PreserveMaterializedReferences(result, "#", children, true, null, new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance));
+                    }
+
+                    return result;
                 }
                 else
                 {
@@ -289,11 +416,12 @@ namespace NJsonSchema
             checkedObjects.Add(obj);
             var firstSegment = segments[0];
 
-            if (obj is IDictionary dictionary)
+            if (JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out var entries))
             {
-                if (dictionary.Contains(firstSegment))
+                var entry = entries.FirstOrDefault(item => item.Key == firstSegment);
+                if (entry?.Value != null)
                 {
-                    return ResolveDocumentReference(dictionary[firstSegment]!, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                    return ResolveChildReference(entry.Value, segments.Skip(1).ToList(), targetType, checkedObjects, entry.ReplaceOrRemove);
                 }
             }
             else if (obj is IEnumerable)
@@ -301,9 +429,10 @@ namespace NJsonSchema
                 if (int.TryParse(firstSegment, out var index))
                 {
                     var enumerable = ((IEnumerable)obj).Cast<object>().ToArray();
-                    if (enumerable.Length > index)
+                    if (index >= 0 && enumerable.Length > index)
                     {
-                        return ResolveDocumentReference(enumerable[index], segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                        return ResolveChildReference(enumerable[index], segments.Skip(1).ToList(), targetType, checkedObjects,
+                            obj is IList list ? value => list[index] = value : null);
                     }
                 }
             }
@@ -312,7 +441,8 @@ namespace NJsonSchema
                 var extensionObj = obj as IJsonExtensionObject;
                 if (extensionObj?.ExtensionData?.ContainsKey(firstSegment) == true)
                 {
-                    return ResolveDocumentReference(extensionObj.ExtensionData[firstSegment]!, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                    return ResolveChildReference(extensionObj.ExtensionData[firstSegment]!, segments.Skip(1).ToList(), targetType, checkedObjects,
+                        value => extensionObj.ExtensionData[firstSegment] = value);
                 }
 
                 IEnumerable<ContextualAccessorInfo> properties;
@@ -324,18 +454,24 @@ namespace NJsonSchema
                 {
                     properties = obj.GetType()
                         .GetContextualAccessors()
-                        .Where(p => !p.IsAttributeDefined<JsonIgnoreAttribute>(inherit: true));
+                        .Where(p =>
+                        {
+                            var jsonIgnoreAttribute = p.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>();
+                            return jsonIgnoreAttribute == null || jsonIgnoreAttribute.Condition != JsonIgnoreCondition.Always;
+                        });
                 }
 
                 foreach (var member in properties)
                 {
-                    var pathSegment = member.GetName();
+                    var jsonPropertyNameAttribute = member.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>();
+                    var pathSegment = jsonPropertyNameAttribute?.Name ?? member.GetName();
                     if (pathSegment == firstSegment)
                     {
                         var value = member.GetValue(obj);
                         if (value != null)
                         {
-                            return ResolveDocumentReference(value, segments.Skip(1).ToList(), targetType, contractResolver, checkedObjects);
+                            return ResolveChildReference(value, segments.Skip(1).ToList(), targetType, checkedObjects,
+                                replacement => member.SetValue(obj, replacement));
                         }
                     }
                 }

@@ -1,6 +1,7 @@
-﻿using NJsonSchema.Annotations;
+using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
-using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace NJsonSchema.Tests.Generation
 {
@@ -116,10 +117,8 @@ namespace NJsonSchema.Tests.Generation
               }
             }";
 
-            // Assert generated JSON matches schema, ignores whitespace and spaces
-            var result = String.Compare(json, expectedJSON, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreSymbols);
-
-            Assert.Equal(0, result);
+            // Assert
+            Assert.True(JsonNode.DeepEquals(JsonNode.Parse(expectedJSON), JsonNode.Parse(json)));
         }
 
         [Fact]
@@ -167,10 +166,8 @@ namespace NJsonSchema.Tests.Generation
                 }
             }";
 
-            // Assert generated JSON matches schema, ignores whitespace and spaces
-            var result = string.Compare(json, expectedJSON, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreSymbols);
-
-            Assert.Equal(0, result);
+            // Assert
+            Assert.True(JsonNode.DeepEquals(JsonNode.Parse(expectedJSON, documentOptions: new JsonDocumentOptions { AllowTrailingCommas = true }), JsonNode.Parse(json)));
         }
     }
 }

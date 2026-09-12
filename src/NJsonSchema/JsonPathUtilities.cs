@@ -9,8 +9,9 @@
 using System.Collections;
 using System.Linq;
 using System.Reflection;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json.Serialization;
+using Namotion.Reflection;
+using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema
 {
@@ -25,39 +26,25 @@ namespace NJsonSchema
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
         public static string? GetJsonPath(object rootObject, object searchedObject)
         {
-            // TODO: Remove this overload?
-            return GetJsonPath(rootObject, searchedObject, new DefaultContractResolver());
-        }
-
-        /// <summary>Gets the JSON path of the given object.</summary>
-        /// <param name="rootObject">The root object.</param>
-        /// <param name="searchedObject">The object to search.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
-        /// <returns>The path or <c>null</c> when the object could not be found.</returns>
-        /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
-        public static string? GetJsonPath(object rootObject, object searchedObject, IContractResolver contractResolver)
-        {
-            return GetJsonPaths(rootObject, [searchedObject], contractResolver)[searchedObject];
+            return GetJsonPaths(rootObject, [searchedObject])[searchedObject];
         }
 
         /// <summary>Gets the JSON path of the given object.</summary>
         /// <param name="rootObject">The root object.</param>
         /// <param name="searchedObjects">The objects to search.</param>
-        /// <param name="contractResolver">The contract resolver.</param>
         /// <returns>The path or <c>null</c> when the object could not be found.</returns>
         /// <exception cref="InvalidOperationException">Could not find the JSON path of a child object.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="rootObject"/> is <see langword="null"/></exception>
         public static IReadOnlyDictionary<object, string?> GetJsonPaths(object rootObject,
-            IEnumerable<object> searchedObjects, IContractResolver contractResolver)
+            IEnumerable<object> searchedObjects)
         {
             if (rootObject == null)
             {
                 throw new ArgumentNullException(nameof(rootObject));
             }
 
-            var mappings = searchedObjects.ToDictionary(o => o, o => (string?)null);
-            FindJsonPaths(rootObject, mappings, "#", [], contractResolver);
+            var mappings = searchedObjects.ToDictionary(o => o, o => (string?)null, JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance);
+            FindJsonPaths(rootObject, mappings, "#", new HashSet<object>(JsonObjectGraphUtilities.ReferenceIdentityComparer.Instance));
 
             if (mappings.Any(p => p.Value == null))
             {
@@ -72,7 +59,7 @@ namespace NJsonSchema
         }
 
         private static bool FindJsonPaths(object obj, Dictionary<object, string?> searchedObjects,
-            string basePath, HashSet<object> checkedObjects, IContractResolver contractResolver)
+            string basePath, HashSet<object> checkedObjects)
         {
             if (obj == null)
             {
@@ -83,7 +70,7 @@ namespace NJsonSchema
             if (type == typeof(string)
                 || type.IsPrimitive
                 || type.IsEnum
-                || type == typeof(JValue)
+                || type.IsValueType
                 || checkedObjects.Contains(obj)
             )
             {
@@ -103,12 +90,13 @@ namespace NJsonSchema
             checkedObjects.Add(obj);
 
             var pathAndSeparator = basePath + "/";
-            if (obj is IDictionary dictionary)
+            var isDictionary = JsonObjectGraphUtilities.TryGetDictionaryEntries(obj, out var entries);
+            if (isDictionary)
             {
-                foreach (DictionaryEntry pair in dictionary)
+                foreach (var pair in entries)
                 {
-                    if (pair.Value != null && 
-                        FindJsonPaths(pair.Value, searchedObjects, pathAndSeparator + pair.Key, checkedObjects, contractResolver))
+                    if (pair.Value != null &&
+                        FindJsonPaths(pair.Value, searchedObjects, pathAndSeparator + pair.Key, checkedObjects))
                     {
                         return true;
                     }
@@ -119,8 +107,8 @@ namespace NJsonSchema
                 for (var i = 0; i < list.Count; ++i)
                 {
                     var item = list[i];
-                    if (item != null && 
-                        FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
+                    if (item != null &&
+                        FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects))
                     {
                         return true;
                     }
@@ -132,43 +120,77 @@ namespace NJsonSchema
                 foreach (var item in enumerable)
                 {
                     if (item != null &&
-                        FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects, contractResolver))
+                        FindJsonPaths(item, searchedObjects, pathAndSeparator + i, checkedObjects))
                     {
                         return true;
                     }
                     i++;
                 }
             }
-            else
+            if (obj is not IEnumerable || (isDictionary && type.GetCustomAttribute<JsonConverterAttribute>(true) != null))
             {
-                if (contractResolver.ResolveContract(type) is JsonObjectContract contract)
-                {
-                    foreach (var jsonProperty in contract.Properties)
-                    {
-                        if (jsonProperty.Ignored)
-                        {
-                            continue;
-                        }
+                var isExtensionObject = obj is IJsonExtensionObject;
 
-                        var value = jsonProperty.ValueProvider?.GetValue(obj);
-                        if (value != null &&
-                            FindJsonPaths(value, searchedObjects, pathAndSeparator + jsonProperty.PropertyName, checkedObjects, contractResolver))
+                // Order properties so that settable properties (with a setter) are processed before
+                // getter-only properties. This ensures that when two properties return the same object
+                // (e.g., an alias like "Definitions1 => Definitions2"), the canonical settable property
+                // is traversed first and its path is recorded, while the alias is naturally skipped
+                // via the checkedObjects set.
+                var properties = type.GetContextualProperties()
+                    .OrderBy(static property => property.PropertyInfo.SetMethod != null ? 0 : 1);
+
+                foreach (var property in properties)
+                {
+                    var jsonIgnoreAttr = property.MemberInfo.GetCustomAttribute<JsonIgnoreAttribute>();
+                    if ((jsonIgnoreAttr != null && jsonIgnoreAttr.Condition == JsonIgnoreCondition.Always) ||
+                        property.PropertyInfo.GetMethod?.IsStatic == true ||
+                        (isDictionary && property.MemberInfo.DeclaringType != type))
+                    {
+                        continue;
+                    }
+
+                    // Check if the property is ignored by the current SchemaSerializationConverter
+                    // (e.g., "components" is ignored for Swagger2, "definitions" for OpenApi3)
+                    var originalName = property.MemberInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? property.Name;
+                    if (!JsonObjectGraphUtilities.TryGetSerializedPropertyName(type, originalName, out var jsonName))
+                    {
+                        continue;
+                    }
+
+                    // Skip ExtensionData property — it's handled separately below with correct path resolution
+                    if (isExtensionObject && property.MemberInfo.GetCustomAttribute<JsonExtensionDataAttribute>() != null)
+                    {
+                        continue;
+                    }
+
+                    // Skip string, value type, and indexer properties
+                    if (property.PropertyType.Type == typeof(string) ||
+                        property.PropertyType.Type.IsValueType ||
+                        property.PropertyInfo.GetIndexParameters().Length > 0)
+                    {
+                        continue;
+                    }
+
+                    var value = property.GetValue(obj);
+                    if (value != null)
+                    {
+                        if (FindJsonPaths(value, searchedObjects, pathAndSeparator + jsonName, checkedObjects))
                         {
                             return true;
                         }
                     }
+                }
 
-                    if (obj is IJsonExtensionObject)
+                if (obj is IJsonExtensionObject)
+                {
+                    var extensionDataProperty = type.GetRuntimeProperty(nameof(IJsonExtensionObject.ExtensionData));
+                    if (extensionDataProperty != null)
                     {
-                        var extensionDataProperty = type.GetRuntimeProperty(nameof(IJsonExtensionObject.ExtensionData));
-                        if (extensionDataProperty != null)
+                        var value = extensionDataProperty.GetValue(obj);
+                        if (value != null &&
+                            FindJsonPaths(value, searchedObjects, basePath, checkedObjects))
                         {
-                            var value = extensionDataProperty.GetValue(obj);
-                            if (value != null && 
-                                FindJsonPaths(value, searchedObjects, basePath, checkedObjects, contractResolver))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }

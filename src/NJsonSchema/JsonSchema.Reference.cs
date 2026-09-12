@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Runtime.CompilerServices;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using NJsonSchema.References;
 
 namespace NJsonSchema

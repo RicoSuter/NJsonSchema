@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation
@@ -15,7 +15,7 @@ namespace NJsonSchema.Tests.Validation
                              Format = "base64"
                          };
 
-            var token = new JValue("invalid");
+            var token = JsonValue.Create("invalid");
 
             // Act
             var errors = schema.Validate(token);
@@ -35,7 +35,7 @@ namespace NJsonSchema.Tests.Validation
                              Format = JsonFormatStrings.Byte
                          };
 
-            var token = new JValue("invalid");
+            var token = JsonValue.Create("invalid");
 
             // Act
             var errors = schema.Validate(token);
@@ -56,7 +56,7 @@ namespace NJsonSchema.Tests.Validation
                          };
 
             var value = Convert.ToBase64String([101, 22, 87, 25]);
-            var token = new JValue(value);
+            var token = JsonValue.Create(value);
 
             // Act
             var errors = schema.Validate(token);
@@ -76,7 +76,7 @@ namespace NJsonSchema.Tests.Validation
                          };
 
             var value = Convert.ToBase64String([101, 22, 87, 25]);
-            var token = new JValue(value);
+            var token = JsonValue.Create(value);
 
             // Act
             var errors = schema.Validate(token);
@@ -96,7 +96,7 @@ namespace NJsonSchema.Tests.Validation
                          };
 
             var value = Convert.ToBase64String([1, 2, 3]);
-            var token = new JValue(value);
+            var token = JsonValue.Create(value);
 
             // Act
             var errors = schema.Validate(token);
@@ -116,7 +116,7 @@ namespace NJsonSchema.Tests.Validation
                          };
 
             var value = Convert.ToBase64String([1, 2, 3]);
-            var token = new JValue(value);
+            var token = JsonValue.Create(value);
 
             // Act
             var errors = schema.Validate(token);
@@ -135,7 +135,7 @@ namespace NJsonSchema.Tests.Validation
                                     Format = JsonFormatStrings.Byte
                                 };
 
-            var token = new JValue(1);
+            var token = JsonValue.Create(1);
 
             // Act
             var numericErrors = numericSchema.Validate(token);

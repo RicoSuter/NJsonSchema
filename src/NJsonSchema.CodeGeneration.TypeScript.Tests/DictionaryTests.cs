@@ -1,4 +1,4 @@
-﻿using NJsonSchema.CodeGeneration.Tests;
+using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.Generation;
 using NJsonSchema.NewtonsoftJson.Generation;
 
@@ -6,6 +6,28 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 {
     public class DictionaryTests
     {
+        [Theory]
+        [InlineData("readOnly", TypeScriptTypeStyle.Interface)]
+        [InlineData("readOnly", TypeScriptTypeStyle.Class)]
+        [InlineData("readonly", TypeScriptTypeStyle.Interface)]
+        [InlineData("readonly", TypeScriptTypeStyle.Class)]
+        [InlineData("READONLY", TypeScriptTypeStyle.Interface)]
+        [InlineData("READONLY", TypeScriptTypeStyle.Class)]
+        public async Task Parsed_readonly_dictionary_preserves_generated_contract(string spelling, TypeScriptTypeStyle style)
+        {
+            // Arrange
+            var schema = await JsonSchema.FromJsonAsync($$$$$$"""{"type":"object","properties":{"values":{"type":"object","{{{{{{spelling}}}}}}":true,"additionalProperties":{"type":"string"}}}}""");
+
+            // Act
+            var output = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings { TypeStyle = style }).GenerateFile("Container");
+
+            // Assert
+            Assert.True(schema.Properties["values"].IsReadOnly);
+            Assert.Contains("readonly values", output);
+            Assert.Contains("[key: string]: string", output);
+            TypeScriptCompiler.AssertCompile(output);
+        }
+
         public class AnyDictionary : Dictionary<string, object>
         {
             public string Foo { get; set; }

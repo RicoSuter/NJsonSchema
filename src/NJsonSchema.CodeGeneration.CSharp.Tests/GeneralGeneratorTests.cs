@@ -1,4 +1,4 @@
-﻿using System.CodeDom.Compiler;
+using System.CodeDom.Compiler;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -713,26 +713,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             var code = generator.GenerateFile("MyClass");
 
             // Assert
-            Assert.Contains(@"  ""required"": [
-    ""FirstName"",
-    ""Age""
-  ],
-  ""properties"": {
-    ""FirstName"": {
-      ""type"": ""string"",
-      ""minLength"": 1
-    },
-    ""MiddleName"": {
-      ""type"": ""string""
-    },
-    ""Age"": {
-      ""type"": [
-        ""integer"",
-        ""null""
-      ],
-      ""format"": ""int32""
-    }
-  }".Replace("\r", string.Empty), schemaJson.Replace("\r", string.Empty));
+            var parsed = System.Text.Json.Nodes.JsonNode.Parse(schemaJson)!;
+            Assert.True(System.Text.Json.Nodes.JsonNode.DeepEquals(
+                System.Text.Json.Nodes.JsonNode.Parse("""["FirstName","Age"]"""), parsed["required"]));
+            Assert.True(System.Text.Json.Nodes.JsonNode.DeepEquals(
+                System.Text.Json.Nodes.JsonNode.Parse("""{"FirstName":{"type":"string","minLength":1},"MiddleName":{"type":"string"},"Age":{"type":["integer","null"],"format":"int32"}}"""), parsed["properties"]));
 
             await VerifyHelper.Verify(code);
             CSharpCompiler.AssertCompile(code);

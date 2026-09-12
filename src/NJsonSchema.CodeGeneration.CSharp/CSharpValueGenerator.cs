@@ -88,6 +88,20 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The C# number literal.</returns>
         public override string GetNumericValue(JsonObjectType type, object value, string? format)
         {
+            // Unwrap JsonElement values that may not have been converted during post-processing
+            if (value is System.Text.Json.JsonElement element)
+            {
+                value = NJsonSchema.Infrastructure.JsonSchemaSerialization.ConvertJsonElement(element) ?? value;
+                if (value is System.Text.Json.JsonElement number && number.ValueKind == System.Text.Json.JsonValueKind.Number &&
+                    (format == JsonFormatStrings.Byte || format == JsonFormatStrings.Integer ||
+                     format == JsonFormatStrings.Long || format == JsonFormatStrings.ULong))
+                {
+                    // Integer formats need a convertible value; decimal retains the entire ulong range
+                    // and accepts exponent notation without rounding through double.
+                    value = number.GetDecimal();
+                }
+            }
+
             switch (format)
             {
                 case JsonFormatStrings.Byte:
@@ -105,6 +119,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 case JsonFormatStrings.Decimal:
                     return ConvertNumberToString(value) + "M";
                 default:
+                    if (type.IsInteger() && value is System.Text.Json.JsonElement integerElement &&
+                        integerElement.ValueKind == System.Text.Json.JsonValueKind.Number &&
+                        NJsonSchema.Infrastructure.JsonNumber.Parse(integerElement).TryGetIntegerLiteral(20, out var integerLiteral))
+                    {
+                        // Twenty characters cover ulong.MaxValue and signed long.MinValue. Normalize
+                        // exact integers only, without expanding unbounded exponents or rounding fractions.
+                        return integerLiteral!;
+                    }
                     return type.IsInteger() ?
                         ConvertNumberToString(value) :
                         ConvertNumberToString(value) + "D";

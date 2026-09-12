@@ -9,7 +9,7 @@
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using Namotion.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Runtime.Serialization;
 
 namespace NJsonSchema.Generation

@@ -78,11 +78,12 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
                         if (_schema.Type.IsInteger())
                         {
+                            var literal = ValueGeneratorBase.GetIntegerEnumLiteral(value);
                             var name = _schema.EnumerationNames.Count > i
                                 ? _schema.EnumerationNames[i]
-                                : "_" + value;
+                                : "_" + (_settings.EnumNameGenerator.GetType() == typeof(DefaultEnumNameGenerator) ? literal : value.ToString());
 
-                            if (_schema.IsFlagEnumerable && TryGetInt64(value, out long valueInt64))
+                            if (_schema.IsFlagEnumerable && long.TryParse(literal, NumberStyles.Integer, CultureInfo.InvariantCulture, out long valueInt64))
                             {
                                 entries.Add(new EnumerationItemModel
                                 {
@@ -102,7 +103,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                     OriginalName = name,
                                     Value = value.ToString()!,
                                     Description = description,
-                                    InternalValue = value.ToString(),
+                                    InternalValue = literal,
                                     InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                                 });
                             }
@@ -130,63 +131,5 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             }
         }
 
-        private static bool TryGetInt64(object value, out long valueInt64)
-        {
-            if (value is byte b)
-            {
-                valueInt64 = b;
-                return true;
-            }
-            else if (value is sbyte sb)
-            {
-                valueInt64 = sb;
-                return true;
-            }
-            else if (value is short int16)
-            {
-                valueInt64 = int16;
-                return true;
-            }
-            else if (value is ushort uint16)
-            {
-                valueInt64 = uint16;
-                return true;
-            }
-            else if (value is int int32)
-            {
-                valueInt64 = int32;
-                return true;
-            }
-            else if (value is uint uint32)
-            {
-                valueInt64 = uint32;
-                return true;
-            }
-            else if (value is long int64)
-            {
-                valueInt64 = int64;
-                return true;
-            }
-            else if (value is ulong uint64)
-            {
-                valueInt64 = (long)uint64;
-                return true;
-            }
-            else if (value is float ieee754 && System.Math.Floor(ieee754) == ieee754)
-            {
-                valueInt64 = (long)ieee754;
-                return true;
-            }
-            else if (value is double dieee754 && System.Math.Floor(dieee754) == dieee754)
-            {
-                valueInt64 = (long)dieee754;
-                return true;
-            }
-            else
-            {
-                valueInt64 = default;
-                return false;
-            }
-        }
     }
 }

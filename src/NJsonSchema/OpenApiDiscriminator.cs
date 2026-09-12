@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="OpenApiDiscriminator.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
@@ -6,10 +6,10 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Newtonsoft.Json;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NJsonSchema.References;
-using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema
 {
@@ -17,13 +17,15 @@ namespace NJsonSchema
     public class OpenApiDiscriminator
     {
         /// <summary>Gets or sets the discriminator property name.</summary>
-        [JsonProperty("propertyName", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("propertyName")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? PropertyName { get; set; }
 
         /// <summary>Gets or sets the discriminator mappings.</summary>
-        [JsonProperty("mapping", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonPropertyName("mapping")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonConverter(typeof(DiscriminatorMappingConverter))]
-        public IDictionary<string, JsonSchema> Mapping { get; } = new Dictionary<string, JsonSchema>();
+        public IDictionary<string, JsonSchema> Mapping { get; set; } = new Dictionary<string, JsonSchema>();
 
         /// <summary>The currently used <see cref="JsonInheritanceConverter"/>.</summary>
         [JsonIgnore]
@@ -49,53 +51,36 @@ namespace NJsonSchema
         }
 
         /// <summary>
-        /// Used to convert from Dictionary{string, JsonSchema4} (NJsonSchema model) to Dictionary{string, string} (OpenAPI).
-        /// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#discriminator-object and
-        /// issue https://github.com/RicoSuter/NSwag/issues/1684
+        /// Used to convert from Dictionary{string, JsonSchema} (NJsonSchema model) to Dictionary{string, string} (OpenAPI).
         /// </summary>
-        private sealed class DiscriminatorMappingConverter : JsonConverter
+        private sealed class DiscriminatorMappingConverter : JsonConverter<IDictionary<string, JsonSchema>>
         {
-            public override bool CanConvert(Type objectType)
+            public override IDictionary<string, JsonSchema>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                return true;
-            }
-
-            public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
-            {
-                var openApiMapping = serializer.Deserialize<Dictionary<string, string>>(reader);
-                if (openApiMapping != null && existingValue != null)
+                var openApiMapping = JsonSerializer.Deserialize<Dictionary<string, string>>(ref reader, options);
+                if (openApiMapping != null)
                 {
-                    var internalMapping = (IDictionary<string, JsonSchema>)existingValue;
-                    internalMapping.Clear();
-
+                    var internalMapping = new Dictionary<string, JsonSchema>();
                     foreach (var tuple in openApiMapping)
                     {
                         var schema = new JsonSchema();
                         ((IJsonReferenceBase)schema).ReferencePath = tuple.Value;
                         internalMapping[tuple.Key] = schema;
                     }
+                    return internalMapping;
                 }
 
-                return existingValue;
+                return null;
             }
 
-            public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+            public override void Write(Utf8JsonWriter writer, IDictionary<string, JsonSchema> value, JsonSerializerOptions options)
             {
-                if (value is IDictionary<string, JsonSchema> internalMapping)
+                writer.WriteStartObject();
+                foreach (var tuple in value)
                 {
-                    var openApiMapping = new Dictionary<string, string>();
-                    foreach (var tuple in internalMapping)
-                    {
-                        openApiMapping[tuple.Key] = ((IJsonReferenceBase)tuple.Value).ReferencePath!;
-                    }
-
-                    var jObject = JObject.FromObject(openApiMapping, serializer);
-                    writer.WriteToken(jObject.CreateReader());
+                    writer.WriteString(tuple.Key, ((IJsonReferenceBase)tuple.Value).ReferencePath);
                 }
-                else
-                {
-                    writer.WriteValue((string?)null);
-                }
+                writer.WriteEndObject();
             }
         }
     }

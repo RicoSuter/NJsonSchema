@@ -48,7 +48,7 @@ namespace NJsonSchema.NewtonsoftJson.Converters
         {
             if (value is not null)
             {
-                JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(value, false, serializer.ContractResolver);
+                JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(value, false);
             }
 
             try

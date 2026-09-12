@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using System.Text.Json;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Tests.Infrastructure
@@ -9,14 +9,14 @@ namespace NJsonSchema.Tests.Infrastructure
         public void When_property_is_renamed_then_it_does_not_land_in_extension_data()
         {
             // Arrange
-            var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
-            resolver.RenameProperty(typeof(JsonSchemaProperty), "x-readOnly", "readOnly");
-            resolver.RenameProperty(typeof(JsonSchema), "x-nullable", "nullable");
+            var converter = new SchemaSerializationConverter();
+            converter.RenameProperty(typeof(JsonSchemaProperty), "x-readOnly", "readOnly");
+            converter.RenameProperty(typeof(JsonSchema), "x-nullable", "nullable");
 
             var json = "{ \"readOnly\": true, \"nullable\": true, \"additionalProperties\": { \"nullable\": true } }";
 
             // Act
-            var obj = JsonSchemaSerialization.FromJson<JsonSchemaProperty>(json, resolver);
+            var obj = JsonSchemaSerialization.FromJson<JsonSchemaProperty>(json, converter);
 
             // Assert
             Assert.True(obj.IsReadOnly);
@@ -26,7 +26,6 @@ namespace NJsonSchema.Tests.Infrastructure
 
         public class MyClass
         {
-            [JsonProperty("foo")]
             public string Foo { get; set; }
         }
 
@@ -34,15 +33,17 @@ namespace NJsonSchema.Tests.Infrastructure
         public void When_property_is_renamed_then_json_is_correct()
         {
             // Arrange
-            var resolver = new PropertyRenameAndIgnoreSerializerContractResolver();
-            resolver.RenameProperty(typeof(MyClass), "foo", "bar");
+            var converter = new SchemaSerializationConverter();
+            converter.RenameProperty(typeof(MyClass), "Foo", "bar");
 
             var obj = new MyClass();
             obj.Foo = "abc";
 
             // Act
-            var json = JsonConvert.SerializeObject(obj, new JsonSerializerSettings { ContractResolver = resolver });
-            obj = JsonConvert.DeserializeObject<MyClass>(json, new JsonSerializerSettings { ContractResolver = resolver });
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(converter);
+            var json = JsonSerializer.Serialize(obj, options);
+            obj = JsonSerializer.Deserialize<MyClass>(json, options);
 
             // Assert
             Assert.Contains("bar", json);
@@ -51,13 +52,10 @@ namespace NJsonSchema.Tests.Infrastructure
 
         public class ClassWithDoubleProperties
         {
-            [JsonProperty("schema")]
             public JsonSchema Schema { get; set; }
 
-            [JsonProperty("definitions1")]
             public Dictionary<string, JsonSchema> Definitions1 => Definitions2;
 
-            [JsonProperty("definitions2")]
             public Dictionary<string, JsonSchema> Definitions2 { get; set; } = new Dictionary<string, JsonSchema>();
         }
 
@@ -65,8 +63,8 @@ namespace NJsonSchema.Tests.Infrastructure
         public void When_property_is_ignored_then_refs_ignore_it()
         {
             // Arrange
-            var contractResolver = new PropertyRenameAndIgnoreSerializerContractResolver();
-            contractResolver.IgnoreProperty(typeof(ClassWithDoubleProperties), "definitions1");
+            var converter = new SchemaSerializationConverter();
+            converter.IgnoreProperty(typeof(ClassWithDoubleProperties), "Definitions1");
 
             var schema = new JsonSchema
             {
@@ -82,12 +80,14 @@ namespace NJsonSchema.Tests.Infrastructure
             };
 
             // Act
-            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(foo, false, contractResolver);
-            var json = JsonConvert.SerializeObject(foo, Formatting.Indented, new JsonSerializerSettings { ContractResolver = contractResolver });
+            JsonSchemaReferenceUtilities.UpdateSchemaReferencePaths(foo, false);
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            options.Converters.Add(converter);
+            var json = JsonSerializer.Serialize(foo, options);
 
             // Assert
-            Assert.Contains("#/definitions2/Bar", json);
-            Assert.DoesNotContain("#/definitions1/Bar", json);
+            Assert.Contains("#/Definitions2/Bar", json);
+            Assert.DoesNotContain("#/Definitions1/Bar", json);
         }
     }
 }

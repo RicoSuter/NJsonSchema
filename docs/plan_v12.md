@@ -71,6 +71,18 @@ Before the final `v12` → `master` merge, revert the temporary shims that only 
 
 Add items to this checklist as new temporary shims are introduced during v12 development, so nothing leaks into the final release.
 
+### PR #1914 stabilization and subsequent technical debt
+
+The [PR #1914 stabilization roadmap](./superpowers/specs/2026-09-11-pr-1914-stabilization-design.md) records the migration review findings and proposed repair sequence. Passing the existing suite does not establish migration compatibility: literal-value loss, async context failures, incomplete traversal, and validation regressions need repairs before merging the migration. The [first implementation plan](./superpowers/plans/2026-09-11-pr-1914-values-and-validation.md) covers values and validation.
+
+Distinguish those correctness repairs from optional architectural follow-ups:
+
+1. **Replace `PropertyFilterConverter<T>` with a `JsonTypeInfoResolver` modifier.** The converter currently round-trips through `JsonNode` in `Read` to apply per-type reverse renames. A modifier that rewrites `JsonPropertyInfo.Name` per type during `JsonTypeInfo` construction would let STJ's default reflection pipeline handle the rest and drop the `JsonNode` round-trip, the walked CLR-type guide, and the `[ThreadStatic]` stripped-options cache. The custom converter would shrink to Write-only (ignore rules, empty-collection filtering, extension-data ordering) — Read could go through standard STJ.
+
+2. **Path-format escaping in `ValidationError.Path` and `BuildPathString`.** The current `#/` path format uses `.` as a property separator, which collides when a JSON property name literally contains a dot. `{"foo.bar": 1}` and `{"foo": {"bar": 1}}` both stringify to `#/foo.bar`. JSON Pointer's `~0` / `~1` escaping (RFC 6901) would disambiguate, but it's a public `Path` contract change — schedule alongside any other public-API churn.
+
+3. **Preserve serializer context across asynchronous reference resolution (migration blocker).** The thread-local options dependency can fail inside a valid `FromJsonAsync` flow after an awaited external resolver. Stabilization Phase 2 must repair context lifetime, dialect retention, and concurrent-call isolation. Explicit context plumbing is preferred; any resulting public API changes need an inventory and NSwag cross-check. A broader resolver API redesign can remain separate after correctness is restored.
+
 ## Changelog and migration guide
 
 See [`changelog_v12.md`](./changelog_v12.md) for the running list of landed changes and the v11 → v12 migration guide. Every PR merged to `v12` that has user-visible impact should update that file (see its `Contributing` section).

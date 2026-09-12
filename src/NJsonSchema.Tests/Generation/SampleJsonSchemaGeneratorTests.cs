@@ -1,4 +1,7 @@
-﻿namespace NJsonSchema.Tests.Generation
+﻿using System.Globalization;
+using System.Text;
+
+namespace NJsonSchema.Tests.Generation
 {
     public class SampleJsonSchemaGeneratorTests
     {
@@ -150,6 +153,105 @@
             // Assert
             Assert.Equal(JsonObjectType.Array, property.Type);
             Assert.Equal(JsonObjectType.Integer, property.Item.ActualSchema.Type);
+        }
+
+        [Theory]
+        [InlineData("{ // comment\n unquoted: 'value', trailing: 1, }")]
+        [InlineData("{ unquoted: 'value', trailing: 1 }")]
+        public void StreamInputHasSameLenientSemanticsAsStringInput(string data)
+        {
+            // Arrange
+            var generator = new SampleJsonSchemaGenerator();
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
+
+            // Act
+            var stringSchema = generator.Generate(data);
+            var streamSchema = generator.Generate(stream);
+
+            // Assert
+            Assert.Equal(JsonObjectType.Object, streamSchema.Type);
+            Assert.Equal(JsonObjectType.String, streamSchema.Properties["unquoted"].Type);
+            Assert.Equal(JsonObjectType.Integer, streamSchema.Properties["trailing"].Type);
+            Assert.Equal(stringSchema.ToJson(), streamSchema.ToJson());
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void StreamInputSupportsByteOrderMarksAndDisposesStream(bool useUtf16)
+        {
+            // Arrange
+            var encoding = useUtf16 ? Encoding.Unicode : new UTF8Encoding(true);
+            var preamble = encoding.GetPreamble();
+            var content = encoding.GetBytes("{ value: 'text', }");
+            var bytes = preamble.Concat(content).ToArray();
+            var stream = new TrackingMemoryStream(bytes);
+            var generator = new SampleJsonSchemaGenerator();
+
+            // Act
+            var schema = generator.Generate(stream);
+
+            // Assert
+            Assert.Equal(JsonObjectType.String, schema.Properties["value"].Type);
+            Assert.True(stream.IsDisposed);
+        }
+
+        [Fact]
+        public void InvalidStreamInputDisposesStream()
+        {
+            // Arrange
+            var stream = new TrackingMemoryStream(Encoding.UTF8.GetBytes("{"));
+            var generator = new SampleJsonSchemaGenerator();
+
+            // Act
+            Assert.ThrowsAny<Exception>(() => generator.Generate(stream));
+
+            // Assert
+            Assert.True(stream.IsDisposed);
+        }
+
+        [Fact]
+        public void DateInferenceUsesSupportedInvariantFormats()
+        {
+            // Arrange
+            var originalCulture = CultureInfo.CurrentCulture;
+            var generator = new SampleJsonSchemaGenerator();
+            var cultures = new[] { "en-US", "de-DE", "th-TH" };
+
+            try
+            {
+                foreach (var cultureName in cultures)
+                {
+                    CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(cultureName);
+
+                    // Act
+                    var schema = generator.Generate("{ local: '10/12/2024', year: '2024', date: '2024-02-29', invalidDate: '2023-02-29', midnight: '2024-10-12T00:00:00', offset: '2024-10-12T00:00:00+02:00' }");
+
+                    // Assert
+                    Assert.Null(schema.Properties["local"].Format);
+                    Assert.Null(schema.Properties["year"].Format);
+                    Assert.Equal(JsonFormatStrings.Date, schema.Properties["date"].Format);
+                    Assert.Null(schema.Properties["invalidDate"].Format);
+                    Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["midnight"].Format);
+                    Assert.Equal(JsonFormatStrings.DateTime, schema.Properties["offset"].Format);
+                    Assert.Empty(schema.Validate("{ \"local\": \"10/12/2024\", \"year\": \"2024\", \"date\": \"2024-02-29\", \"invalidDate\": \"2023-02-29\", \"midnight\": \"2024-10-12T00:00:00\", \"offset\": \"2024-10-12T00:00:00+02:00\" }"));
+                }
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+            }
+        }
+
+        private sealed class TrackingMemoryStream(byte[] buffer) : MemoryStream(buffer)
+        {
+            public bool IsDisposed { get; private set; }
+
+            protected override void Dispose(bool disposing)
+            {
+                IsDisposed = true;
+                base.Dispose(disposing);
+            }
         }
     }
 }

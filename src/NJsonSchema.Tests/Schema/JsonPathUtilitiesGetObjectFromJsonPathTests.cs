@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Serialization;
-
-namespace NJsonSchema.Tests.Schema
+﻿namespace NJsonSchema.Tests.Schema
 {
     public class JsonPathUtilitiesGetObjectFromJsonPathTests
     {
@@ -20,7 +18,7 @@ namespace NJsonSchema.Tests.Schema
 
             // Act
             var resolver = new JsonReferenceResolver(null);
-            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/Property2", typeof(JsonSchema), new DefaultContractResolver());
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/Property2", typeof(JsonSchema));
 
             // Assert
             Assert.Equal(foundObject, objectToSearch);
@@ -46,7 +44,7 @@ namespace NJsonSchema.Tests.Schema
 
             // Act
             var resolver = new JsonReferenceResolver(null);
-            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/2", typeof(JsonSchema), new DefaultContractResolver());
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/2", typeof(JsonSchema));
 
             // Assert
             Assert.Equal(foundObject, objectToSearch);
@@ -72,7 +70,7 @@ namespace NJsonSchema.Tests.Schema
 
             // Act
             var resolver = new JsonReferenceResolver(null);
-            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/Test3", typeof(JsonSchema), new DefaultContractResolver());
+            var foundObject = await resolver.ResolveReferenceAsync(obj, "#/Property/List/Test3", typeof(JsonSchema));
 
             // Assert
             Assert.Equal(foundObject, objectToSearch);
@@ -86,7 +84,7 @@ namespace NJsonSchema.Tests.Schema
 
             // Act
             var resolver = new JsonReferenceResolver(null);
-            var foundObject = await resolver.ResolveReferenceAsync(objectToSearch, "#", typeof(JsonSchema), new DefaultContractResolver());
+            var foundObject = await resolver.ResolveReferenceAsync(objectToSearch, "#", typeof(JsonSchema));
 
             // Assert
             Assert.Equal(foundObject, objectToSearch);

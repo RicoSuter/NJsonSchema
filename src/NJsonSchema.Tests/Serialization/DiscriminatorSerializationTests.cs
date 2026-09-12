@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using NJsonSchema.CodeGeneration.Tests;
+﻿using NJsonSchema.CodeGeneration.Tests;
 using NJsonSchema.Infrastructure;
 
 namespace NJsonSchema.Tests.Serialization
@@ -87,7 +85,7 @@ namespace NJsonSchema.Tests.Serialization
             };
 
             // Act
-            var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, new DefaultContractResolver(), Formatting.Indented);
+            var json = JsonSchemaSerialization.ToJson(schema, SchemaType.Swagger2, null, true);
 
             // Assert
             Assert.Contains(@"""discriminator"": ""discr""", json);

@@ -2,7 +2,6 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Foo",
   "type": "object",
-  "additionalProperties": false,
   "properties": {
     "Dictionary": {
       "type": [
@@ -31,7 +30,6 @@
   "definitions": {
     "Bar": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "Name": {
           "type": [
@@ -39,7 +37,9 @@
             "string"
           ]
         }
-      }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "additionalProperties": false
 }

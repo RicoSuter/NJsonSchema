@@ -10,7 +10,7 @@ using System.Collections.Concurrent;
 using System.Runtime.Serialization;
 
 using Namotion.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 using NJsonSchema.Generation;
 
@@ -30,10 +30,10 @@ namespace NJsonSchema.Infrastructure
 
         private static string GetNameWithoutCache(ContextualAccessorInfo accessorInfo)
         {
-            var jsonPropertyAttribute = accessorInfo.GetAttribute<JsonPropertyAttribute>(true);
-            if (jsonPropertyAttribute != null && !string.IsNullOrEmpty(jsonPropertyAttribute.PropertyName))
+            var jsonPropertyNameAttribute = accessorInfo.GetAttribute<JsonPropertyNameAttribute>(true);
+            if (jsonPropertyNameAttribute != null && !string.IsNullOrEmpty(jsonPropertyNameAttribute.Name))
             {
-                return jsonPropertyAttribute.PropertyName!;
+                return jsonPropertyNameAttribute.Name!;
             }
 
             var dataMemberAttribute = accessorInfo.GetAttribute<DataMemberAttribute>(true);

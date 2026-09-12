@@ -2,7 +2,6 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "IntegerEnumContainer",
   "type": "object",
-  "additionalProperties": false,
   "properties": {
     "IntegerCloudCover": {
       "$ref": "#/definitions/IntegerCloudCover"
@@ -23,5 +22,6 @@
         2
       ]
     }
-  }
+  },
+  "additionalProperties": false
 }

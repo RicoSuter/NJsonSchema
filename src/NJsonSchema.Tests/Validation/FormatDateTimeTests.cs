@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation
@@ -13,7 +13,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("test");
+            var token = JsonValue.Create("test");
 
             // Act
             var errors = schema.Validate(token);
@@ -30,7 +30,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("2014-12-01 11:00:01");
+            var token = JsonValue.Create("2014-12-01 11:00:01");
 
             // Act
             var errors = schema.Validate(token);
@@ -47,7 +47,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("25/01/2015");
+            var token = JsonValue.Create("25/01/2015");
 
             // Act
             var errors = schema.Validate(token);
@@ -64,7 +64,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("2015-01-25T15:43:30Z");
+            var token = JsonValue.Create("2015-01-25T15:43:30Z");
 
             // Act
             var errors = schema.Validate(token);
@@ -81,7 +81,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("2015-01-25T15:43:30+10:00");
+            var token = JsonValue.Create("2015-01-25T15:43:30+10:00");
 
             // Act
             var errors = schema.Validate(token);
@@ -98,7 +98,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("2015-01-25T15:43:30.1234567Z");
+            var token = JsonValue.Create("2015-01-25T15:43:30.1234567Z");
 
             // Act
             var errors = schema.Validate(token);
@@ -115,7 +115,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("2015-01-25T15:43:30.123456789Z");
+            var token = JsonValue.Create("2015-01-25T15:43:30.123456789Z");
 
             // Act
             var errors = schema.Validate(token);
@@ -132,7 +132,7 @@ namespace NJsonSchema.Tests.Validation
             schema.Type = JsonObjectType.String;
             schema.Format = JsonFormatStrings.DateTime;
 
-            var token = new JValue("2024-01-31Z");
+            var token = JsonValue.Create("2024-01-31Z");
 
             // Act
             var errors = schema.Validate(token);

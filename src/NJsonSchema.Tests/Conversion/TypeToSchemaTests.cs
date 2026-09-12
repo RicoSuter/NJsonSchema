@@ -16,9 +16,9 @@ namespace NJsonSchema.Tests.Conversion
             var schema = NewtonsoftJsonSchemaGenerator.FromType<MyType>();
 
             // Act
-            var schemaData1 = JsonConvert.SerializeObject(schema, Formatting.Indented);
-            var schema2 = JsonConvert.DeserializeObject<JsonSchema>(schemaData1);
-            var schemaData2 = JsonConvert.SerializeObject(schema2, Formatting.Indented);
+            var schemaData1 = schema.ToJson();
+            var schema2 = await JsonSchema.FromJsonAsync(schemaData1);
+            var schemaData2 = schema2.ToJson();
 
             // Assert
             Assert.Equal(schemaData1, schemaData2);

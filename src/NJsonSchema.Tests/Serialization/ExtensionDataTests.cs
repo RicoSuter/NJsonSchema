@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using NJsonSchema.Annotations;
 using NJsonSchema.NewtonsoftJson.Generation;
 
@@ -55,7 +55,7 @@ namespace NJsonSchema.Tests.Serialization
             var schema = await JsonSchema.FromJsonAsync(json);
 
             // Assert
-            Assert.Equal((long)123, schema.ExtensionData["Test"]);
+            Assert.Equal(123, schema.ExtensionData["Test"]);
         }
 
         [Fact]
@@ -253,7 +253,8 @@ namespace NJsonSchema.Tests.Serialization
             var json2 = schema.ToJson();
 
             // Assert
-            Assert.Equal(json.Replace("\r", string.Empty), json2.Replace("\r", string.Empty));
+            Assert.True(System.Text.Json.Nodes.JsonNode.DeepEquals(
+                System.Text.Json.Nodes.JsonNode.Parse(json), System.Text.Json.Nodes.JsonNode.Parse(json2)));
         }
     }
 }

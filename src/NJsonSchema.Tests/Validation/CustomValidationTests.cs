@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using NJsonSchema.Validation;
 using NJsonSchema.Validation.FormatValidators;
 using System.Globalization;
@@ -17,7 +18,7 @@ namespace NJsonSchema.Tests.Validation
                 Format = JsonFormatStrings.DateTime
             };
 
-            var token = new JValue("2014-12-01 11:00:01:55");
+            var token = JsonValue.Create("2014-12-01 11:00:01:55");
 
             // Act
             var settings = new JsonSchemaValidatorSettings();
@@ -50,10 +51,9 @@ namespace NJsonSchema.Tests.Validation
             /// <param name="value">String value.</param>
             /// <param name="tokenType">Type of token holding the value.</param>
             /// <returns></returns>
-            public bool IsValid(string value, JTokenType tokenType)
+            public bool IsValid(string value, JsonValueKind tokenType)
             {
-                return tokenType == JTokenType.Date
-                       || DateTimeOffset.TryParseExact(value, _acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+                return DateTimeOffset.TryParseExact(value, _acceptableFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
             }
         }
     }
