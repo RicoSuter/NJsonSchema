@@ -25,6 +25,8 @@ Planned (not yet merged — track via linked PRs):
 
 ### Fixes
 
+- Preserve validation source coordinates for colliding or escaped property names, null values, and nested errors without changing public diagnostic paths. Count CRLF and bare CR correctly, retain character positions for multibyte text, skip source lookup for valid documents, and scan error locations in linear time.
+
 - Restore case-insensitive schema member input (including readonly declarations) without folding dictionary or vendor-extension keys. Restore free-form Newtonsoft `JObject`/`JToken` generation, preserving explicit type mappers and array handling.
 
 - Generate integral enum constants and default member names from exact JSON numeric values, including decimal and exponent spellings and metadata flags. Match enum defaults by JSON equality and reuse declaration inputs for custom enum-name generators. This also repairs preexisting mixed-numeric default lookup mismatches; large C# integer values remain exact, while TypeScript retains JavaScript Number semantics.

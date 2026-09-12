@@ -20,11 +20,14 @@ namespace NJsonSchema.Validation
         private readonly string _propertyName;
         private readonly JsonNode? _value;
 
-        public JsonPropertyToken(string propertyName, JsonNode? value)
+        public JsonPropertyToken(string propertyName, JsonNode? value, JsonObject owner)
         {
             _propertyName = propertyName;
             _value = value;
+            SourceIdentity = ((JsonNode)owner, propertyName, -2);
         }
+
+        internal object SourceIdentity { get; }
 
         /// <summary>
         /// Returns the property in Newtonsoft JProperty format: <c>"name": value</c>.

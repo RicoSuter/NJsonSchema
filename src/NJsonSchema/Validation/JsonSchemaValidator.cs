@@ -67,382 +67,12 @@ namespace NJsonSchema.Validation
 
             var errors = Validate(jsonObject, schema, schemaType);
 
-            var lineInfoMap = BuildLineInfoMap(jsonToParse);
-            ApplyLineInfo(errors, lineInfoMap);
+            if (errors.Count > 0)
+            {
+                JsonSourceLocation.Apply(jsonToParse, jsonObject, errors);
+            }
 
             return errors;
-        }
-
-        /// <summary>
-        /// Builds a map from JSON paths to line/column positions by scanning the raw JSON with a Utf8JsonReader.
-        /// Positions match Newtonsoft.Json's IJsonLineInfo convention: the reader position right after consuming
-        /// the token, measured as a character offset from the line start.
-        /// Two types of entries are stored:
-        /// - Value entries (key = "#/path"): position past the end of the value token
-        /// - Property entries (key = "#/path\x00prop"): position past the colon of the property name
-        /// </summary>
-        private static Dictionary<string, (int Line, int Position)> BuildLineInfoMap(string jsonData)
-        {
-            var map = new Dictionary<string, (int Line, int Position)>();
-            var jsonBytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
-            var readerOptions = new JsonReaderOptions
-            {
-                CommentHandling = JsonCommentHandling.Skip,
-                AllowTrailingCommas = true,
-            };
-            var reader = new Utf8JsonReader(jsonBytes, readerOptions);
-
-            // Precompute line start BYTE offsets for quick line/position lookup.
-            // Utf8JsonReader reports byte offsets; the public LinePosition is a character
-            // count per Newtonsoft's IJsonLineInfo convention, so the conversion happens
-            // in GetLineAndPosition using UTF-8 decoding.
-            var lineStartOffsets = BuildLineStartOffsets(jsonBytes);
-
-            var currentPath = new List<string>();
-            var arrayIndexStack = new Stack<int>();
-            string? pendingPropertyName = null;
-            long pendingPropertyEndOffset = 0;
-
-            while (reader.Read())
-            {
-                switch (reader.TokenType)
-                {
-                    case JsonTokenType.StartObject:
-                    case JsonTokenType.StartArray:
-                    {
-                        if (pendingPropertyName != null)
-                        {
-                            // Record property-level position (past the colon) before pushing
-                            currentPath.Add(pendingPropertyName);
-                            var propertyKey = BuildPathString(currentPath) + "\x00prop";
-                            map[propertyKey] = GetLineAndPosition(lineStartOffsets, pendingPropertyEndOffset, jsonBytes);
-                            pendingPropertyName = null;
-                        }
-                        else if (arrayIndexStack.Count > 0)
-                        {
-                            var index = arrayIndexStack.Pop();
-                            currentPath.Add($"[{index}]");
-                            arrayIndexStack.Push(index + 1);
-                        }
-
-                        // Record value-level position for the container (past the opening bracket)
-                        var containerPath = BuildPathString(currentPath);
-                        var endOffset = reader.TokenStartIndex + 1; // past '{' or '['
-                        map[containerPath] = GetLineAndPosition(lineStartOffsets, endOffset, jsonBytes);
-
-                        if (reader.TokenType == JsonTokenType.StartArray)
-                        {
-                            arrayIndexStack.Push(0);
-                        }
-
-                        break;
-                    }
-                    case JsonTokenType.EndObject:
-                    {
-                        if (currentPath.Count > 0)
-                        {
-                            currentPath.RemoveAt(currentPath.Count - 1);
-                        }
-
-                        break;
-                    }
-                    case JsonTokenType.EndArray:
-                    {
-                        if (arrayIndexStack.Count > 0)
-                        {
-                            arrayIndexStack.Pop();
-                        }
-
-                        if (currentPath.Count > 0)
-                        {
-                            currentPath.RemoveAt(currentPath.Count - 1);
-                        }
-
-                        break;
-                    }
-                    case JsonTokenType.PropertyName:
-                    {
-                        pendingPropertyName = reader.GetString();
-                        // Compute the byte offset past the colon after the property name.
-                        // Scan forward from end of property name string to find ':'.
-                        var colonOffset = FindColonAfterPropertyName(jsonBytes, reader.TokenStartIndex);
-                        pendingPropertyEndOffset = colonOffset + 1; // past the ':'
-                        break;
-                    }
-                    default:
-                    {
-                        // Value token (String, Number, True, False, Null)
-                        var endOffset = GetTokenEndOffset(reader);
-
-                        string valuePath;
-                        if (pendingPropertyName != null)
-                        {
-                            currentPath.Add(pendingPropertyName);
-                            valuePath = BuildPathString(currentPath);
-
-                            // Also record property-level position
-                            var propertyKey = valuePath + "\x00prop";
-                            map[propertyKey] = GetLineAndPosition(lineStartOffsets, pendingPropertyEndOffset, jsonBytes);
-
-                            currentPath.RemoveAt(currentPath.Count - 1);
-                            pendingPropertyName = null;
-                        }
-                        else if (arrayIndexStack.Count > 0)
-                        {
-                            var index = arrayIndexStack.Pop();
-                            currentPath.Add($"[{index}]");
-                            valuePath = BuildPathString(currentPath);
-                            currentPath.RemoveAt(currentPath.Count - 1);
-                            arrayIndexStack.Push(index + 1);
-                        }
-                        else
-                        {
-                            valuePath = BuildPathString(currentPath);
-                        }
-
-                        map[valuePath] = GetLineAndPosition(lineStartOffsets, endOffset, jsonBytes);
-                        break;
-                    }
-                }
-            }
-
-            return map;
-        }
-
-        private static long GetTokenEndOffset(Utf8JsonReader reader)
-        {
-            // Returns the byte offset past the last byte of the current token.
-            return reader.TokenType switch
-            {
-                JsonTokenType.String => reader.TokenStartIndex + 2 + (reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length),
-                JsonTokenType.Number => reader.TokenStartIndex + (reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length),
-                JsonTokenType.True => reader.TokenStartIndex + 4,
-                JsonTokenType.False => reader.TokenStartIndex + 5,
-                JsonTokenType.Null => reader.TokenStartIndex + 4,
-                _ => reader.TokenStartIndex + 1,
-            };
-        }
-
-        private static long FindColonAfterPropertyName(byte[] jsonBytes, long propertyNameTokenStart)
-        {
-            // PropertyName token starts at the opening '"'. Scan forward to find the closing '"',
-            // then continue scanning to find the ':'.
-            var index = propertyNameTokenStart + 1; // skip opening '"'
-            var inEscape = false;
-            // Find closing '"'
-            while (index < jsonBytes.Length)
-            {
-                if (inEscape)
-                {
-                    inEscape = false;
-                }
-                else if (jsonBytes[index] == (byte)'\\')
-                {
-                    inEscape = true;
-                }
-                else if (jsonBytes[index] == (byte)'"')
-                {
-                    break; // found closing '"'
-                }
-                index++;
-            }
-            index++; // past closing '"'
-            // Find ':'
-            while (index < jsonBytes.Length && jsonBytes[index] != (byte)':')
-            {
-                index++;
-            }
-            return index; // position of ':'
-        }
-
-        private static List<long> BuildLineStartOffsets(byte[] jsonBytes)
-        {
-            var offsets = new List<long> { 0 }; // Line 1 starts at offset 0
-            for (var i = 0; i < jsonBytes.Length; i++)
-            {
-                if (jsonBytes[i] == (byte)'\n')
-                {
-                    offsets.Add(i + 1); // Next line starts after '\n'
-                }
-            }
-            return offsets;
-        }
-
-        private static (int Line, int Position) GetLineAndPosition(List<long> lineStartOffsets, long byteOffset, byte[] jsonBytes)
-        {
-            // Find the line containing this byte offset.
-            var lineIndex = lineStartOffsets.Count - 1;
-            for (var i = lineStartOffsets.Count - 1; i >= 0; i--)
-            {
-                if (lineStartOffsets[i] <= byteOffset)
-                {
-                    lineIndex = i;
-                    break;
-                }
-            }
-
-            var lineStart = lineStartOffsets[lineIndex];
-            var line = lineIndex + 1; // 1-based line number
-            var byteLength = (int)(byteOffset - lineStart);
-
-            // Convert the byte offset within the line to a character count so LinePosition
-            // matches Newtonsoft's IJsonLineInfo convention (characters, not UTF-8 bytes).
-            var position = byteLength == 0
-                ? 0
-                : System.Text.Encoding.UTF8.GetCharCount(jsonBytes, (int)lineStart, byteLength);
-            return (line, position);
-        }
-
-        private static string BuildPathString(List<string> pathSegments)
-        {
-            if (pathSegments.Count == 0)
-            {
-                return "#";
-            }
-
-            var result = new System.Text.StringBuilder("#/");
-            for (var i = 0; i < pathSegments.Count; i++)
-            {
-                var segment = pathSegments[i];
-                if (i > 0 && !segment.StartsWith('['))
-                {
-                    result.Append('.');
-                }
-                result.Append(segment);
-            }
-
-            return result.ToString();
-        }
-
-        private static void ApplyLineInfo(ICollection<ValidationError> errors, Dictionary<string, (int Line, int Position)> lineInfoMap)
-        {
-            foreach (var error in errors)
-            {
-                ApplyLineInfoToError(error, lineInfoMap);
-            }
-        }
-
-        private static void ApplyLineInfoToError(ValidationError error, Dictionary<string, (int Line, int Position)> lineInfoMap)
-        {
-            string? lookupPath = null;
-
-            if (error.Token is JsonNode tokenNode)
-            {
-                lookupPath = ConvertJsonNodePathToValidationPath(tokenNode.GetPath());
-            }
-            else if (error.Token is JsonPropertyToken)
-            {
-                // For property-level errors (e.g. NoAdditionalPropertiesAllowed), use the property position
-                var propertyKey = (error.Path ?? "#") + "\x00prop";
-                if (lineInfoMap.TryGetValue(propertyKey, out var propertyPosition))
-                {
-                    error.HasLineInfo = true;
-                    error.LineNumber = propertyPosition.Line;
-                    error.LinePosition = propertyPosition.Position;
-                }
-            }
-
-            if (!error.HasLineInfo)
-            {
-                // Fallback to value position using token path or error path
-                lookupPath ??= error.Path ?? "#";
-
-                if (lineInfoMap.TryGetValue(lookupPath, out var position))
-                {
-                    error.HasLineInfo = true;
-                    error.LineNumber = position.Line;
-                    error.LinePosition = position.Position;
-                }
-            }
-
-            // Recurse into child schema errors
-            if (error is ChildSchemaValidationError childError)
-            {
-                foreach (var childErrors in childError.Errors.Values)
-                {
-                    ApplyLineInfo(childErrors, lineInfoMap);
-                }
-            }
-            else if (error is MultiTypeValidationError multiError)
-            {
-                foreach (var childErrors in multiError.Errors.Values)
-                {
-                    ApplyLineInfo(childErrors, lineInfoMap);
-                }
-            }
-        }
-
-        private static string ConvertJsonNodePathToValidationPath(string jsonNodePath)
-        {
-            // JsonNode.GetPath() returns "$", "$.prop1", "$.prop4[0]", "$[0]", or "$['foo.bar']".
-            // Map uses "#", "#/prop1", "#/prop4[0]", "#/[0]", "#/foo.bar" etc.
-            if (jsonNodePath == "$")
-            {
-                return "#";
-            }
-
-            var result = new System.Text.StringBuilder("#");
-            var i = 1; // skip the leading '$'
-            var isFirstSegment = true;
-
-            while (i < jsonNodePath.Length)
-            {
-                var c = jsonNodePath[i];
-                if (c == '.')
-                {
-                    // Dotted property name: `.propName` — `#/propName` (first) or `#/<prev>.propName`
-                    i++;
-                    var end = i;
-                    while (end < jsonNodePath.Length && jsonNodePath[end] != '.' && jsonNodePath[end] != '[')
-                    {
-                        end++;
-                    }
-                    result.Append(isFirstSegment ? "/" : ".");
-                    result.Append(jsonNodePath, i, end - i);
-                    i = end;
-                    isFirstSegment = false;
-                }
-                else if (c == '[')
-                {
-                    // Either bracket-quoted property name `['foo.bar']` or array index `[0]`.
-                    if (i + 1 < jsonNodePath.Length && jsonNodePath[i + 1] == '\'')
-                    {
-                        var closeQuote = jsonNodePath.IndexOf('\'', i + 2);
-                        if (closeQuote < 0)
-                        {
-                            break;
-                        }
-                        var propName = jsonNodePath.Substring(i + 2, closeQuote - (i + 2));
-                        result.Append(isFirstSegment ? "/" : ".");
-                        result.Append(propName);
-                        i = closeQuote + 2; // past `']`
-                        isFirstSegment = false;
-                    }
-                    else
-                    {
-                        // Array index — preserve `[n]` and keep as its own segment.
-                        if (isFirstSegment)
-                        {
-                            result.Append('/');
-                            isFirstSegment = false;
-                        }
-                        var end = jsonNodePath.IndexOf(']', i);
-                        if (end < 0)
-                        {
-                            break;
-                        }
-                        result.Append(jsonNodePath, i, end - i + 1);
-                        i = end + 1;
-                    }
-                }
-                else
-                {
-                    // Unexpected character — bail out so we don't produce a malformed path.
-                    break;
-                }
-            }
-
-            return result.ToString();
         }
 
         /// <summary>Validates the given JSON token.</summary>
@@ -752,7 +382,7 @@ namespace NJsonSchema.Validation
                 var newPropertyPath = GetPropertyPath(propertyPath, propertyInfo.Key);
 
                 if (obj != null &&
-                    TryGetPropertyWithStringComparer(obj, propertyInfo.Key, stringComparer, out var value))
+                    TryGetPropertyWithStringComparer(obj, propertyInfo.Key, stringComparer, out var value, out var actualPropertyName))
                 {
                     if (value == null && propertyInfo.Value.IsNullable(schemaType))
                     {
@@ -760,6 +390,7 @@ namespace NJsonSchema.Validation
                     }
 
                     var propertyErrors = Validate(value, propertyInfo.Value.ActualSchema, schemaType, propertyInfo.Key, newPropertyPath);
+                    JsonSourceLocation.SetNullIdentity(propertyErrors, ((JsonNode)obj, actualPropertyName, -1));
                     errors.AddRange(propertyErrors);
                 }
                 else if (propertyInfo.Value.IsRequired)
@@ -830,7 +461,7 @@ namespace NJsonSchema.Validation
                     var error = TryCreateChildSchemaError(kvp.Value,
                         patternPropertySchema.Value,
                         schemaType,
-                        ValidationErrorKind.AdditionalPropertiesNotValid, kvp.Key, propPath);
+                        ValidationErrorKind.AdditionalPropertiesNotValid, kvp.Key, propPath, ((JsonNode)obj, kvp.Key, -1));
 
                     if (error != null)
                     {
@@ -853,7 +484,7 @@ namespace NJsonSchema.Validation
                     var error = TryCreateChildSchemaError(obj[propName],
                         schema.AdditionalPropertiesSchema,
                         schemaType,
-                        ValidationErrorKind.AdditionalPropertiesNotValid, propName, propPath);
+                        ValidationErrorKind.AdditionalPropertiesNotValid, propName, propPath, ((JsonNode)obj, propName, -1));
                     if (error != null)
                     {
                         errors.Add(error);
@@ -865,7 +496,7 @@ namespace NJsonSchema.Validation
                 foreach (var propName in additionalPropertyNames)
                 {
                     var newPropertyPath = GetPropertyPath(propertyPath, propName);
-                    var propertyToken = new JsonPropertyToken(propName, obj[propName]?.DeepClone());
+                    var propertyToken = new JsonPropertyToken(propName, obj[propName]?.DeepClone(), obj);
                     errors.Add(new ValidationError(ValidationErrorKind.NoAdditionalPropertiesAllowed, propName, newPropertyPath, propertyToken, schema));
                 }
             }
@@ -893,6 +524,7 @@ namespace NJsonSchema.Validation
                 for (var index = 0; index < array.Count; index++)
                 {
                     var item = array[index];
+                    var firstError = errors.Count;
 
                     var propertyIndex = $"[{index}]";
                     var itemPath = !string.IsNullOrEmpty(propertyPath) ? propertyPath + propertyIndex : propertyIndex;
@@ -907,6 +539,10 @@ namespace NJsonSchema.Validation
                     }
 
                     ValidateAdditionalItems(item, schema, schemaType, index, propertyPath, errors);
+                    for (var errorIndex = firstError; errorIndex < errors.Count; errorIndex++)
+                    {
+                        JsonSourceLocation.SetNullIdentity(errors[errorIndex], ((JsonNode)array, (string?)null, index));
+                    }
                 }
             }
             else if (type.IsArray())
@@ -955,7 +591,7 @@ namespace NJsonSchema.Validation
             }
         }
 
-        private ChildSchemaValidationError? TryCreateChildSchemaError(JsonNode? token, JsonSchema schema, SchemaType schemaType, ValidationErrorKind errorKind, string property, string path)
+        private ChildSchemaValidationError? TryCreateChildSchemaError(JsonNode? token, JsonSchema schema, SchemaType schemaType, ValidationErrorKind errorKind, string property, string path, object? sourceIdentity = null)
         {
             var errors = Validate(token, schema.ActualSchema, schemaType, null, path);
             if (errors.Count == 0)
@@ -968,11 +604,22 @@ namespace NJsonSchema.Validation
                 { schema, errors }
             };
 
-            return new ChildSchemaValidationError(errorKind, property, path, errorDictionary, token, schema);
+            var error = new ChildSchemaValidationError(errorKind, property, path, errorDictionary, token, schema);
+            if (sourceIdentity != null)
+            {
+                JsonSourceLocation.SetNullIdentity(error, sourceIdentity);
+            }
+            return error;
         }
 
         private static bool TryGetPropertyWithStringComparer(JsonObject obj, string propertyName, StringComparer comparer, out JsonNode? value)
         {
+            return TryGetPropertyWithStringComparer(obj, propertyName, comparer, out value, out _);
+        }
+
+        private static bool TryGetPropertyWithStringComparer(JsonObject obj, string propertyName, StringComparer comparer, out JsonNode? value, out string actualPropertyName)
+        {
+            actualPropertyName = propertyName;
             if (obj.TryGetPropertyValue(propertyName, out value))
             {
                 return true;
@@ -982,6 +629,7 @@ namespace NJsonSchema.Validation
             {
                 if (comparer.Equals(propertyName, kvp.Key))
                 {
+                    actualPropertyName = kvp.Key;
                     value = kvp.Value;
                     return true;
                 }

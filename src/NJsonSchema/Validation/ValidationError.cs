@@ -33,6 +33,8 @@ namespace NJsonSchema.Validation
             Schema = schema;
         }
 
+        internal object? SourceIdentity { get; set; }
+
         /// <summary>Gets the error kind. </summary>
         public ValidationErrorKind Kind { get; private set; }
 

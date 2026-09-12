@@ -1,5 +1,4 @@
 #nullable enable
-using System.Reflection;
 using NJsonSchema.Validation;
 
 namespace NJsonSchema.Tests.Validation;
@@ -61,27 +60,199 @@ public class LineInformationMultiByteTest
     }
 
     [Theory]
-    [InlineData("$", "#")]
-    [InlineData("$.prop", "#/prop")]
-    [InlineData("$.prop1.prop2", "#/prop1.prop2")]
-    [InlineData("$.prop[0]", "#/prop[0]")]
-    [InlineData("$[0]", "#/[0]")]
-    [InlineData("$[0][1]", "#/[0][1]")]
-    [InlineData("$['foo.bar']", "#/foo.bar")]
-    [InlineData("$.outer['foo.bar']", "#/outer.foo.bar")]
-    public void ConvertJsonNodePathToValidationPath_maps_known_shapes(string input, string expected)
+    [InlineData("\n", "null")]
+    [InlineData("\r\n", "null")]
+    [InlineData("\r", "null")]
+    [InlineData("\n", "\"é😀\"")]
+    public async Task Colliding_property_paths_keep_actual_source_locations(string newline, string value)
     {
         // Arrange
-        var method = typeof(JsonSchemaValidator).GetMethod(
-            "ConvertJsonNodePathToValidationPath",
-            BindingFlags.Static | BindingFlags.NonPublic)
-            ?? throw new InvalidOperationException("ConvertJsonNodePathToValidationPath not found");
+        var schema = await JsonSchema.FromJsonAsync("""
+            {"properties":{"a.b":{"type":["integer","boolean"]},"a":{"properties":{"b":{"anyOf":[{"type":"integer"},{"type":"boolean"}]}}}}}
+            """);
+        var lines = new[] { "{", "  \"a.b\": " + value + ",", "  \"a\": {", "    \"b\": " + value, "  }", "}" };
 
         // Act
-        var result = (string)method.Invoke(null, new object[] { input })!;
+        var errors = schema.Validate(string.Join(newline, lines)).ToArray();
 
         // Assert
-        Assert.Equal(expected, result);
+        Assert.Equal(2, errors.Length);
+        Assert.All(errors, error => Assert.Equal("#/a.b", error.Path));
+        AssertLocationTree(errors[0], 2, lines[1].Length - 1);
+        AssertLocationTree(errors[1], 4, lines[3].Length);
+    }
+
+    [Fact]
+    public void Root_null_has_token_end_location()
+    {
+        // Arrange
+        var schema = new JsonSchema { Type = JsonObjectType.Integer };
+
+        // Act
+        var error = Assert.Single(schema.Validate("null"));
+
+        // Assert
+        Assert.Equal("#/", error.Path);
+        AssertLocationTree(error, 1, 4);
+    }
+
+    [Theory]
+    [InlineData("a.b")]
+    [InlineData("[0]")]
+    [InlineData("")]
+    [InlineData("a\"b")]
+    [InlineData("a\\b")]
+    [InlineData("/~")]
+    [InlineData("é😀")]
+    public void Forbidden_properties_keep_name_coordinates(string name)
+    {
+        // Arrange
+        var schema = new JsonSchema { AllowAdditionalProperties = false };
+        var property = System.Text.Json.JsonSerializer.Serialize(name);
+        var json = "{\n  " + property + ": null\n}";
+
+        // Act
+        var error = Assert.Single(schema.Validate(json));
+
+        // Assert
+        Assert.Equal("#/" + name, error.Path);
+        AssertLocationTree(error, 2, 2 + property.Length + 1);
+    }
+
+    [Fact]
+    public async Task Array_null_and_bracket_property_keep_distinct_locations()
+    {
+        // Arrange
+        var schema = await JsonSchema.FromJsonAsync("""
+            {"properties":{"a[0]":{"type":"integer"},"a":{"type":"array","items":{"type":"integer"}}}}
+            """);
+
+        // Act
+        var errors = schema.Validate("{\n\"a[0]\": null,\n\"a\": [null]\n}").ToArray();
+
+        // Assert
+        Assert.Equal(2, errors.Length);
+        Assert.All(errors, error => Assert.Equal("#/a[0]", error.Path));
+        AssertLocationTree(errors[0], 2, 12);
+        AssertLocationTree(errors[1], 3, 10);
+    }
+
+    [Theory]
+    [InlineData("a.b")]
+    [InlineData("[0]")]
+    [InlineData("")]
+    [InlineData("a\"b")]
+    [InlineData("a\\b")]
+    [InlineData("/~")]
+    [InlineData("é😀")]
+    public void Special_property_names_keep_value_coordinates(string name)
+    {
+        // Arrange
+        var schema = new JsonSchema();
+        schema.Properties[name] = new JsonSchemaProperty { Type = JsonObjectType.Integer };
+        var property = System.Text.Json.JsonSerializer.Serialize(name);
+        var json = "{\n  " + property + ": \"é😀\"\n}";
+
+        // Act
+        var error = Assert.Single(schema.Validate(json));
+
+        // Assert
+        Assert.Equal("#/" + name, error.Path);
+        AssertLocationTree(error, 2, 2 + property.Length + 2 + 5);
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("\"wrong\"")]
+    public async Task Case_insensitive_matching_uses_actual_input_identity(string value)
+    {
+        // Arrange
+        var schema = await JsonSchema.FromJsonAsync("""
+            {"properties":{"a.b":{"type":"integer"},"a":{"properties":{"b":{"type":"integer"}}}}}
+            """);
+        var validator = new JsonSchemaValidator(new JsonSchemaValidatorSettings { PropertyStringComparer = StringComparer.OrdinalIgnoreCase });
+        var lines = new[] { "{", "\"A.B\": " + value + ",", "\"A\": {\"B\": " + value + "}", "}" };
+
+        // Act
+        var errors = validator.Validate(string.Join("\n", lines), schema).ToArray();
+
+        // Assert
+        Assert.Equal(2, errors.Length);
+        Assert.All(errors, error => Assert.Equal("#/a.b", error.Path));
+        AssertLocationTree(errors[0], 2, lines[1].Length - 1);
+        AssertLocationTree(errors[1], 3, lines[2].Length - 1);
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("{\"x\": 1}")]
+    public async Task Forbidden_colliding_properties_keep_original_owner(string value)
+    {
+        // Arrange
+        var schema = await JsonSchema.FromJsonAsync("""
+            {"additionalProperties":false,"properties":{"a":{"additionalProperties":false}}}
+            """);
+        var json = "{\n\"a.b\": " + value + ",\n\"a\": {\n\"b\": " + value + "\n}\n}";
+
+        // Act
+        var errors = schema.Validate(json).OrderBy(error => error.LineNumber).ToArray();
+
+        // Assert
+        Assert.Equal(2, errors.Length);
+        Assert.All(errors, error => Assert.Equal("#/a.b", error.Path));
+        AssertLocationTree(errors[0], 2, 6);
+        AssertLocationTree(errors[1], 4, 4);
+    }
+
+    [Theory]
+    [InlineData("{\"patternProperties\":{\".*\":{\"type\":\"integer\"}}}")]
+    [InlineData("{\"additionalProperties\":{\"type\":\"integer\"}}")]
+    public async Task Null_additional_and_pattern_properties_keep_child_locations(string schemaJson)
+    {
+        // Arrange
+        var schema = await JsonSchema.FromJsonAsync(schemaJson);
+
+        // Act
+        var errors = schema.Validate("{\n\"a.b\": null,\n\"\": null\n}").ToArray();
+
+        // Assert
+        Assert.Equal(2, errors.Length);
+        AssertLocationTree(errors[0], 2, 11);
+        AssertLocationTree(errors[1], 3, 8);
+    }
+
+    [Fact]
+    public async Task Null_tuple_and_additional_items_keep_child_locations()
+    {
+        // Arrange
+        var schema = await JsonSchema.FromJsonAsync("""
+            {"items":[{"type":"integer"}],"additionalItems":{"type":"boolean"}}
+            """);
+
+        // Act
+        var errors = schema.Validate("[\nnull,\nnull\n]").ToArray();
+
+        // Assert
+        Assert.Equal(2, errors.Length);
+        AssertLocationTree(errors[0], 2, 4);
+        AssertLocationTree(errors[1], 3, 4);
+    }
+
+    private static void AssertLocationTree(ValidationError error, int line, int position)
+    {
+        Assert.True(error.HasLineInfo);
+        Assert.Equal(line, error.LineNumber);
+        Assert.Equal(position, error.LinePosition);
+        if (error is ChildSchemaValidationError child)
+        {
+            foreach (var nested in child.Errors.Values.SelectMany(errors => errors))
+                AssertLocationTree(nested, line, position);
+        }
+        if (error is MultiTypeValidationError multi)
+        {
+            foreach (var nested in multi.Errors.Values.SelectMany(errors => errors))
+                AssertLocationTree(nested, line, position);
+        }
     }
 }
 #nullable restore
