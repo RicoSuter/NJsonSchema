@@ -35,7 +35,7 @@ namespace NJsonSchema
         {
             get
             {
-                var schema = Reference != null ? Reference : this;
+                var schema = Reference ?? this;
                 if (schema._allOf.Count > 1 && schema._allOf.Count(static s => !s.HasReference && !s.IsDictionary) == 1)
                 {
                     return schema._allOf.First(static s => !s.HasReference && !s.IsDictionary).ActualSchema;

@@ -425,6 +425,85 @@ namespace NJsonSchema
         [JsonProperty("default", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public object? Default { get; set; }
 
+        /// <summary>Gets or sets the const value (JSON Schema draft 6).
+        /// Set to any value (including null) to define a const constraint.
+        /// Set <see cref="HasConstValue"/> to false to remove the constraint.</summary>
+        [JsonProperty("const", NullValueHandling = NullValueHandling.Include)]
+        public object? Const
+        {
+            get;
+            set
+            {
+                field = value;
+                HasConstValue = true;
+            }
+        }
+
+        /// <summary>Gets or sets a value indicating whether the schema contains a const value.
+        /// Set to false to clear a previously set const constraint.</summary>
+        [JsonIgnore]
+        public bool HasConstValue { get; set; }
+
+        /// <summary>Determines whether the <see cref="Const"/> property should be serialized.</summary>
+        public bool ShouldSerializeConst() => HasConstValue;
+
+        /// <summary>Gets the inferred JSON object type for the const value.</summary>
+        [JsonIgnore]
+        public JsonObjectType ConstValueType
+        {
+            get
+            {
+                if (!HasConstValue)
+                {
+                    return JsonObjectType.None;
+                }
+
+                if (Const is JValue jv)
+                {
+                    return jv.Type switch
+                    {
+                        JTokenType.Boolean => JsonObjectType.Boolean,
+                        JTokenType.Integer => JsonObjectType.Integer,
+                        JTokenType.Float => JsonObjectType.Number,
+                        JTokenType.Null => JsonObjectType.Null,
+                        _ => JsonObjectType.String,
+                    };
+                }
+
+                if (Const is JArray)
+                {
+                    return JsonObjectType.Array;
+                }
+
+                if (Const is JObject)
+                {
+                    return JsonObjectType.Object;
+                }
+
+                if (Const is null)
+                {
+                    return JsonObjectType.Null;
+                }
+
+                if (Const is bool)
+                {
+                    return JsonObjectType.Boolean;
+                }
+
+                if (Const is int or long or short)
+                {
+                    return JsonObjectType.Integer;
+                }
+
+                if (Const is double or float or decimal)
+                {
+                    return JsonObjectType.Number;
+                }
+
+                return JsonObjectType.String;
+            }
+        }
+
         /// <summary>Gets or sets the required multiple of for the number value.</summary>
         [JsonProperty("multipleOf", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         public decimal? MultipleOf { get; set; }
@@ -814,7 +893,8 @@ namespace NJsonSchema
                                  _patternProperties.Count == 0 &&
                                  AdditionalPropertiesSchema == null &&
                                  MultipleOf == null &&
-                                !IsEnumeration;
+                                 !IsEnumeration &&
+                                 !HasConstValue;
 
         #endregion
 
