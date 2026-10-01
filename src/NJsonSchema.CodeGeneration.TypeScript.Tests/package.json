@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "moment": "^2.30.1",
+    "moment": "^2.31.0",
     "dayjs": "^1.11.13",
     "typescript": "^5.8.3"
   }
