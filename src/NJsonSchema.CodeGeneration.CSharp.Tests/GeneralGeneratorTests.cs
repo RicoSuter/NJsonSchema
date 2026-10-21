@@ -994,6 +994,40 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
             CSharpCompiler.AssertCompile(output);
         }
 
+        [Theory]
+        [InlineData("int64", "0", "9223372036854775807", "long", "0", "9223372036854775807")]
+        [InlineData("int64", "9007199254740993", "9007199254740995", "long", "9007199254740993", "9007199254740995")]
+        [InlineData("int64", "-9223372036854775808", "-1", "long", "-9223372036854775808", "-1")]
+        [InlineData("uint64", "0", "18446744073709551615", "ulong", "0", "18446744073709551615")]
+        public async Task When_64_bit_integer_has_range_use_exact_typed_range_attribute(
+            string format, string minimum, string maximum, string type, string expectedMinimum, string expectedMaximum)
+        {
+            var json = $"""
+            {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "format": "{{format}}",
+                  "minimum": {{minimum}},
+                  "maximum": {{maximum}}
+                }
+              }
+            }
+            """;
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                SchemaType = SchemaType.OpenApi3
+            });
+
+            var code = generator.GenerateFile("MyClass");
+
+            Assert.Contains($"Range(typeof({type}), \"{expectedMinimum}\", \"{expectedMaximum}\")", code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
         [Fact]
         public async Task When_definition_contains_minimum_a_range_attribute_is_added_with_minimum_and_max_double_maximum()
         {
