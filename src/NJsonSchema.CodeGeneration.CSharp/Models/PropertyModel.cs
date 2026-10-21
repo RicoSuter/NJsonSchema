@@ -147,8 +147,6 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             }
         }
 
-        private bool IsDecimalRange => GetSchemaFormat(_property.ActualSchema) is JsonFormatStrings.Decimal;
-
         /// <summary>
         /// The type of range attribute, used when the value is not double or integer.
         /// </summary>
@@ -193,7 +191,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         minimum ?? (propertyFormat == JsonFormatStrings.Long ? long.MinValue : ulong.MinValue)));
                 }
 
-                if (IsDecimalRange)
+                if (propertyFormat == JsonFormatStrings.Decimal)
                 {
                     // special case decimals
                     return ValueGeneratorBase.ConvertToNumberToStringCore(minimum.GetValueOrDefault(decimal.MinValue));
@@ -238,7 +236,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         maximum ?? (propertyFormat == JsonFormatStrings.Long ? long.MaxValue : ulong.MaxValue)));
                 }
 
-                if (IsDecimalRange)
+                if (propertyFormat == JsonFormatStrings.Decimal)
                 {
                     // special case decimals
                     return ValueGeneratorBase.ConvertToNumberToStringCore(maximum.GetValueOrDefault(decimal.MaxValue));
