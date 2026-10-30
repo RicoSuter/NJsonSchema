@@ -147,12 +147,16 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             }
         }
 
-        private bool IsDecimalRange => GetSchemaFormat(_property.ActualSchema) is JsonFormatStrings.Decimal;
-
         /// <summary>
         /// The type of range attribute, used when the value is not double or integer.
         /// </summary>
-        public string? RangeType => IsDecimalRange ? "decimal" : null;
+        public string? RangeType => GetSchemaFormat(_property.ActualSchema) switch
+        {
+            JsonFormatStrings.Long => "long",
+            JsonFormatStrings.ULong => "ulong",
+            JsonFormatStrings.Decimal => "decimal",
+            _ => null
+        };
 
         /// <summary>Gets the minimum value of the range attribute.</summary>
         public string RangeMinimumValue
@@ -181,7 +185,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     }
                 }
 
-                if (IsDecimalRange)
+                if (propertyFormat is JsonFormatStrings.Long or JsonFormatStrings.ULong)
+                {
+                    return FormatIntegerRangeValue(propertyFormat, EnsureBounds(propertyFormat,
+                        minimum ?? (propertyFormat == JsonFormatStrings.Long ? long.MinValue : ulong.MinValue)));
+                }
+
+                if (propertyFormat == JsonFormatStrings.Decimal)
                 {
                     // special case decimals
                     return ValueGeneratorBase.ConvertToNumberToStringCore(minimum.GetValueOrDefault(decimal.MinValue));
@@ -220,7 +230,13 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     }
                 }
 
-                if (IsDecimalRange)
+                if (propertyFormat is JsonFormatStrings.Long or JsonFormatStrings.ULong)
+                {
+                    return FormatIntegerRangeValue(propertyFormat, EnsureBounds(propertyFormat,
+                        maximum ?? (propertyFormat == JsonFormatStrings.Long ? long.MaxValue : ulong.MaxValue)));
+                }
+
+                if (propertyFormat == JsonFormatStrings.Decimal)
                 {
                     // special case decimals
                     return ValueGeneratorBase.ConvertToNumberToStringCore(maximum.GetValueOrDefault(decimal.MaxValue));
@@ -231,6 +247,11 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                     : type + "." + nameof(double.MaxValue);
             }
         }
+
+        private static string FormatIntegerRangeValue(string format, decimal value) =>
+            format == JsonFormatStrings.Long
+                ? Convert.ToInt64(value).ToString(CultureInfo.InvariantCulture)
+                : Convert.ToUInt64(value).ToString(CultureInfo.InvariantCulture);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static decimal EnsureBounds(string? propertyFormat, decimal value)

@@ -12,7 +12,7 @@ namespace MyNamespace
     {
 
         [Newtonsoft.Json.JsonProperty("value", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Range(-9223372036854775808L, 9223372036854775807L)]
+        [System.ComponentModel.DataAnnotations.Range(typeof(long), "-9223372036854775808", "9223372036854775807")]
         public long Value { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
