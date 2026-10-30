@@ -1002,7 +1002,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Tests
         public async Task When_64_bit_integer_has_range_use_exact_typed_range_attribute(
             string format, string minimum, string maximum, string type, string expectedMinimum, string expectedMaximum)
         {
-            var json = $"""
+            var json = $$"""
             {
               "type": "object",
               "properties": {

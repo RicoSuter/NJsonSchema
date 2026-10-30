@@ -12,7 +12,7 @@ namespace MyNamespace
     {
 
         [Newtonsoft.Json.JsonProperty("pageSize", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.Range(1L, long.MaxValue)]
+        [System.ComponentModel.DataAnnotations.Range(typeof(long), "1", "9223372036854775807")]
         public long? PageSize { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
