@@ -36,6 +36,62 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
         }
 
         [Fact]
+        public async Task When_generate_enum_as_string_then_string_enums_are_open_strings_with_allowed_values_in_comments()
+        {
+            var json =
+                """
+                {
+                  "type": "object",
+                  "definitions": {
+                    "State": {
+                      "type": "string",
+                      "enum": ["open", "closed"]
+                    }
+                  },
+                  "properties": {
+                    "state": { "$ref": "#/definitions/State" },
+                    "category": {
+                      "type": "string",
+                      "description": "A category.",
+                      "default": "commercial",
+                      "enum": ["commercial", "residential"]
+                    },
+                    "states": {
+                      "type": "array",
+                      "items": { "type": "string", "enum": ["open", "closed"] }
+                    },
+                    "legacyStatus": {
+                      "enum": ["pending", "complete"]
+                    },
+                    "priority": {
+                      "type": "integer",
+                      "enum": [1, 2]
+                    }
+                  }
+                }
+                """;
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                GenerateEnumAsString = true
+            });
+
+            var code = generator.GenerateFile("MyClass");
+
+            Assert.Contains("public string State", code);
+            Assert.Contains("public string Category", code);
+            Assert.Contains("= \"commercial\";", code);
+            Assert.Contains("public System.Collections.Generic.ICollection<string> States", code);
+            Assert.Contains("public string LegacyStatus", code);
+            Assert.Contains("public enum MyClassPriority", code);
+            Assert.Contains("Allowed values: \"open\", \"closed\".", code);
+            Assert.Contains("A category. Allowed values: \"commercial\", \"residential\".", code);
+            Assert.Contains("Allowed values: \"pending\", \"complete\".", code);
+            Assert.DoesNotContain("enum State", code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_enum_has_no_type_then_enum_is_generated_with_flags()
         {
             // Arrange

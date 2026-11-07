@@ -19,6 +19,7 @@ namespace NJsonSchema.CodeGeneration
 #pragma warning restore CS8618
         {
             GenerateDefaultValues = true;
+            GenerateEnumAsString = false;
             ExcludedTypeNames = [];
         }
 
@@ -27,6 +28,9 @@ namespace NJsonSchema.CodeGeneration
 
         /// <summary>Gets or sets a value indicating whether to generate default values for properties (when JSON Schema default is set, default: true).</summary>
         public bool GenerateDefaultValues { get; set; }
+
+        /// <summary>Gets or sets a value indicating whether string enums should be generated as plain strings (default: false).</summary>
+        public bool GenerateEnumAsString { get; set; }
 
         /// <summary>Gets or sets the excluded type names (must be defined in an import or other namespace).</summary>
         public string[] ExcludedTypeNames { get; set; }
