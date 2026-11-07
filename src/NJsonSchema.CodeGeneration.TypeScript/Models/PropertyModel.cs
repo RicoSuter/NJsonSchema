@@ -50,7 +50,16 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         public bool HasDescription => !string.IsNullOrEmpty(Description);
 
         /// <summary>Gets the description.</summary>
-        public string? Description => _property.Description;
+        public string? Description
+        {
+            get
+            {
+                var description = GetDescriptionWithEnumValues(_settings.GenerateEnumAsString);
+                return string.Equals(description, _property.Description, StringComparison.Ordinal)
+                    ? description
+                    : description?.Replace("*/", "* /");
+            }
+        }
 
         /// <summary>Gets the type of the property.</summary>
         public override string Type
@@ -61,6 +70,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     _classTemplateModel.HasInheritance &&
                     InterfaceName == _classTemplateModel.BaseDiscriminator)
                 {
+                    if (_settings.GenerateEnumAsString &&
+                        _property.ActualTypeSchema.IsEnumeration &&
+                        IsStringEnumSchema(_property.ActualTypeSchema))
+                    {
+                        return "string";
+                    }
+
                     // use string type as the discriminator property type in specialized interfaces
                     if (_property.ActualTypeSchema.IsEnumeration &&
                         _settings.EnumStyle == TypeScriptEnumStyle.Enum)

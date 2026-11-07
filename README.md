@@ -222,6 +222,22 @@ var file = generator.GenerateFile();
     
 The `file` variable now contains the C# code for all the classes defined in the JSON schema. 
 
+### Forward-compatible string enums
+
+Set `GenerateEnumAsString` to generate string-valued enums as plain strings instead of closed generated enum types. This allows clients to accept string enum values added by the server after the client was generated. The currently declared values are appended to each affected property's generated comment. The option is disabled by default; numeric enums are unchanged.
+
+```cs
+var csharpGenerator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+{
+    GenerateEnumAsString = true
+});
+
+var typeScriptGenerator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+{
+    GenerateEnumAsString = true
+});
+```
+
 ### TypeScript
 
 The previously generated JSON Schema would generate the following TypeScript interfaces. 
