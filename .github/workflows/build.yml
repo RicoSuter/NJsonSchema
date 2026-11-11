@@ -28,6 +28,10 @@ on:
       - '**/*.*'
       - '!**/*.md'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   windows-latest:
     name: windows-latest
@@ -53,11 +57,16 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('global.json', 'src/**/*.csproj', 'src/**/package.json') }}
+      - name: 'NuGet login'
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }}
       - name: 'Run: Compile, Test, Pack, Publish'
         run: ./build.cmd Compile Test Pack Publish
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
       - name: 'Publish: artifacts'
         uses: actions/upload-artifact@v5
         if: runner.os == 'Windows'
@@ -80,11 +89,16 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('global.json', 'src/**/*.csproj', 'src/**/package.json') }}
+      - name: 'NuGet login'
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }}
       - name: 'Run: Compile, Test, Pack, Publish'
         run: ./build.cmd Compile Test Pack Publish
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
       - name: 'Publish: artifacts'
         uses: actions/upload-artifact@v5
         if: runner.os == 'Windows'
