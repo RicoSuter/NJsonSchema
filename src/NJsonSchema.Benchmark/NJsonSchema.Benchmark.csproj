@@ -9,6 +9,13 @@
         <EnableNETAnalyzers>false</EnableNETAnalyzers>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>exe</OutputType>
+        <!--
+            This is a benchmark host, not a shipped library. It became packable in v11.4.0
+            when the Microsoft.NET.Test.Sdk reference was dropped, since that package sets
+            IsPackable to false implicitly, and the Publish target pushes every *.nupkg in
+            the artifacts directory.
+        -->
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
