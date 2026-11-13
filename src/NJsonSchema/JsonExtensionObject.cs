@@ -30,6 +30,13 @@ namespace NJsonSchema
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
+            if (!typeof(IJsonExtensionObject).IsAssignableFrom(objectType))
+            {
+                // Newtonsoft.Json picks the converter of an existing value, so it is used for a property of another
+                // type (e.g. object) that already holds a schema when the JSON repeats the key: read it like the first one
+                return serializer.Deserialize(reader);
+            }
+
             if (reader.TokenType != JsonToken.Null)
             {
                 var obj = (IJsonExtensionObject)Activator.CreateInstance(objectType)!;
