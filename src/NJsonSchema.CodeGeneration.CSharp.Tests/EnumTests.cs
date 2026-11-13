@@ -687,5 +687,44 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
             await VerifyHelper.Verify(code);
             CSharpCompiler.AssertCompile(code);
         }
+
+        [Theory]
+        [InlineData(CSharpJsonLibrary.NewtonsoftJson)]
+        [InlineData(CSharpJsonLibrary.SystemTextJson)]
+        public async Task When_string_enum_has_date_format_then_only_enum_converter_is_added(CSharpJsonLibrary jsonLibrary)
+        {
+            // Arrange
+            var json =
+                """
+                {
+                    "type": "object",
+                    "properties": {
+                        "day": { "$ref": "#/definitions/PublicHoliday" }
+                    },
+                    "definitions": {
+                        "PublicHoliday": {
+                            "type": "string",
+                            "format": "date",
+                            "enum": [ "2026-01-01", "2026-12-25" ],
+                            "x-enumNames": [ "NewYear", "Christmas" ]
+                        }
+                    }
+                }
+                """;
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema, new CSharpGeneratorSettings
+            {
+                ClassStyle = CSharpClassStyle.Poco,
+                JsonLibrary = jsonLibrary
+            });
+
+            // Act
+            var code = generator.GenerateFile("MyClass");
+
+            // Assert
+            Assert.Contains("public PublicHoliday Day { get; set; }", code);
+            Assert.DoesNotContain("JsonConverter(typeof(DateFormatConverter))", code);
+            CSharpCompiler.AssertCompile(code);
+        }
     }
 }

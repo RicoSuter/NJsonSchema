@@ -337,7 +337,8 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type.IsString();
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
-        public bool IsDate => _property.ActualSchema.Format == JsonFormatStrings.Date;
+        /// <remarks>An enum with the date format is generated as an enum, so its values are not formatted like dates.</remarks>
+        public bool IsDate => _property.ActualSchema.Format == JsonFormatStrings.Date && !_property.ActualTypeSchema.IsEnumeration;
 
         /// <summary>Gets a value indicating whether the property is deprecated.</summary>
         public bool IsDeprecated => _property.IsDeprecated;
