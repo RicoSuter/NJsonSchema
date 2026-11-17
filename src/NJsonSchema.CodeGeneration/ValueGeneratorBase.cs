@@ -8,6 +8,7 @@
 
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.CodeGeneration
 {
@@ -48,12 +49,21 @@ namespace NJsonSchema.CodeGeneration
         /// <returns>The code.</returns>
         public virtual string? GetDefaultValue(JsonSchema schema, bool allowsNull, string targetType, string? typeNameHint, bool useSchemaDefault, TypeResolverBase typeResolver)
         {
+            // For properties dive through allOf via ActualTypeSchema; for other schemas (incl. subclasses
+            // like NSwag's OpenApiParameter that override ActualSchema) respect the override via ActualSchema.
+            var actualSchema = schema is JsonSchemaProperty property ? property.ActualTypeSchema : schema.ActualSchema;
+
+            // Const values are always used as default values (they define the only valid value).
+            if (actualSchema.HasConstValue)
+            {
+                return GetConstantValue(actualSchema, targetType);
+            }
+
             if (schema.Default == null || !useSchemaDefault)
             {
                 return null;
             }
 
-            var actualSchema = schema is JsonSchemaProperty ? ((JsonSchemaProperty)schema).ActualTypeSchema : schema.ActualSchema;
             if (actualSchema.IsEnumeration && !actualSchema.Type.IsObject() && actualSchema.Type != JsonObjectType.None)
             {
                 return GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
@@ -114,6 +124,37 @@ namespace NJsonSchema.CodeGeneration
             return ConversionUtilities.ConvertToStringLiteral(schema.Default?.ToString() ?? string.Empty, "\"", "\"");
         }
 
+        /// <summary>Gets the constant value code for a schema with a const value.</summary>
+        /// <param name="schema">The schema with a const value.</param>
+        /// <param name="targetType">The target type name.</param>
+        /// <returns>The code representing the constant value, or null if not applicable.</returns>
+        protected virtual string? GetConstantValue(JsonSchema schema, string targetType)
+        {
+            if (!schema.HasConstValue)
+            {
+                return null;
+            }
+
+            var constType = schema.ConstValueType;
+
+            if (schema.Const is null || constType == JsonObjectType.Null)
+            {
+                return "null";
+            }
+
+            if (constType.IsBoolean())
+            {
+                return schema.Const.ToString()!.ToLowerInvariant();
+            }
+
+            if (constType.IsInteger() || constType.IsNumber())
+            {
+                return ConvertToNumberToStringCore(schema.Const);
+            }
+
+            return ConversionUtilities.ConvertToStringLiteral(schema.Const.ToString() ?? string.Empty, "\"", "\"");
+        }
+
         /// <summary>Converts a number to its string representation.</summary>
         /// <param name="value">The value.</param>
         /// <returns>The string.</returns>
@@ -126,6 +167,11 @@ namespace NJsonSchema.CodeGeneration
 
         internal static string ConvertToNumberToStringCore(object value)
         {
+            if (value is JValue jv && jv.Value != null)
+            {
+                value = jv.Value;
+            }
+
             return value switch
             {
                 byte b => b.ToString(CultureInfo.InvariantCulture),

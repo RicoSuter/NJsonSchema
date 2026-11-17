@@ -89,7 +89,8 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 schema.InheritedSchema == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
                 !Types.ContainsKey(schema) &&
-                !schema.HasReference)
+                !schema.HasReference &&
+                !schema.ActualTypeSchema.HasConstValue)
             {
                 return "any";
             }
@@ -100,6 +101,11 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 type = schema.ActualTypeSchema.Enumeration.All(v => v is int) ?
                     JsonObjectType.Integer :
                     JsonObjectType.String;
+            }
+
+            if (schema.ActualTypeSchema.HasConstValue)
+            {
+                return ResolveConst(schema.ActualTypeSchema);
             }
 
             if (type.IsNumber())
@@ -294,6 +300,28 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         private static string ResolveInteger(JsonSchema schema, string? typeNameHint)
         {
             return "number";
+        }
+
+        private static string ResolveConst(JsonSchema schema)
+        {
+            var constType = schema.ConstValueType;
+
+            if (schema.Const is null || constType == JsonObjectType.Null)
+            {
+                return "null";
+            }
+
+            if (constType.IsBoolean())
+            {
+                return schema.Const.ToString()!.ToLowerInvariant();
+            }
+
+            if (constType.IsInteger() || constType.IsNumber())
+            {
+                return ValueGeneratorBase.ConvertToNumberToStringCore(schema.Const);
+            }
+
+            return ConversionUtilities.ConvertToStringLiteral(schema.Const.ToString() ?? string.Empty, "\"", "\"");
         }
 
         private string ResolveArrayOrTuple(JsonSchema schema, string? typeNameHint, bool addInterfacePrefix)

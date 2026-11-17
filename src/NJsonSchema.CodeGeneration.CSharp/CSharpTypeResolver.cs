@@ -81,7 +81,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 schema.InheritedSchema == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
                 !Types.ContainsKey(schema) &&
-                !schema.HasReference)
+                !schema.HasReference &&
+                !schema.ActualTypeSchema.HasConstValue)
             {
                 return markAsNullableType ? Settings.AnyType + "?" : Settings.AnyType;
             }
@@ -92,6 +93,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 type = schema.ActualTypeSchema.Enumeration.All(v => v is int)
                     ? JsonObjectType.Integer
                     : JsonObjectType.String;
+            }
+
+            if (type == JsonObjectType.None && schema.ActualTypeSchema.HasConstValue)
+            {
+                type = schema.ActualTypeSchema.ConstValueType;
             }
 
             if (type.IsNumber())
