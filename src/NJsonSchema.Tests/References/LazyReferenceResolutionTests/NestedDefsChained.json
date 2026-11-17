@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "definitions": {
+    "homes": {
+      "myHome": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" },
+          "rooms": { "$ref": "#/definitions/types/standard" }
+        }
+      }
+    },
+    "types": {
+      "standard": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "string" }
+        }
+      }
+    }
+  },
+  "properties": {
+    "home": { "$ref": "#/definitions/homes/myHome" }
+  }
+}

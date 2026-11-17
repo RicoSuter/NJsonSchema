@@ -1,0 +1,7 @@
+{
+  "type": "object",
+  "properties": {
+    "value": { "type": "integer" },
+    "c": { "$ref": "ThreeWayC.json" }
+  }
+}
