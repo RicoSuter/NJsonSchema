@@ -6,6 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
+
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
     /// <summary>Converts the default value to a TypeScript identifier.</summary>
@@ -37,6 +39,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         {
             if (schema.Default is not null &&
                 typeResolver is TypeScriptTypeResolver { Settings.EnumStyle: TypeScriptEnumStyle.StringLiteral })
+            {
+                return GetDefaultAsStringLiteral(schema);
+            }
+
+            if (schema.Default is not null &&
+                typeResolver is TypeScriptTypeResolver { Settings.GenerateEnumAsString: true } &&
+                (actualSchema.Type.IsString() ||
+                 actualSchema.Type == JsonObjectType.None && !actualSchema.Enumeration.All(v => v is int)))
             {
                 return GetDefaultAsStringLiteral(schema);
             }

@@ -174,6 +174,62 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
         }
 
         [Fact]
+        public async Task When_generate_enum_as_string_then_string_enums_are_open_strings_with_allowed_values_in_comments()
+        {
+            var json =
+                """
+                {
+                  "type": "object",
+                  "definitions": {
+                    "State": {
+                      "type": "string",
+                      "enum": ["open", "closed"]
+                    }
+                  },
+                  "properties": {
+                    "state": { "$ref": "#/definitions/State" },
+                    "category": {
+                      "type": "string",
+                      "description": "A category.",
+                      "default": "commercial",
+                      "enum": ["commercial", "residential"]
+                    },
+                    "states": {
+                      "type": "array",
+                      "items": { "type": "string", "enum": ["open", "closed"] }
+                    },
+                    "legacyStatus": {
+                      "enum": ["pending", "complete"]
+                    },
+                    "priority": {
+                      "type": "integer",
+                      "enum": [1, 2]
+                    }
+                  }
+                }
+                """;
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new TypeScriptGenerator(schema, new TypeScriptGeneratorSettings
+            {
+                GenerateEnumAsString = true
+            });
+
+            var code = generator.GenerateFile("MyClass");
+
+            Assert.Contains("state!: string;", code);
+            Assert.Contains("category!: string;", code);
+            Assert.Contains("this.category = \"commercial\";", code);
+            Assert.Contains("states!: string[];", code);
+            Assert.Contains("legacyStatus!: string;", code);
+            Assert.Contains("export enum MyClassPriority", code);
+            Assert.Contains("Allowed values: \"open\", \"closed\".", code);
+            Assert.Contains("A category. Allowed values: \"commercial\", \"residential\".", code);
+            Assert.Contains("Allowed values: \"pending\", \"complete\".", code);
+            Assert.DoesNotContain("export enum State", code);
+            TypeScriptCompiler.AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_class_has_description_then_typescript_has_comment()
         {
             // Arrange

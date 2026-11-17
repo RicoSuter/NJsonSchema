@@ -6,6 +6,9 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
+using System.Linq;
+
 namespace NJsonSchema.CodeGeneration.Models
 {
     /// <summary>The property template model base class.</summary>
@@ -62,10 +65,49 @@ namespace NJsonSchema.CodeGeneration.Models
             _property.ActualTypeSchema.IsArray &&
             _property.ActualTypeSchema.Item != null &&
             _property.ActualTypeSchema.Item.ActualTypeSchema.IsEnumeration &&
-            _property.ActualTypeSchema.Item.ActualTypeSchema.Type.IsString();
+            _property.ActualTypeSchema.Item.ActualTypeSchema.Type.IsString() &&
+            !_settings.GenerateEnumAsString;
 
         /// <summary>Gets the property extension data.</summary>
         public IDictionary<string, object?>? ExtensionData => _property.ExtensionData;
+
+        /// <summary>Gets the property description with the declared enum values appended when requested.</summary>
+        protected string? GetDescriptionWithEnumValues(bool generateEnumAsString)
+        {
+            var description = _property.Description;
+            if (!generateEnumAsString)
+            {
+                return description;
+            }
+
+            var enumSchema = _property.ActualTypeSchema;
+            if (enumSchema.IsArray)
+            {
+                enumSchema = enumSchema.Item?.ActualTypeSchema;
+            }
+            else if (enumSchema.IsDictionary)
+            {
+                enumSchema = enumSchema.AdditionalPropertiesSchema?.ActualTypeSchema;
+            }
+
+            if (enumSchema?.IsEnumeration != true || !IsStringEnumSchema(enumSchema))
+            {
+                return description;
+            }
+
+            var values = string.Join(", ", enumSchema.Enumeration.Select(FormatEnumValue));
+            var allowedValues = "Allowed values: " + values + ".";
+            return string.IsNullOrEmpty(description) ? allowedValues : description + " " + allowedValues;
+        }
+
+        /// <summary>Checks whether the schema represents a string-valued enumeration.</summary>
+        /// <param name="schema">The schema to check.</param>
+        /// <returns><see langword="true"/> when the schema is a string-valued enumeration.</returns>
+        protected static bool IsStringEnumSchema(JsonSchema schema)
+        {
+            return schema.Type.IsString() ||
+                   schema.Type == JsonObjectType.None && !schema.Enumeration.All(value => value is int);
+        }
 
         /// <summary>Gets the JSON Schema format property.</summary>
         public string? Format => _property.ActualSchema.Format;
@@ -91,6 +133,22 @@ namespace NJsonSchema.CodeGeneration.Models
             }
 
             return className + ConversionUtilities.ConvertToUpperCamelCase(PropertyName, false);
+        }
+
+        private static string FormatEnumValue(object? value)
+        {
+            if (value is null)
+            {
+                return "null";
+            }
+
+            var text = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
+            return "\"" + text
+                .Replace("\\", "\\\\")
+                .Replace("\"", "\\\"")
+                .Replace("\r", "\\r")
+                .Replace("\n", "\\n")
+                .Replace("*/", "*\\/") + "\"";
         }
     }
 }

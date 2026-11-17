@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Globalization;
+using System.Linq;
 
 namespace NJsonSchema.CodeGeneration.CSharp
 {
@@ -119,6 +120,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>The enum default value.</returns>
         protected override string GetEnumDefaultValue(JsonSchema schema, JsonSchema actualSchema, string? typeNameHint, TypeResolverBase typeResolver)
         {
+            if (_settings.GenerateEnumAsString &&
+                actualSchema.IsEnumeration &&
+                (actualSchema.Type.IsString() ||
+                 actualSchema.Type == JsonObjectType.None && !actualSchema.Enumeration.All(v => v is int)))
+            {
+                return GetDefaultAsStringLiteral(schema);
+            }
+
             return _settings.Namespace + "." + base.GetEnumDefaultValue(schema, actualSchema, typeNameHint, typeResolver);
         }
     }

@@ -94,6 +94,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     : JsonObjectType.String;
             }
 
+            if (Settings.GenerateEnumAsString &&
+                schema.ActualTypeSchema.IsEnumeration &&
+                IsStringEnumSchema(schema.ActualTypeSchema))
+            {
+                return "string" + (markAsNullableType ? "?" : string.Empty);
+            }
+
             if (type.IsNumber())
             {
                 return ResolveNumber(schema.ActualTypeSchema, isNullable);
@@ -147,6 +154,11 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <returns>True if the schema should generate a type.</returns>
         protected override bool IsDefinitionTypeSchema(JsonSchema schema)
         {
+            if (Settings.GenerateEnumAsString && IsStringEnumSchema(schema))
+            {
+                return false;
+            }
+
             if ((schema.IsDictionary && !Settings.InlineNamedDictionaries) ||
                 (schema.IsArray && !Settings.InlineNamedArrays) ||
                 (schema.IsTuple && !Settings.InlineNamedTuples))
@@ -155,6 +167,13 @@ namespace NJsonSchema.CodeGeneration.CSharp
             }
 
             return base.IsDefinitionTypeSchema(schema);
+        }
+
+        private static bool IsStringEnumSchema(JsonSchema schema)
+        {
+            return schema.IsEnumeration &&
+                   (schema.Type.IsString() ||
+                    schema.Type == JsonObjectType.None && !schema.Enumeration.All(v => v is int));
         }
 
         private string ResolveString(JsonSchema schema, bool isNullable, string? typeNameHint)

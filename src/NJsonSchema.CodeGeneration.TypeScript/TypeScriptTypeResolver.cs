@@ -66,12 +66,24 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         /// <returns>True if the schema should generate a type.</returns>
         protected override bool IsDefinitionTypeSchema(JsonSchema schema)
         {
+            if (Settings.GenerateEnumAsString && IsStringEnumSchema(schema))
+            {
+                return false;
+            }
+
             if (schema.IsDictionary && !Settings.InlineNamedDictionaries)
             {
                 return true;
             }
 
             return base.IsDefinitionTypeSchema(schema);
+        }
+
+        private static bool IsStringEnumSchema(JsonSchema schema)
+        {
+            return schema.IsEnumeration &&
+                   (schema.Type.IsString() ||
+                    schema.Type == JsonObjectType.None && !schema.Enumeration.All(v => v is int));
         }
 
         private string Resolve(JsonSchema schema, string? typeNameHint, bool addInterfacePrefix)
@@ -100,6 +112,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 type = schema.ActualTypeSchema.Enumeration.All(v => v is int) ?
                     JsonObjectType.Integer :
                     JsonObjectType.String;
+            }
+
+            if (Settings.GenerateEnumAsString &&
+                schema.ActualTypeSchema.IsEnumeration &&
+                IsStringEnumSchema(schema.ActualTypeSchema))
+            {
+                return "string";
             }
 
             if (type.IsNumber())

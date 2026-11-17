@@ -53,10 +53,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public override string Type => _resolver.Resolve(_property, _property.IsNullable(_settings.SchemaType), GetTypeNameHint());
 
         /// <summary>Gets a value indicating whether the property has a description.</summary>
-        public bool HasDescription => !string.IsNullOrEmpty(_property.Description);
+        public bool HasDescription => !string.IsNullOrEmpty(Description);
 
         /// <summary>Gets the description.</summary>
-        public string? Description => _property.Description;
+        public string? Description => GetDescriptionWithEnumValues(_settings.GenerateEnumAsString);
 
         /// <summary>Gets the additional attributes created by the <see cref="CSharpGeneratorSettings.PropertyAttributeFactory"/>.</summary>
         public IEnumerable<string> AdditionalAttributes =>
@@ -334,7 +334,10 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         public string? RegularExpressionValue => _property.ActualSchema.Pattern?.Replace("\"", "\"\"");
 
         /// <summary>Gets a value indicating whether the property type is string enum.</summary>
-        public bool IsStringEnum => _property.ActualTypeSchema.IsEnumeration && _property.ActualTypeSchema.Type.IsString();
+        public bool IsStringEnum =>
+            _property.ActualTypeSchema.IsEnumeration &&
+            _property.ActualTypeSchema.Type.IsString() &&
+            !_settings.GenerateEnumAsString;
 
         /// <summary>Gets a value indicating whether the property should be formatted like a date.</summary>
         public bool IsDate => _property.ActualSchema.Format == JsonFormatStrings.Date;
