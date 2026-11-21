@@ -9,6 +9,44 @@ namespace NJsonSchema.CodeGeneration.Tests.CSharp
     public class EnumTests
     {
         [Fact]
+        public async Task When_integer_enum_has_negative_values_then_code_does_not_depend_on_current_culture()
+        {
+            // Arrange
+            var json =
+                @"{
+                ""type"": ""object"",
+                ""properties"": {
+                    ""level"" : {
+                        ""type"" : ""integer"",
+                        ""enum"" : [ -1, 0, 1 ]
+                    }
+                }
+            }";
+            var schema = await JsonSchema.FromJsonAsync(json);
+            var generator = new CSharpGenerator(schema);
+
+            // fi-FI formats negative numbers with U+2212 MINUS SIGN, which is not valid C#
+            var culture = System.Globalization.CultureInfo.CurrentCulture;
+            string code;
+            try
+            {
+                System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("fi-FI");
+
+                // Act
+                code = generator.GenerateFile("MyClass");
+            }
+            finally
+            {
+                System.Globalization.CultureInfo.CurrentCulture = culture;
+            }
+
+            // Assert
+            Assert.Contains("= -1,", code);
+            Assert.DoesNotContain(((char)0x2212).ToString(), code);
+            CSharpCompiler.AssertCompile(code);
+        }
+
+        [Fact]
         public async Task When_enum_has_no_type_then_enum_is_generated()
         {
             // Arrange

@@ -233,6 +233,38 @@ namespace NJsonSchema.CodeGeneration.Tests
             TypeScriptCompiler.AssertCompile(code);
         }
 
+        [Fact]
+        public async Task When_integer_enum_has_negative_values_then_TS_code_does_not_depend_on_current_culture()
+        {
+            // Arrange
+            var schema = await JsonSchema.FromJsonAsync(@"{
+  ""type"": ""object"",
+  ""properties"": {
+    ""Level"": { ""type"": ""integer"", ""enum"": [ -1, 0, 1 ] }
+  }
+}");
+            var generator = new TypeScriptGenerator(schema);
+
+            // fi-FI formats negative numbers with U+2212 MINUS SIGN, which is not valid TypeScript
+            var culture = System.Globalization.CultureInfo.CurrentCulture;
+            string code;
+            try
+            {
+                System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("fi-FI");
+
+                // Act
+                code = generator.GenerateFile("MyClass");
+            }
+            finally
+            {
+                System.Globalization.CultureInfo.CurrentCulture = culture;
+            }
+
+            // Assert
+            Assert.Contains("= -1,", code);
+            Assert.DoesNotContain(((char)0x2212).ToString(), code);
+        }
+
         public class ClassWithIntegerEnum
         {
             public NumberEnum Bar { get; set; }

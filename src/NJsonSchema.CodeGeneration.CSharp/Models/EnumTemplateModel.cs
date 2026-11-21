@@ -80,7 +80,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                         {
                             var name = _schema.EnumerationNames.Count > i
                                 ? _schema.EnumerationNames[i]
-                                : "_" + value;
+                                : "_" + Convert.ToString(value, CultureInfo.InvariantCulture);
 
                             if (_schema.IsFlagEnumerable && TryGetInt64(value, out long valueInt64))
                             {
@@ -88,7 +88,7 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 {
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     OriginalName = name,
-                                    Value = value.ToString()!,
+                                    Value = Convert.ToString(value, CultureInfo.InvariantCulture)!,
                                     Description = description,
                                     InternalValue = valueInt64.ToString(CultureInfo.InvariantCulture),
                                     InternalFlagValue = valueInt64.ToString(CultureInfo.InvariantCulture)
@@ -100,9 +100,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
                                 {
                                     Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                                     OriginalName = name,
-                                    Value = value.ToString()!,
+                                    Value = Convert.ToString(value, CultureInfo.InvariantCulture)!,
                                     Description = description,
-                                    InternalValue = value.ToString(),
+                                    InternalValue = Convert.ToString(value, CultureInfo.InvariantCulture),
                                     InternalFlagValue = (1 << i).ToString(CultureInfo.InvariantCulture)
                                 });
                             }

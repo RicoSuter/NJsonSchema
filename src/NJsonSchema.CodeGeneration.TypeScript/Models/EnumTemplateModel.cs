@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
 using System.Linq;
 using NJsonSchema.CodeGeneration.Models;
 
@@ -56,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                     {
                         var name = _schema.EnumerationNames.Count > i
                             ? _schema.EnumerationNames[i]
-                            : _schema.Type.IsInteger() ? "_" + value : value.ToString()!;
+                            : _schema.Type.IsInteger() ? "_" + Convert.ToString(value, CultureInfo.InvariantCulture) : value.ToString()!;
 
                         var description = _schema.EnumerationDescriptions.Count > i
                             ? _schema.EnumerationDescriptions[i]
@@ -66,7 +67,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
                         {
                             Name = _settings.EnumNameGenerator.Generate(i, name, value, _schema),
                             OriginalName = name,
-                            Value = _schema.Type.IsInteger() ? value.ToString()! : "\"" + value + "\"",
+                            Value = _schema.Type.IsInteger() ? Convert.ToString(value, CultureInfo.InvariantCulture)! : "\"" + value + "\"",
                             Description = description,
                         });
                     }
