@@ -73,6 +73,7 @@ namespace NJsonSchema
         internal void OnDeserialized(StreamingContext ctx)
         {
             Initialize();
+            MapEnumerationDescriptionsByValue();
         }
 
         /// <summary>Gets the discriminator property (Swagger only).</summary>
@@ -415,24 +416,63 @@ namespace NJsonSchema
 
         /// <summary>Gets or sets the enumeration descriptions (used for deserialization only).</summary>
         [JsonProperty("x-enumDescriptions", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
-        internal JArray? EnumerationDescriptionsRaw
+        internal JToken? EnumerationDescriptionsRaw
         {
             get => null;
             set => EnumerationDescriptionsDashedRaw = value;
         }
 
         /// <summary>Gets or sets the enumeration descriptions (optional, draft v5).</summary>
+        /// <remarks>An array parallel to <c>enum</c>, or an object keyed by enum value. Other shapes are ignored.</remarks>
         [JsonProperty("x-enum-descriptions", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        internal JArray? EnumerationDescriptionsDashedRaw
+        internal JToken? EnumerationDescriptionsDashedRaw
         {
             get => EnumerationDescriptions is { Count: > 0 } ? new JArray(EnumerationDescriptions) : null;
             set
             {
-                var converted = ConvertPossibleStringArray(value);
+                if (value is JObject descriptionsByValue)
+                {
+                    // "enum" may not be read yet, so map the keys in OnDeserialized
+                    _enumerationDescriptionsByValue = descriptionsByValue;
+                    return;
+                }
+
+                var converted = ConvertPossibleStringArray(value as JArray);
                 if (converted != null)
                 {
                     EnumerationDescriptions = new ObservableCollection<string?>(converted);
                 }
+            }
+        }
+
+        private JObject? _enumerationDescriptionsByValue;
+
+        private void MapEnumerationDescriptionsByValue()
+        {
+            var descriptionsByValue = _enumerationDescriptionsByValue;
+            _enumerationDescriptionsByValue = null;
+
+            if (descriptionsByValue == null || EnumerationDescriptions.Count > 0 || Enumeration.Count == 0)
+            {
+                return;
+            }
+
+            var descriptions = new List<string?>(Enumeration.Count);
+            var found = false;
+            foreach (var value in Enumeration)
+            {
+                var key = value as string ?? (value as IFormattable)?.ToString(null, CultureInfo.InvariantCulture);
+                var description = key != null && descriptionsByValue.TryGetValue(key, out var token) && token.Type == JTokenType.String
+                    ? token.Value<string>()
+                    : null;
+
+                found |= description != null;
+                descriptions.Add(description);
+            }
+
+            if (found)
+            {
+                EnumerationDescriptions = new ObservableCollection<string?>(descriptions);
             }
         }
 
