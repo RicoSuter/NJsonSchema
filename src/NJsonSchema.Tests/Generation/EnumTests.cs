@@ -280,5 +280,85 @@ namespace NJsonSchema.Tests.Generation
             // Assert
             await VerifyHelper.Verify(json);
         }
+
+        [Fact]
+        public async Task When_x_enumDescriptions_is_an_array_then_descriptions_are_loaded()
+        {
+            // Arrange
+            const string json = """
+                {
+                  "type": "string",
+                  "enum": ["pending", "running"],
+                  "x-enumDescriptions": ["Not started.", "Syncing now."]
+                }
+                """;
+
+            // Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Assert
+            Assert.Equal(["Not started.", "Syncing now."], schema.EnumerationDescriptions);
+        }
+
+        [Fact]
+        public async Task When_x_enumDescriptions_is_an_object_then_descriptions_are_mapped_to_enum_values()
+        {
+            // Arrange
+            const string json = """
+                {
+                  "type": "string",
+                  "enum": ["pending", "running", "done"],
+                  "x-enumDescriptions": {
+                    "running": "Syncing now.",
+                    "pending": "Not started."
+                  }
+                }
+                """;
+
+            // Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Assert
+            Assert.Equal(["Not started.", "Syncing now.", null], schema.EnumerationDescriptions);
+        }
+
+        [Fact]
+        public async Task When_x_enumDescriptions_object_comes_before_enum_then_descriptions_are_mapped()
+        {
+            // Arrange
+            const string json = """
+                {
+                  "x-enumDescriptions": { "1": "One", "2": "Two" },
+                  "type": "integer",
+                  "enum": [1, 2]
+                }
+                """;
+
+            // Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Assert
+            Assert.Equal(["One", "Two"], schema.EnumerationDescriptions);
+        }
+
+        [Fact]
+        public async Task When_x_enumDescriptions_has_an_unknown_shape_then_schema_still_loads()
+        {
+            // Arrange
+            const string json = """
+                {
+                  "type": "string",
+                  "enum": ["pending", "running"],
+                  "x-enumDescriptions": "not a list"
+                }
+                """;
+
+            // Act
+            var schema = await JsonSchema.FromJsonAsync(json);
+
+            // Assert
+            Assert.Equal(2, schema.Enumeration.Count);
+            Assert.Empty(schema.EnumerationDescriptions);
+        }
     }
 }
