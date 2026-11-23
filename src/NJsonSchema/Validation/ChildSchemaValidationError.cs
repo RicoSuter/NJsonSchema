@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace NJsonSchema.Validation
@@ -28,6 +29,16 @@ namespace NJsonSchema.Validation
 
         /// <summary>Gets the errors for each validated subschema. </summary>
         public IReadOnlyDictionary<JsonSchema, ICollection<ValidationError>> Errors { get; private set; }
+
+        /// <summary>Converts the error (including nested child errors) into a structured JSON object.
+        /// The "errors" property contains one array of errors per validated subschema (in subschema order).</summary>
+        /// <returns>The JSON object.</returns>
+        public override JObject ToJObject()
+        {
+            var obj = base.ToJObject();
+            obj["errors"] = new JArray(Errors.Select(e => ToJArray(e.Value)));
+            return obj;
+        }
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>

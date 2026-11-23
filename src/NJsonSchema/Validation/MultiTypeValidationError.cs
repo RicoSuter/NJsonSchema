@@ -30,6 +30,22 @@ namespace NJsonSchema.Validation
         /// <summary>Gets the errors for each validated type. </summary>
         public IReadOnlyDictionary<JsonObjectType, ICollection<ValidationError>> Errors { get; private set; }
 
+        /// <summary>Converts the error (including nested child errors) into a structured JSON object.
+        /// The "errors" property maps each validated type to its errors.</summary>
+        /// <returns>The JSON object.</returns>
+        public override JObject ToJObject()
+        {
+            var obj = base.ToJObject();
+            var errors = new JObject();
+            foreach (var error in Errors)
+            {
+                errors[error.Key.ToString()] = ToJArray(error.Value);
+            }
+
+            obj["errors"] = errors;
+            return obj;
+        }
+
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
         /// <filterpriority>2</filterpriority>
