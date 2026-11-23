@@ -6,6 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -66,6 +67,39 @@ namespace NJsonSchema.Validation
 
         /// <summary>Gets the JToken of the element failed the validation. </summary>
         public JToken? Token { get; private set; }
+
+        /// <summary>Converts the error (including nested child errors) into a structured JSON object
+        /// which can easily be processed or pretty printed.</summary>
+        /// <returns>The JSON object.</returns>
+        public virtual JObject ToJObject()
+        {
+            var obj = new JObject
+            {
+                ["kind"] = Kind.ToString(),
+                ["path"] = Path
+            };
+
+            if (Property != null)
+            {
+                obj["property"] = Property;
+            }
+
+            if (HasLineInfo)
+            {
+                obj["lineNumber"] = LineNumber;
+                obj["linePosition"] = LinePosition;
+            }
+
+            return obj;
+        }
+
+        /// <summary>Converts the given errors into a JSON array of structured error objects.</summary>
+        /// <param name="errors">The errors.</param>
+        /// <returns>The JSON array.</returns>
+        public static JArray ToJArray(IEnumerable<ValidationError> errors)
+        {
+            return new JArray(errors.Select(e => e.ToJObject()));
+        }
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
